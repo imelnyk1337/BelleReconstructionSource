@@ -203,106 +203,56 @@ void setGammaError(Particle& gamma) {
 }
 
 void setGammaError(std::vector<Particle>& p) {
-  for(std::vector<Particlvoid setGammaError(Particle& p, const HepPoint3D& gVertex, const HepSymMatrix& errGVertex) {
-  if(!p.mdstGamma())return;
-
-  HepSymMatrix errG(3, 0);
-  errG[0][0] = p.mdstGamma().ecl().error(0);
-  errG[1][0] = p.mdstGamma().ecl().error(1);
-  errG[1][1] = p.mdstGamma().ecl().error(2);
-  errG[2][0] = p.mdstGamma().ecl().error(3);
-  errG[2][1] = p.mdstGamma().ecl().error(4);
-  errG[2][2] = p.mdstGamma().ecl().error(5);
-  GammaParticle g(p.mdstGamma().ecl().energy(),
-		  p.mdstGamma().ecl().phi(),
-		  p.mdstGamma().ecl().theta(),
-		  p.mdstGamma().ecl().r(),
-		  errG);
-  g.vertex(gVertex, errGVertex);
-  
-  HepSymMatrix errGnew(7,0);
-  errGnew.sub(1,g.errorMomentumEnergy());
-  errGnew.sub(5,errGVertex);
-  
-  p.momentum().momentumPosition(g.momentumEnergy(),
-				gVertex,errGnew);
-}
-
-/************ Set error matrix for two gammas of pi0 ***************************/
-void setGammasError(Particle& p, const HepPoint3D& gVertex, const HepSymMatrix& errGVertex) { 
-  if (!p.child(0) || !p.child(1)) return;
-  if (!p.child(0).mdstGamma() || !p.child(1).mdstGamma()) return;
-  for (int i = 0; i < 2; ++i) {
-    setGammaError(p.child(i), gVertex, errGVertex);
-  }
-}e>::iterator i = p.begin(); i != p.end(); ++i)
+  for(std::vector<Particle>::iterator i = p.begin(); i != p.end(); ++i)
     setGammaError(*i);
 }
 
-void setGammaError(Particle& p, const HepPoint3D& gVertex, const HepSymMatrix& errGVertex) {
-  if(!p.mdstGamma())return;
+// ************************************* //
+// ************************************* //
+// ********** From utility.cc ********** //
+// ************************************* //
+// ************************************* //
 
-  HepSymMatrix errG(3, 0);
-  errG[0][0] = p.mdstGamma().ecl().error(0);
-  errG[1][0] = p.mdstGamma().ecl().error(1);
-  errG[1][1] = p.mdstGamma().ecl().error(2);
-  errG[2][0] = p.mdstGamma().ecl().error(3);
-  errG[2][1] = p.mdstGamma().ecl().error(4);
-  errG[2][2] = p.mdstGamma().ecl().error(5);
-  GammaParticle g(p.mdstGamma().ecl().energy(),
-		  p.mdstGamma().ecl().phi(),
-		  p.mdstGamma().ecl().theta(),
-		  p.mdstGamma().ecl().r(),
-		  errG);
-  g.vertex(gVertex, errGVertex);
-  
-  HepSymMatrix errGnew(7, 0);
-  errGnew.sub(1, g.errorMomentumEnergy());
-  errGnew.sub(5, errGVertex);
-  
-  p.momentum().momentumPosition(g.momentumEnergy(), gVertex,errGnew);
-}
 
-/************ Set error matrix for two gammas of pi0 ***************************/
-void setGammasError(Particle& p, const HepPoint3D& gVertex, const HepSymMatrix& errGVertex) { 
-  if (!p.child(0) || !p.child(1)) return;
-  if (!p.child(0).mdstGamma() || !p.child(1).mdstGamma()) return;
-  for (int i = 0; i < 2; ++i) {void setGammaError(Particle& p, const HepPoint3D& gVertex, const HepSymMatrix& errGVertex) {
-  if(!p.mdstGamma())return;
+/************ Set error matrix for gamma ***************************/
+// void setGammaError(Particle& p, const HepPoint3D& gVertex, const HepSymMatrix& errGVertex) {
+//   if(!p.mdstGamma())return;
 
-  HepSymMatrix errG(3, 0);
-  errG[0][0] = p.mdstGamma().ecl().error(0);
-  errG[1][0] = p.mdstGamma().ecl().error(1);
-  errG[1][1] = p.mdstGamma().ecl().error(2);
-  errG[2][0] = p.mdstGamma().ecl().error(3);
-  errG[2][1] = p.mdstGamma().ecl().error(4);
-  errG[2][2] = p.mdstGamma().ecl().error(5);
-  GammaParticle g(p.mdstGamma().ecl().energy(),
-		  p.mdstGamma().ecl().phi(),
-		  p.mdstGamma().ecl().theta(),
-		  p.mdstGamma().ecl().r(),
-		  errG);
-  g.vertex(gVertex, errGVertex);
+//   HepSymMatrix errG(3, 0);
+//   errG[0][0] = p.mdstGamma().ecl().error(0);
+//   errG[1][0] = p.mdstGamma().ecl().error(1);
+//   errG[1][1] = p.mdstGamma().ecl().error(2);
+//   errG[2][0] = p.mdstGamma().ecl().error(3);
+//   errG[2][1] = p.mdstGamma().ecl().error(4);
+//   errG[2][2] = p.mdstGamma().ecl().error(5);
+//   GammaParticle g(p.mdstGamma().ecl().energy(),
+// 		        p.mdstGamma().ecl().phi(),
+// 		        p.mdstGamma().ecl().theta(),
+// 		        p.mdstGamma().ecl().r(),
+// 		        errG);
+//   g.vertex(gVertex, errGVertex);
   
-  HepSymMatrix errGnew(7,0);
-  errGnew.sub(1,g.errorMomentumEnergy());
-  errGnew.sub(5,errGVertex);
+//   HepSymMatrix errGnew(7, 0);
+//   errGnew.sub(1, g.errorMomentumEnergy());
+//   errGnew.sub(5, errGVertex);
   
-  p.momentum().momentumPosition(g.momentumEnergy(),
-				gVertex,errGnew);
-}
+//   p.momentum().momentumPosition(g.momentumEnergy(), gVertex, errGnew);
+// }
 
-/************ Set error matrix for two gammas of pi0 ***************************/
-void setGammasError(Particle& p, const HepPoint3D& gVertex, const HepSymMatrix& errGVertex) { 
-  if (!p.child(0) || !p.child(1)) return;
-  if (!p.child(0).mdstGamma() || !p.child(1).mdstGamma()) return;
-  for (int i = 0; i < 2; ++i) {
-    setGammaError(p.child(i), gVertex, errGVertex);
-  }
-}
-    setGammaError(p.child(i), gVertex, errGVertex);
-  }
-}
+// /************ Set error matrix for two gammas of pi0 ***************************/
+// void setGammasError(Particle& p, const HepPoint3D& gVertex, const HepSymMatrix& errGVertex) { 
+//   if (!p.child(0) || !p.child(1)) return;
+//   if (!p.child(0).mdstGamma() || !p.child(1).mdstGamma()) return;
+//   for (int i = 0; i < 2; ++i) {
+//     setGammaError(p.child(i), gVertex, errGVertex);
+//   }
+// }
+
+// void setGammasError(std::vector<Particle>& p_list, const HepPoint3D& gVertex, const HepSymMatrix& errGVertex) {
+//     for (std::vector<Particle>::iterator it = p_list.begin(); it != p_list.end(); ++it) {
+//         setGammaError(*it, gVertex, errGVertex);
+//     }
+// }
 
 /************ Set error matrix (dpx) for pi0 ******************/
 void setPi0Error(Particle& p) {
@@ -568,7 +518,7 @@ void createUserInfo(Particle& p) {
         wMass = dM_Ksr0;
     } else if ((abs(lund)==113) || (abs(lund)==213)) { // RHO0,+.-
         wMass = dM_Rho;
-    } else if ((abs(lund)==413) || (abs(lund)==423)) { // D*+, D*0
+    } else if ((abs(lund)==413) || (abs(lund)==423)) { // D*+, D*0feve
         useTube = true; 
         wMass = wDst;
     } else if (abs(lund)==431) { // DS+
@@ -601,6 +551,7 @@ void setBadVtx(Particle& p) {
     info.isAdoptCut(false);
 }
 //***********************************************************
+
 double distanceToIP(Particle& p) {
     const HepPoint3D& ip_position = IpProfile::position();
     Hep3Vector vtxIP(IpProfile::position().x(), IpProfile::position().y(), 0.0);
@@ -1514,9 +1465,9 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump=false,
     
 
     VectorL pB  = pStar(P.p());
-    // double de_bs_old = pB.e() - Benergy();
+    double de_bs_old = pB.e() - Benergy();
     double de_bs = pB.e() - BeamEnergy::E_beam_corr();
-    // double mbc_bs_old = beamEnergyConstraint(P);
+    double mbc_bs_old = beamEnergyConstraint(P);
     
     double energyEl = BeamEnergy::E_HER();
     double energyPos = BeamEnergy::E_LER();
@@ -1527,9 +1478,9 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump=false,
     const int nValI = 2; 
     const int nValD = 10; 
     int valPclI[nValI] = {chg_bs, gen_bs};
-    double valPclD[nValD] = {msKvf, chisq, vx,vy,vz, P3D.perp(),P3D.phi(),P3D.theta(), mbc_bs, de_bs};
+    double valPclD[nValD] = {msKvf, chisq, vx, vy, vz, P3D.perp(), P3D.phi(), P3D.theta(), mbc_bs, de_bs};
     string pclTitI[nValI] = {"chg", "gen"};
-    string pclTitD[nValD] = {"ms", "chi", "vx","vy","vz", "pt", "ph", "th", "mbc", "de"};
+    string pclTitD[nValD] = {"ms", "chi", "vx", "vy", "vz", "pt", "ph", "th", "mbc", "de"};
     
     
     if (debugDump) {
@@ -1633,14 +1584,22 @@ void Reco::event(BelleEvent *evptr, int *status) {
 
     makeGamma(gammaV);
     withPCut(gammaV, eGammaMin);
-    if(useVTX) setGammaError(gammaV);
-    
+    if(useVTX) {
+        for (std::vector<Particle>::iterator it = gammaV.begin(); it != gammaV.end(); ++it) {
+            setGammasError(*it, ip_position, ip_error);
+        }
+    }
+
+    // Match gamma candidates with their genhep info
+    if (McFlag) {
+        setGenHepInfoG(gammaV);
+    }
     // =================   WORKING WITH PI0 CANDIDATES ================= // 
-    makePi0(pi0);   
+    makePi0(pi0);
     withPi0GammPCut(pi0, minPi0GammP);
     withPi0MassGamGamCut(pi0, wMassPi0GG);
     setPi0Error(pi0);
-    
+
     if (debugPi0) {
         printf(" pi0[%i]  \n", pi0.size() );
 //         printPi0( pi0 );
@@ -1650,7 +1609,6 @@ void Reco::event(BelleEvent *evptr, int *status) {
     if (McFlag) {
         for (int itr = 0; itr < nTrk; itr++) setGenHepInfoF(trkV[itr]);
         setGenHepInfoP(pi0);
-        setGenHepInfoG(gammaV);
     }    
     
     combination(phi0,    Ptype("PHI"),  trkV[2],   trkV[3], dM_V0); // k_p, k_m
