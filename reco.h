@@ -184,11 +184,11 @@ namespace Belle {
         string s_child_1  = " gen_ch1 chg_ch1 ms_ch1 chi_ch1 pt_ch1 hel_ch1 ind_ch1 "; 
         string s_child_2  = " gen_ch2 chg_ch2 ms_ch2 chi_ch2 pt_ch2 hel_ch2 ind_ch2 "; 
 
-        string s_2317     = " gen_d17 chg_d17  ms_d17 chi_d17 pt_d17 ph_d17 th_d17 ";
+        string s_2317     = " gen_d17 chg_d17  ms_d17 chi_d17 pt_d17 psr_d17 ph_d17 th_d17 ";
         string s_2317_gen = " ms_d17_t px_d17_t py_d17_t pz_d17_t e_d17_t ";
 
-        string s_pi_d17 =  " gen_p0_d eg1_p0_d  eg2_p0_d  psr_p0_d  mgg_p0_d ";
-        string s_pi_B0s =  " gen_p0_b eg1_p0_b  eg2_p0_b  psr_p0_b  mgg_p0_b ";
+        string s_pi_d17 =  " gen_p0_d eg1_p0_d  eg2_p0_d  psr_p0_d  mgg_p0_d gg1_p0_d gg2_p0_d";
+        string s_pi_B0s =  " gen_p0_b eg1_p0_b  eg2_p0_b  psr_p0_b  mgg_p0_b gg1_p0_b gg2_p0_b";
         
         string s_2317_wPi = s_2317 + s_2317_gen + s_pi_d17;
         string s_Dss1_wCh = s_Dss_1 + s_Dss_gen_1 + s_child_1;

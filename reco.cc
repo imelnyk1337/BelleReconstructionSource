@@ -696,7 +696,7 @@ void printPi0(vector<Particle> &pi0, string comment="") {
         Particle &g1 = pi0[iPi0].child(0);
         Particle &g2 = pi0[iPi0].child(1);
         double msPi0_gg = ( g1.p()+g2.p() ).m();
-        double ptot_cm = pStar(p0.p(),E_HER,E_LER).vect().mag();
+        double ptot_cm = pStar(p0.p(), E_HER, E_LER).vect().mag();
         printf(" Pi0 (%i)  mass:%7.5f, [px,py,pz]:[%7.4f, %7.4f, %7.4f], p:%6.4f,  p_cm:%6.4f,  Eg(1,2): [%6.4f, %6.4f], ms_gg:%7.5f\n",
         iPi0, p0.mass(), p0.px(), p0.py(), p0.pz(), p0.ptot(), ptot_cm, g1.ptot(), g2.ptot(), msPi0_gg);
     }
@@ -1124,19 +1124,19 @@ void evtInfo_dump(BelleTuple* tt, bool debugDump=false) {
     //*************  MC  ****************
     tt->column("evtgen", idGenType );
 }
+
 VectorL getGenVectorL(int idhPcl) {
     VectorL pclL;
     int ID_Pcl = -1; 
     Gen_hepevt_Manager& genMgr = Gen_hepevt_Manager::get_manager();
-    for(std::vector<Gen_hepevt>::iterator i = genMgr.begin(); 
-        i != genMgr.end(); ++i) {
+    for (std::vector<Gen_hepevt>::iterator i = genMgr.begin(); i != genMgr.end(); ++i) {
         int idh = (*i).idhep();
-        if ( idh==idhPcl ) { // Ds+/-
+        if (idh == idhPcl) { // Ds+/-
             ID_Pcl = (*i).get_ID();
-            pclL.setPx(genMgr[ID_Pcl-1].PX());
-            pclL.setPy(genMgr[ID_Pcl-1].PY());
-            pclL.setPz(genMgr[ID_Pcl-1].PZ());
-            pclL.setE (genMgr[ID_Pcl-1].E());
+            pclL.setPx(genMgr[ID_Pcl - 1].PX());
+            pclL.setPy(genMgr[ID_Pcl - 1].PY());
+            pclL.setPz(genMgr[ID_Pcl - 1].PZ());
+            pclL.setE (genMgr[ID_Pcl - 1].E());
         }
     }
     return pclL;
@@ -1153,14 +1153,16 @@ void pi0_dump(BelleTuple* tt, Particle& p0, string sfx, bool debugDump) {
     double ptot_cm = pStar(p0.p(), E_HER, E_LER).vect().mag();
 
     bool gen_pi0 = IDhep(p0) == 0 ? false : true;
+    bool gen_g1  = IDhep(g1) == 0 ? false : true;
+    bool gen_g2  = IDhep(g2) == 0 ? false : true;
 
     const int nValI = 1; 
-    const int nValD = 4; 
+    const int nValD = 6; 
 
     string pclTitI[nValI] = {"gen"};
     int valPclI[nValI]    = {gen_pi0};
-    string pclTitD[nValD] = {"eg1",     "eg2",     "psr",   "mgg"};
-    double valPclD[nValD] = {g1.ptot(), g2.ptot(), ptot_cm, msPi0_gg};
+    string pclTitD[nValD] = {"eg1",     "eg2",     "psr",   "mgg",    "gg1",  "gg2"};
+    double valPclD[nValD] = {g1.ptot(), g2.ptot(), ptot_cm, msPi0_gg, gen_g1, gen_g2};
     
     if (debugDump) {
         printf("  ==== val_dump ==== pi0 (%s): ", sfx.c_str());
@@ -1177,9 +1179,8 @@ void pi0_dump(BelleTuple* tt, Particle& p0, string sfx, bool debugDump) {
 }
 
 //***********************************************************
-void val_dump(BelleTuple* tt, int nValI, int nValD, // string* is a pointer to the first element of an array
-            int* valPclI, double* valPclD, string* pclTitI, string* pclTitD, 
-            string sfx, bool debugDump) {
+void val_dump(BelleTuple* tt, int nValI, int nValD, int* valPclI, double* valPclD, string* pclTitI, string* pclTitD, 
+                                                                                            string sfx, bool debugDump) {
     if (debugDump) {
         printf("  ==== val_dump ==== dec:(%s): ", sfx.c_str() );
         for (int iVal=0; iVal<nValI; iVal++) 
@@ -1196,7 +1197,7 @@ void val_dump(BelleTuple* tt, int nValI, int nValD, // string* is a pointer to t
 // ----------------------------------------------------------
 void gen_val_dump(BelleTuple* tt, bool gen_pcl, VectorL pclL, string sfx, bool debugDump) {
     const int nValD = 5; 
-    string pclTitD[nValD] = {"ms", "px", "py","pz", "e"};
+    string pclTitD[nValD] = {"ms", "px", "py", "pz", "e"};
     double valPclD[nValD] = {pclL.m(), pclL.px(), pclL.py(), pclL.pz(), pclL.e()};
     if (!gen_pcl) 
         for (int iVal = 0; iVal < nValD; iVal++)
@@ -1395,6 +1396,10 @@ void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=f
     Particle& pi0_2317 = P.child(1);
     UserInfo& infoChild = dynamic_cast<UserInfo&>(Child.userInfo());
     double msKvfChild  = infoChild.msKvf();
+    double E_HER = BeamEnergy::E_HER();
+    double E_LER = BeamEnergy::E_LER();
+    double psr_d17 = pStar(P.p(), E_HER, E_LER).vect().mag();
+    
     
     Hep3Vector P3D(P.px(), P.py(), P.pz());
     int chg_d17 = (int)P.lund() > 0 ? 1 : -1;
@@ -1410,11 +1415,11 @@ void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=f
 
 //         string s_2317     = " gen_d17 chg_d17  ms_d17 chi_d17 pt_d17 ph_d17 th_d17 "; 
     const int nValI = 2; 
-    const int nValD = 9; 
-    int valPclI[nValI] = { chg_d17, gen_d17 };
-    double valPclD[nValD] = { msKvf, chisq, P3D.perp(),P3D.phi(),P3D.theta(), helic_2317 };
-    string pclTitI[nValI] = { "chg", "gen" };
-    string pclTitD[nValD] = { "ms", "chi", "pt", "ph", "th", "hel" };
+    const int nValD = 10; 
+    int valPclI[nValI] = {chg_d17, gen_d17};
+    double valPclD[nValD] = {msKvf, chisq, P3D.perp(), psr_d17, P3D.phi(), P3D.theta(), helic_2317};
+    string pclTitI[nValI] = {"chg", "gen"};
+    string pclTitD[nValD] = {"ms", "chi", "pt", "psr", "ph", "th", "hel"};
 
     string dgrSuff="_d17", genDgrSuff="_d17_t";
     
