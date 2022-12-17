@@ -207,53 +207,6 @@ void setGammaError(std::vector<Particle>& p) {
     setGammaError(*i);
 }
 
-// ************************************* //
-// ************************************* //
-// ********** From utility.cc ********** //
-// ************************************* //
-// ************************************* //
-
-
-/************ Set error matrix for gamma ***************************/
-// void setGammaError(Particle& p, const HepPoint3D& gVertex, const HepSymMatrix& errGVertex) {
-//   if(!p.mdstGamma())return;
-
-//   HepSymMatrix errG(3, 0);
-//   errG[0][0] = p.mdstGamma().ecl().error(0);
-//   errG[1][0] = p.mdstGamma().ecl().error(1);
-//   errG[1][1] = p.mdstGamma().ecl().error(2);
-//   errG[2][0] = p.mdstGamma().ecl().error(3);
-//   errG[2][1] = p.mdstGamma().ecl().error(4);
-//   errG[2][2] = p.mdstGamma().ecl().error(5);
-//   GammaParticle g(p.mdstGamma().ecl().energy(),
-// 		        p.mdstGamma().ecl().phi(),
-// 		        p.mdstGamma().ecl().theta(),
-// 		        p.mdstGamma().ecl().r(),
-// 		        errG);
-//   g.vertex(gVertex, errGVertex);
-  
-//   HepSymMatrix errGnew(7, 0);
-//   errGnew.sub(1, g.errorMomentumEnergy());
-//   errGnew.sub(5, errGVertex);
-  
-//   p.momentum().momentumPosition(g.momentumEnergy(), gVertex, errGnew);
-// }
-
-// /************ Set error matrix for two gammas of pi0 ***************************/
-// void setGammasError(Particle& p, const HepPoint3D& gVertex, const HepSymMatrix& errGVertex) { 
-//   if (!p.child(0) || !p.child(1)) return;
-//   if (!p.child(0).mdstGamma() || !p.child(1).mdstGamma()) return;
-//   for (int i = 0; i < 2; ++i) {
-//     setGammaError(p.child(i), gVertex, errGVertex);
-//   }
-// }
-
-// void setGammasError(std::vector<Particle>& p_list, const HepPoint3D& gVertex, const HepSymMatrix& errGVertex) {
-//     for (std::vector<Particle>::iterator it = p_list.begin(); it != p_list.end(); ++it) {
-//         setGammaError(*it, gVertex, errGVertex);
-//     }
-// }
-
 /************ Set error matrix (dpx) for pi0 ******************/
 void setPi0Error(Particle& p) {
     if (p.nChildren() != 2) return;
@@ -373,8 +326,8 @@ void printPclDebug(Particle& p, string comment="", string comment2=""){
         printf("              vtx:[%8.5f,%8.5f,%8.5f] ", vx, vy, vz );
 //         printf( "      distanceToIP:%8.5f \n", distanceToIP(p) );
         printf("Children  ID: ");
-        for(int jM=0; jM<p.nChildren(); ++jM) {
-            Particle &Child = p.child(jM);
+        for (int jM =0 ; jM < p.nChildren(); ++jM) {
+            Particle& Child = p.child(jM);
             int lundChild = (int)Child.lund() ;
             string childType = pclType(lundChild);
             bool isTrkChild = isLikeTrk( lundChild, "onlyCharged" );
@@ -611,14 +564,14 @@ void vertex_staged(Particle& Mother, bool debugDump=false, bool useKmvf=false) {
             return;
         }
 //         chisq = kvfMother.chisq();
-        makeMother(kvfMother,Mother);
+        makeMother(kvfMother, Mother);
         infoMother.msKvf(Mother.p().m());
         infoMother.chisq(kvfMother.chisq());
         infoMother.chisqKvf(kvfMother.chisq());
         infoMother.cl(kvfMother.cl());
         infoMother.clKvf(kvfMother.cl());
         infoMother.dist2IP(distanceToIP(Mother));
-        for(int jM = 0; jM<Mother.nChildren(); ++jM) {
+        for (int jM = 0; jM < Mother.nChildren(); ++jM) {
             Particle& Child = Mother.child(jM);
             int lundChild = (int)Child.lund() ;
             bool isTrkChild = isLikeTrk(lundChild);
@@ -732,7 +685,7 @@ void printTrkPID(vector<Particle> &trkList, string pType, string comment = "") {
 void printVtxDebug( std::vector<Particle> &plist, string comment="", string comment2="" ){
     int np = plist.size();
     printf("\n----- Vtx (%i) %9s %s ---\n", np, comment.c_str(), comment2.c_str() );
-    for (int i=0; i<np; i++) {
+    for (int i = 0; i < np; ++i) {
         UserInfo &info = dynamic_cast<UserInfo&>(plist[i].userInfo());
         double vx = plist[i].momentum().decayVertex().x();
         double vy = plist[i].momentum().decayVertex().y();
@@ -745,15 +698,6 @@ void printVtxDebug( std::vector<Particle> &plist, string comment="", string comm
     }
     printf("\n");
 }
-// //***********************************************************
-// void printVtxDebug(vector<Particle> &plist, vector<double> &chisqCand, string comment = "") {
-//     int np = plist.size();
-//     printf("----- Vtx (%i) %9s --- (mass,chisq):", np, comment.c_str());
-//     for (int i = 0; i < np; i++)
-//         printf(" (%6.3f,%6.2f)", plist[i].p().m(), chisqCand[i]);
-//     printf("\n");
-// }
-
 
 double get_pcm(Particle &particle) {
     //return particle.p().vect().mag();
@@ -826,39 +770,18 @@ double getHelicity(VectorL& mother, VectorL& dght, VectorL& grndDght) {
     return helic;
 }
 //***********************************************************
-double getHelicity( Particle &p, int indDough=0 ) {
-//     VectorL mother(p.particle().p()); 
-//     VectorL dght1(p.particle().child(m_dau).p());
-//     VectorL dght2(p.particle().child(m_dau).child(m_daudau).p());
-//     Hep3Vector V1_boost = -dght1.boostVector();
-//     mother.boost(V1_boost);
-//     dght2.boost(V1_boost);
-//     double helic = -mother.vect().unit().dot(dght2.vect().unit());
-
-//     Particle* decMother = (Particle*)p.mother();
-//     if ( !(&p.mother()) ) return -1;
-// printf("---- getHelicity  1 ----- \n");
-    if (p.nChildren()==0) return -1;
+double getHelicity(Particle& p, int indDough=0) {
+    if (p.nChildren() == 0) return -1;
     
     VectorL mother   = p.p(); 
-// printf("---- getHelicity  2 ----- \n");
     VectorL dght     = p.child(indDough).p();
     VectorL grndDght = p.child(indDough).child(0).p();
-// printf("---- getHelicity  3 ----- \n");
-    double helic = getHelicity( mother, dght, grndDght );
-// printf("---- getHelicity  4 ----- \n");
+    double helic = getHelicity(mother, dght, grndDght);
     
-//     Hep3Vector V1_boost = -dght.boostVector();
-//     mother.boost(V1_boost);
-//     grndDght.boost(V1_boost);
-//     double helic = -mother.vect().unit().dot(grndDght.vect().unit());
 // 
     if (debugHel) {
         printf("\n======================== getHelicity ====================");
         printPclDebug( p, "(Mother)" );
-//         cout << "  VectorL   mother:" << mother << endl;
-//         cout << "  VectorL     dght:" << dght << endl;
-//         cout << "  VectorL grndDght:" << grndDght << endl;
         printf("         dght helic: %7.5f\n\n",helic);
     }
     
@@ -1302,15 +1225,14 @@ void dumpDssChild(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump
     if (stDump) tt->dumpData();
 }
 //-----------------------------------------------------------
-void dumpDss(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=false, 
-            bool stDump=true, bool debugDump=false) {
+void dumpDss(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=false, bool stDump=true, bool debugDump=false) {
 
     if (evtInfoDump) evtInfo_dump(tt, debugDump);
-
     int lund = (int)P.lund();
 
     if (!&P.userInfo()) createUserInfo(P);
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
+
     if (info.chisqKvf() < 0.) {
         // particle not vertexed yet
         vertex_staged(P, debugDump, true);
@@ -1357,12 +1279,12 @@ void dumpDss(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=fals
     
     const int nValI = 2; 
     const int nValD = 6; 
-    int valPclI[nValI] = { signPcl, gen_pcl };
-    double valPclD[nValD] = { msKvf, chisq, P3D.perp(),P3D.phi(),P3D.theta(), helicChild1 };
-    string pclTitI[nValI] = { "chg", "gen" };
-    string pclTitD[nValD] = { "ms", "chi", "pt", "ph", "th", "hel" };
+    int valPclI[nValI]    = {signPcl, gen_pcl};
+    double valPclD[nValD] = {msKvf, chisq, P3D.perp(), P3D.phi(), P3D.theta(), helicChild1};
+    string pclTitI[nValI] = {"chg", "gen"};
+    string pclTitD[nValD] = {"ms", "chi", "pt", "ph", "th", "hel"};
 
-    VectorL dssL = getGenVectorL( IDhep(P) );
+    VectorL dssL = getGenVectorL(IDhep(P));
 
     if (debugDump) {
         printf("\n======== Dss  ========= sfx:%s, chg_ds:%i, gen_ds:%i, ms_ds:%7.3f , child ( ms:%7.3f ) \n", 
@@ -1376,8 +1298,8 @@ void dumpDss(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=fals
     if (stDump) tt->dumpData();
 }
 //***********************************************************
-void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=false, 
-                 bool stDump=true, bool debugDump=false) {
+void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=false, bool stDump=true, bool debugDump=false) {
+
     if (evtInfoDump) evtInfo_dump(tt,debugDump);
 
     if (!&P.userInfo()) createUserInfo(P);
@@ -1387,39 +1309,36 @@ void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=f
         vertex_staged(P, debugDump);
     }
     
-    double chisq  = info.chisqKvf(); // -1.; // ??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
-    double msKvf  = info.msKvf(); // dgr.p().m() ; // 
-    double helic_2317 = -1;    
+    double chisq        = info.chisqKvf(); // -1.; //
+    double msKvf        = info.msKvf(); // dgr.p().m() ; // 
+    double helic_2317   = -1;
     
 
-    Particle& Child    = P.child(0);
-    Particle& pi0_2317 = P.child(1);
+    Particle& Child     = P.child(0);
+    Particle& pi0_2317  = P.child(1);
     UserInfo& infoChild = dynamic_cast<UserInfo&>(Child.userInfo());
-    double msKvfChild  = infoChild.msKvf();
-    double E_HER = BeamEnergy::E_HER();
-    double E_LER = BeamEnergy::E_LER();
-    double psr_d17 = pStar(P.p(), E_HER, E_LER).vect().mag();
-    
-    
-    Hep3Vector P3D(P.px(), P.py(), P.pz());
-    int chg_d17 = (int)P.lund() > 0 ? 1 : -1;
-    int gen_d17 = (int)IDhep(P) == 0 ? 0 : 1;
-    
-//         string s_Dss = "gen_dss chg_dss  ms_dss  chi_dss pt_dss ph_dss th_dss "; // 14
-//     tt->column("gen_d17", gen_d17 );
-//     tt->column("chg_d17", chg_d17 );
-//     tt->column("ms_d17",  msKvf );
-//     tt->column("pt_d17",  P3D.perp() );
-//     tt->column("ph_d17",  P3D.phi() );
-//     tt->column("th_d17",  P3D.theta() );
+    double msKvfChild   = infoChild.msKvf();
+    double E_HER        = BeamEnergy::E_HER();
+    double E_LER        = BeamEnergy::E_LER();
+    double psr_d17      = pStar(P.p(), E_HER, E_LER).vect().mag();
+    double px_d17       = P.px();
+    double py_d17       = P.py();
+    double pz_d17       = P.pz();
+    double vx_d17       = P.momentum().decayVertex().x();
+    double vy_d17       = P.momentum().decayVertex().y();
+    double vz_d17       = P.momentum().decayVertex().z();
 
-//         string s_2317     = " gen_d17 chg_d17  ms_d17 chi_d17 pt_d17 ph_d17 th_d17 "; 
-    const int nValI = 2; 
-    const int nValD = 10; 
+
+    Hep3Vector P3D(px_d17, py_d17, pz_d17);
+    int chg_d17 = (int)P.lund() >  0 ? 1 : -1;
+    int gen_d17 = (int)IDhep(P) == 0 ? 0 :  1;
+    
+    const int nValI = 2;
+    const int nValD = 13; 
     int valPclI[nValI] = {chg_d17, gen_d17};
-    double valPclD[nValD] = {msKvf, chisq, P3D.perp(), psr_d17, P3D.phi(), P3D.theta(), helic_2317};
+    double valPclD[nValD] = {msKvf, chisq, P3D.perp(), psr_d17, P3D.phi(), P3D.theta(), helic_2317, px_d17, py_d17, pz_d17, vx_d17, vy_d17, vz_d17};
     string pclTitI[nValI] = {"chg", "gen"};
-    string pclTitD[nValD] = {"ms", "chi", "pt", "psr", "ph", "th", "hel"};
+    string pclTitD[nValD] = {"ms", "chi", "pt", "psr", "ph", "th", "hel", "px", "py", "pz", "vx", "vy", "vz"};
 
     string dgrSuff="_d17", genDgrSuff="_d17_t";
     
@@ -1452,7 +1371,7 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump=false,
         // particle not vertexed yet
         vertex_staged(P, debugDump);
     }
-    double chisq  = info.chisqKvf(); // -1.; // ??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
+    double chisq  = info.chisqKvf(); // -1.; // 
     double msKvf  = info.msKvf(); // dgr.p().m() ; // 
 
     Particle& Dss_Bs0 = P.child(0);
