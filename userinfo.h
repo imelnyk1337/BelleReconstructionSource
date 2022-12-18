@@ -28,7 +28,7 @@ private:
     double m_wMass;
     double m_maxChi2;
     double m_helicity;
-    double m_pid;   // probability of particle identification in case of Kaon, if not, value = -1
+    double m_pid;   // probability of particle identification for Dss children, def value = -1
     Particle* particle;
 
     void init();
@@ -102,8 +102,8 @@ public:
     void helicity(double v);
     double helicity() const;
 
-    void probPID(double v);
-    double probPID() const;
+    void probpid(double v);
+    double probpid() const;
   
 };
 #if defined(BELLE_NAMESPACE)

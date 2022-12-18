@@ -116,8 +116,8 @@ double UserInfo::maxChi2() const {return m_maxChi2;}
 void UserInfo::helicity(double v) {m_helicity = v;}
 double UserInfo::helicity() const {return m_helicity;}
 
-void UserInfo::probPID(double v) {m_pid = v;}
-double UserInfo:: probPID() const {return m_pid;}
+void UserInfo::probpid(double v) {m_pid = v;}
+double UserInfo:: probpid() const {return m_pid;}
 
 
 // #if defined(BELLE_NAMESPACE)

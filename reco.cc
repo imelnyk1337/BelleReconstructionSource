@@ -823,53 +823,41 @@ void checkAdoptCutMassChisqVtx(Particle& p, double pL, double pR, double maxChis
 // pclType((int)p.lund()).c_str(), ms, pL, pR, maxChisq, chisqCand, vx,vy,vz, (int)idErase);
 }
 
-void withKaonId(std::vector<Particle>& list,
-               const double prob,
-               int accq0,
-               int tofq0,
-               int cdcq0,
-	           int ids0,
-               int idb0) {
+void withKaonId(std::vector<Particle>& p_list, const double prob, int accq0, int tofq0, int cdcq0, int ids0, int idb0) {
 
   atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
-  for (size_t i = 0; i < list.size(); ++i) {
-      Particle& P = list[i];
+  for (size_t i = 0; i < p_list.size(); ++i) {
+      Particle& P = p_list[i];
       double probParticle = kid.prob(&(P.mdstCharged()));
 
 	  if (P.mdstCharged() && probParticle >= prob) {
 
          if (!&P.userInfo()) createUserInfo(P);
          UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
-         info.probPID(probParticle);
-        }
-    else {
-      list.erase(list.begin() + i);
-      --i;
-    }
+         info.probpid(probParticle);
+      }
+      else {
+          p_list.erase(p_list.begin() + i);
+          --i;
+      }
   }
 }
 
-void withPionId(std::vector<Particle>& list,
-	           const double prob,
-	           int accq0,
-               int tofq0,
-               int cdcq0,
-	           int ids0,
-               int idb0) {
+void withPionId(std::vector<Particle>& p_list, const double prob, int accq0, int tofq0, int cdcq0, int ids0, int idb0) {
 
   atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
-  for (size_t i = 0; i < list.size(); ++i) {
-      Particle& P = list[i];
+  for (size_t i = 0; i < p_list.size(); ++i) {
+      Particle& P = p_list[i];
       double probParticle = kid.prob(&(P.mdstCharged()));
-      if (P.mdstCharged() && probParticle < prob) {
+      if (P.mdstCharged() && probParticle < prob) { // a big difference compated to withKaonId
 
          if (!&P.userInfo()) createUserInfo(P);
          UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
-         info.probPID(probParticle);
+         info.probpid(probParticle);
         }
-    else {
-      list.erase(list.begin() + i);
-      --i;
+      else {
+        p_list.erase(p_list.begin() + i);
+        --i;
     }
   }
 }
@@ -913,9 +901,9 @@ void checkKaonPionPID(std::vector<Particle>& DssList, double k1MinProb=0.6, doub
             if (!&pion.userInfo()) createUserInfo(pion);
             UserInfo& info_pion = dynamic_cast<UserInfo&>(pion.userInfo());
 
-            double kaon1Prob_KPI = info_kaon1.probPID();
-            double kaon2Prob_KPI = info_kaon2.probPID();
-            double pionProb_KPI = info_pion.probPID();
+            double kaon1Prob_KPI = info_kaon1.probpid();
+            double kaon2Prob_KPI = info_kaon2.probpid();
+            double pionProb_KPI = info_pion.probpid();
             std::cout << "--- --- Compared to pion, the first kaon prob: " << kaon1Prob_KPI << " ,the second kaon prob: " << kaon2Prob_KPI << std::endl;
             if (kaon1Prob_KPI >= k1MinProb && pionProb_KPI < piMaxProb) {
                 if (kaon2Prob_KPI < k2MinProb) {
@@ -947,9 +935,9 @@ void checkKaonPionPID(std::vector<Particle>& DssList, double k1MinProb=0.6, doub
             if (!&pion.userInfo()) createUserInfo(pion);
             UserInfo& info_pion = dynamic_cast<UserInfo&>(pion.userInfo());
 
-            double kaon1Prob_KPI = info_kaon1.probPID();
-            double kaon2Prob_KPI = info_kaon2.probPID();
-            double pionProb_KPI = info_pion.probPID();
+            double kaon1Prob_KPI = info_kaon1.probpid();
+            double kaon2Prob_KPI = info_kaon2.probpid();
+            double pionProb_KPI = info_pion.probpid();
 
             std::cout << "--- --- Compared to pion, first kaon prob: " << kaon1Prob_KPI << ", second kaon prob: " << kaon2Prob_KPI << std::endl;
             if (kaon1Prob_KPI >= k1MinProb && pionProb_KPI < piMaxProb) {
@@ -981,9 +969,9 @@ void checkKaonPionPID(std::vector<Particle>& DssList, double k1MinProb=0.6, doub
             if (!&pion.userInfo()) createUserInfo(pion);
             UserInfo& info_pion = dynamic_cast<UserInfo&>(pion.userInfo());
 
-            double kaon1Prob_KPI = info_kaon1.probPID();
-            double kaon2Prob_KPI = info_kaon2.probPID();
-            double pionProb_KPI = info_pion.probPID();
+            double kaon1Prob_KPI = info_kaon1.probpid();
+            double kaon2Prob_KPI = info_kaon2.probpid();
+            double pionProb_KPI = info_pion.probpid();
 
             std::cout << "--- --- Compared to pion, first kaon prob: " << kaon1Prob_KPI << ", second kaon prob: " << kaon2Prob_KPI << std::endl;
             if (kaon1Prob_KPI >= 0.6 && pionProb_KPI < 0.9) {
@@ -1184,7 +1172,7 @@ void dumpDssChild(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump
     double msComb = info.msComb();
 //     double helic = getHelicity(dgr);
     double helic = info.helicity();
-    double pidprob = info.probPID();
+    double pidprob = info.probpid();
     
     int ind_ch1;
     int lundChild = P.lund();
@@ -1501,13 +1489,13 @@ void Reco::event(BelleEvent *evptr, int *status) {
 // If each plist element is not associated with rphi & z-svd hits
 // whose number is equal to or larger than nRSvdHit and nZSvdHit,
 // its element is removed from plist.
-    for (int itr = 0; itr < nTrk; itr++) {
+    for (int itr = 0; itr < nTrk; ++itr) {
         withSVD2(trkV[itr], 1, 1); // nRSvdHit, nZSvdHit
         withdRdZcut(trkV[itr], ip_position, 0.5, 3.0);
     }
 
     if (debugTrkPID) {
-        for (int itr = 0; itr < nTrk; itr++)
+        for (int itr = 0; itr < nTrk; ++itr)
             printTrkPID(trkV[itr], trkTit[itr], "after");
     }
 
@@ -1517,7 +1505,7 @@ void Reco::event(BelleEvent *evptr, int *status) {
 
     if(useVTX) {
         for (std::vector<Particle>::iterator it = gammaV.begin(); it != gammaV.end(); ++it) {
-            setGammaError(*it, ip_position, ip_error);
+            setGammaError(*it, ip_position, ip_error); // changed from setGammasError
         }
     }
 
@@ -1536,7 +1524,7 @@ void Reco::event(BelleEvent *evptr, int *status) {
     setPi0Error(pi0);
 
     if (debugPi0) {
-        printf(" pi0[%i]  \n", pi0.size() );
+        printf(" pi0[%i]  \n", pi0.size());
 //         printPi0( pi0 );
     }
 
