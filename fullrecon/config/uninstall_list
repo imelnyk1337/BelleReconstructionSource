@@ -1,0 +1,5 @@
+../basf_if/Makefile.in
+../doc/Makefile.in
+../fullrecon/Makefile.in
+../src/Makefile.in
+../Makefile.in

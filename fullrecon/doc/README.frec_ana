@@ -1,0 +1,162 @@
+<< README for frec_ana >> (04/04/06 T.Matsumoto)
+
+module = frec_ana
+author = T.Matsumoto(matumot@bmail.kek.jp)
+
+[selected modes]
+
+   B0B --> D(*)+ (pi, rho, a1)-
+   B0B --> D(*)+ Ds(*)-
+
+   B-  --> D(*)0 (pi, rho, a1)-
+   B-  --> D(*)0 Ds(*)-
+
+ Here, we use following decay chains.
+
+   D*+  --> D0 pi+, D+ pi0
+   D*0  --> D0 pi0, D0 gamma
+   Ds*+ --> Ds+ gamma
+   D0   --> K-pi+, K-pi+pi0, K-pi+pi+pi-, Kspi0, Kspi+pi-, Kspi+pi-pi0, K+K-
+   D+   --> K-pi+pi+, K-pi+pi-pi0, Kspi+, Kspi+pi0, Kspi+pi-pi+, K+K-pi+
+   Ds+  --> KsK+, K-K+pi+
+   a1   --> rho0 pi-
+   rho- --> pi- pi0
+   rho0 --> pi+ pi-
+   Ks   --> pi+ pi-
+   pi0  --> gamma gamma
+
+ - charge conjugated modes are also included.
+
+ - For B --> D(*)a1-, we don't use following modes.
+   B0B --> D+a1-             : except for D+ --> K-pi+pi+, Kspi+
+   B0B --> D*+(D+pi0)a1-     : except for D+ --> K-pi+pi+, Kspi+
+   B-  --> D0a1-             : except for D0 --> K-pi+
+   B-  --> D*0(D0pi0)a1-     : D0 --> Kspi+pi-pi0
+   B-  --> D*0(D0gamma)a1-   : except for D0 --> K-pi+
+
+ - For B --> D(*)Ds(*) where Ds --> K-K+pi+, we apply phi mass cut for following modes.
+   B0B --> D+Ds(*)-          : except for D+ --> K-pi+pi+, Kspi+
+   B0B --> D*+(D+pi0)Ds(*)-  : except for D+ --> K-pi+pi+, Kspi+
+   B-  --> D0Ds(*)-          : except for D0 --> K-pi+
+
+[selection criteria]
+
+***  event classification ***
+
+   HadronB 
+
+*** fundamental particles ***
+
+   pi+-      : Mdst_Charged
+	        |dr|<2.0 cm, |dz|<5.0 cm
+   K+-	     : Mdst_Charged
+                |dr|<2.0 cm, |dz|<5.0 cm
+		KID cut :   probK > 0.6
+			    probK > 0.3 for K from D -->K+K-, K+K-pi+
+   pi0       : Mdst_Pi0
+                Egamma from pi0 : Egamma > 50 MeV
+		 		  Egamma > 30 MeV for pi0 from D* --> Dpi0
+   Ks	     : Mdst_Vee2
+	        good_Ks 
+                Mass cuts --> +/- 30 MeV/c^2 from nominal value
+   rho       : Mass cuts --> +/- 225 MeV/c^2 from nominal value
+   a1-	     : 0.7 < Mass < 1.6 GeV/c^2
+   phi       : Mass cuts --> +/- 20 MeV/c^2 from nominal value
+
+*** D mesons ***
+    
+   Mass cuts
+      - +/- 30 MeV/c^2 
+	 D0  --> K-pi+, K-pi+pi+pi-, Kspi+pi-, K+K-
+	 D+  --> K-pi+pi+, Kspi+, Kspi+pi-pi+, K+K-pi+
+         Ds+ --> K+K-pi+, K-pi+pi+
+      - +/- 45 MeV/c^2 
+	 D0 --> K-pi+pi0, Kspi+pi-pi0
+	 D+ --> K-pi+pi+pi0, Kspi+pi0
+
+      - +/- 60 MeV/c^2
+	 D0 --> Kspi0
+
+*** D* mesons ***
+
+   Mass difference ( dm = M(D*) - M(D) ) cuts 
+      - +/- 5 MeV/c^2 from nominal values
+
+      * +/- 20 MeV/c^2 for D*0 -> D0 gamma and Ds*+ --> Ds gamma
+
+*** B mesons ***
+
+   Beam constrained mass & deltaE
+     Mbc>5.2 GeV/c^2
+     |deltaE|< 0.3 GeV
+
+  - B --> D(*)h
+        P*(D(*))        > 1.0 GeV/c
+	P*(h)           > 1.5 GeV/c
+
+  - B --> D(*)rho-
+       P*(D(*))         > 1.0 GeV/c 
+       1.8   < P*(rho-) < 2.6 GeV/c
+
+  - B --> D(*)a1-
+       P*(D(*))	        > 1.0 GeV/c 
+       1.5   < P*(a1-)  < 2.6 GeV/c 
+
+  - B --> D(*)Ds(*)
+       P*(D(*))	        > 1.0 GeV/c 
+       P*(Ds(*))        > 1.0 GeV/c 
+
+  - best candidate selection
+   
+    At first, we select best candidate for each decay mode by
+    selecting the smallest reduced chisq calculated from
+    dE, M(D), M(D*) - M(D).
+
+    Then we select the best candidate with 2 methods.
+     1) select the best reduced chisq mode
+     2) select the best purity mode
+
+   * best candidate is selected for each of charged B and neutral B.
+
+[basf_if parameters]
+
+   Definition of basf_if parameters can be found under
+   "basf_if/frec_ana.cc".
+
+   Explanations for important variables can be found below.
+
+ - "summaryFile"
+      summary file name for frec_ana module.
+
+ - "Monitor" ( default --> 0 )
+      if "Monitor" flag was set to 1, frec_ana module will process
+    B --> D(*)pi with loose D(*) selection criteria and 
+    B --> D(*)(rho, a1 ) with loose rho, a1 selection criteria.
+    You can check detail kinematics of D(*) or rho, a1 by using
+   output ntuples.
+
+ - "flagHist" ( default --> 1 )
+      if "flagHist" is set to 0, histogram will be not outputted.
+
+ - "SetSave_Brecon" ( default --> 0 )
+      if "SetSave_Brecon" is set to 1, reconstructed B events will
+    be saved as mdst table + brecon/fullrecon table.
+
+ - "useBenergy" ( default --> 2 )
+    We have several options for "useBenergy".
+
+     0 : use default beam energy
+     1 : use values for "Benergy" function
+     2 : use values for  BeamEnergy class ( extract values from data base )
+
+    Default option is 2. 
+   ( If you use MC sample and run-dependent beam energy is not applied, 
+     please select "useBenergy" = 0 opion. )
+
+ - "CutCont" ( default --> 1 )
+     We applied appropriate continuum cut for tag B side. 
+   But if you are applying tight cut for recoil B side ( like
+   high momentum lepton), you may not need continuum cuts for tag B side.
+   In this case, please select "CutCont" = 0 option to remove
+   selection criteria related to continuum cuts.
+

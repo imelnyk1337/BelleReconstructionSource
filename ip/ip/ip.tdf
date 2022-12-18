@@ -1,0 +1,21 @@
+Date 2000/03/31
+
+Define_table Fill_Ip_Vertex 1 "Interaction Point information"
+   Integer    flag                            "Event type and quality flag:
+					       =0x0001: HadronC event;
+					       =0x0003: HadronC event passed through the cuts;
+					       =0x0010: Bhabha event;
+					       =0x0030: Bhabha event passed through the cuts;
+					       =0x0100: Mu-pair event;
+					       =0x0300: Mu-pair event passed through the cuts;
+					       =0x1000: the other event."
+   Real*4     v(3)                            "Vertex position of IP (cm)"
+   Alias      vx              v(1)            "X component of Vertex"
+   Alias      vy              v(2)            "Y component of Vertex"
+   Alias      vz              v(3)            "Z component of Vertex"
+   Real*4     error(6)                        "Error matrix of vertex,
+					       [0][0],[1][0],[1][1],..."
+   Integer    ndf                             "Degrees of freedom in vertex fit"
+   Real*4     chisq                           "Chi^2 of vertex fit"
+   Real*4     cl                              "Confidence level of vertex fit"
+End_of_define_table Fill_Ip_Vertex

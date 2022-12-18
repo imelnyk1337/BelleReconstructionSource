@@ -1,0 +1,100 @@
+<< README for fullrecon table >> (04/04/06 T.Matsumoto)
+
+ Fullrecon table is prepared to save information of reconstructed 
+ B sample after frec_ana module.
+
+ Table definition can be found in  "fullrecon/fullrecon.tdf" and
+ explanations are listed below.
+
+ Example program to use fullrecon table can be found in "basf_if/ex_read.cc".
+
+---
+
+- kind "Kind of B decay"
+
+     1 : B --> Charm decays
+
+- b_mode "B  decay mode code"
+
+     1 : B0B --> D+ pi-
+     2 : B0B --> D*+ pi-
+     3 : B0B --> D+ rho-
+     4 : B0B --> D*+ rho-
+     5 : B0B --> D+ a1-
+     6 : B0B --> D*+ a1-
+    11 : B0B --> D+ Ds-
+    12 : B0B --> D+ Ds*-
+    13 : B0B --> D*+ Ds-
+    14 : B0B --> D*+ Ds*-
+   101 : B-  --> D0 pi-
+   102 : B-  --> D*0 pi-
+   103 : B-  --> D0 rho-
+   104 : B-  --> D*0 rho-
+   105 : B-  --> D0 a1-
+   106 : B-  --> D*0 a1-
+   111 : B-  --> D0 Ds-
+   112 : B-  --> D0 Ds*-
+   113 : B-  --> D*0 Ds-
+   114 : B-  --> D*0 Ds*-
+
+- sub0_mode "Sub decay mode code"
+
+     1 : D*0 --> D0 pi0
+     2 : D*0 --> D0 gamma
+     3 : D*+ --> D0 pi+
+     4 : D*+ --> D+ pi0
+     5 : Ds* --> Ds gamma
+
+  ( for B --> D*Ds*, D* decay modes are outputted )
+
+- sub1_mode "Sub decay mode code"
+
+      1 : D0  --> K-  pi+
+      2 : D0  --> K-  pi+ pi0
+      3 : D0  --> K-  pi+ pi+ pi-
+      4 : D0  --> Ks  pi0
+      5 : D0  --> Ks  pi+ pi-
+      6 : D0  --> Ks  pi+ pi- pi0
+      7 : D0  --> K+  K-
+    101 : D+  --> K-  pi+ pi+
+    102 : D+  --> K-  pi+ pi+ pi0
+    103 : D+  --> Ks  pi+
+    104 : D+  --> Ks  pi+ pi0
+    105 : D+  --> Ks  pi+ pi+ pi-
+    106 : D+  --> K+  K-  pi+
+    201 : Dcp --> pi+ pi-
+    202 : Dcp --> Ks  K+  K-
+    203 : Dcp --> Ks  pi+ K-
+    204 : Dcp --> Ks  pi- K+
+    205 : Dcp --> Ks  pi0 pi0
+    206 : Dcp --> Ks  eta
+    207 : Dcp --> Ks  eta'
+    301 : Ds  --> Ks  K+
+    302 : Ds  --> K+  K-  pi+
+    303 : Ds  --> K+  pi- pi+
+
+- Aux.. "Auxiliary info"
+
+   Aux0 : purity for each decay mode
+          - Purity is estimated from S/(S+N). where yield for signal and noise
+            are estimated from the region 5.27<Mbc<5.29 GeV/c^2, -0.08 < dE < 0.06 GeV. )
+   Aux1 : reduced chi2
+          - reduced chi2 is calculated from dE, M(D) and M(D*)-M(D).
+   Aux2 : cosine of angle between thrust axis for B candidate and others.
+   Aux3 : fox Wolfram moment, R2
+   Aux4 : cosine of B decay angle
+   Aux5 : reduced chi2 for D  vertex fit
+   Aux6 : reduced chi2 for Ds vertex fit
+   Aux7 : reduced chi2 for a1 vertex fit
+   Aux8 : not used
+   Aux9 : not used
+
+- flag.. "flag"
+
+  flag0 : flag for best candidate based on purity ( 1:on, 0:off )
+	  ( dE cut, -0.08 < dE < 0.06 is already applied. )
+  flag1 : flag for best candidate besed on reduced chi2 ( 1:on, 0:off )
+  flag2 : flag for best candidate for each decay mode ( 1:on, 0:off )
+  flag3 : B lund
+  flag4 : flag for mc (not worked well for now.) ( 1:on, 0:off )
+

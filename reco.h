@@ -63,7 +63,7 @@ namespace Belle {
     double dM_Bs0  = 0.080;
     
     double eGammaMin   = 0.030;
-    double wMassPi0GG  = 0.017; // 0.020;
+    double wMassPi0GG  = 0.020; // 0.020;
     double minPi0GammP = 0.030;
     double minPi0pStar = 0.040;
 
@@ -113,19 +113,19 @@ namespace Belle {
         };
 
         void term(void) {};
-        void disp_stat(const char *) {};
+        void disp_stat(const char*) {};
         void hist_def(void);
-        void event(BelleEvent *, int *);
-        void begin_run(BelleEvent *, int *);
-        void end_run(BelleEvent *, int *) {};
-        void other(int *, BelleEvent *, int *) {};
+        void event(BelleEvent*, int*);
+        void begin_run(BelleEvent*, int*);
+        void end_run(BelleEvent*, int*) {};
+        void other(int*, BelleEvent*, int*) {};
 
         BelleTuple *TP_phi0, *TP_Ksr0, *TP_Dss, *TP_Dss_2317, *TP_Bs0;
     };
 
-    extern "C" Module_descr *mdcl_Reco() { /* main */
-        Reco *module = new Reco;
-        Module_descr *dscr = new Module_descr("Reco", module);
+    extern "C" Module_descr* mdcl_Reco() { /* main */
+        Reco* module = new Reco;
+        Module_descr* dscr = new Module_descr("Reco", module);
         IpProfile::define_global(dscr);
         BeamEnergy::define_global(dscr);
         return dscr;
@@ -136,7 +136,7 @@ namespace Belle {
     };
 
 
-    void Reco::begin_run(BelleEvent *, int *) {
+    void Reco::begin_run(BelleEvent*, int *) {
         std::cout << std::endl << "---- Reco's begin_run function -----" << std::endl;
         eid::init_data();
         //   Get IP profile data from $BELLE_POSTGRES_SERVER
@@ -169,12 +169,12 @@ namespace Belle {
 
         std::cout << "---- Reco's hist_def function -----" << std::endl; 
 
-        string s_info        = " expn  runn  evtn  r2  ipx  ipy  ipz  evtgen "; 
+        string s_info        = " expn runn evtn r2 ipx ipy ipz evtgen "; 
 
         string s_B0s         = " gen_bs chg_bs mbc_bs de_bs  ms_bs chi_bs vx_bs vy_bs vz_bs pt_bs ph_bs th_bs ";
         string s_Dss         = " gen_ds chg_ds  ms_ds chi_ds pt_ds ph_ds th_ds "; 
         string s_Dss_1       = " gen_ds1 chg_ds1  ms_ds1 chi_ds1 pt_ds1 ph_ds1 th_ds1 "; 
-        string s_Dss_2       = " gen_ds2 chg_ds2  ms_ds2 chi_ds2 pt_ds2 ph_ds2 th_ds2 "; 
+        string s_Dss_2       = " gen_ds2 chg_ds2  ms_ds2 chi_ds2 pt_ds2 ph_ds2 th_ds2 ";
         string s_Dss_gen     = " ms_ds_t  px_ds_t  py_ds_t  pz_ds_t  e_ds_t ";
         string s_Dss_gen_1   = " ms_ds_t1 px_ds_t1 py_ds_t1 pz_ds_t1 e_ds_t1 ";
         string s_Dss_gen_2   = " ms_ds_t2 px_ds_t2 py_ds_t2 pz_ds_t2 e_ds_t2 ";

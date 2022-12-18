@@ -1,0 +1,40 @@
+Date 2002/08/20
+
+include brecon.tdf
+
+"Contains information about the B full reconstruction"
+"2002/08/20 Matsumoto version 0.1"
+
+Define_table Fullrecon 100     "full recon info"
+
+  Pointer FullBrec Brecon      "pointer to Brecon"
+  Integer kind                 "Kind of B decay"
+  Integer b_mode               "B  decay mode code"
+  Integer sub0_mode            "Sub decay mode code"
+  Integer sub1_mode            "Sub decay mode code"
+  Real    deltE                "Delta E"
+  Real    Mbc                  "Beam constraint mass"
+  Real    Aux0                 "Auxiliary info"
+  Real    Aux1                 "Auxiliary info"
+  Real    Aux2                 "Auxiliary info"
+  Real    Aux3                 "Auxiliary info"
+  Real    Aux4                 "Auxiliary info"
+  Real    Aux5                 "Auxiliary info"
+  Real    Aux6                 "Auxiliary info"
+  Real    Aux7                 "Auxiliary info"
+  Real    Aux8                 "Auxiliary info"
+  Real    Aux9                 "Auxiliary info"
+  Integer flag0                "flag"
+  Integer flag1                "flag"
+  Integer flag2                "flag"
+  Integer flag3                "flag"
+  Integer flag4                "flag"
+
+End_of_define_table Fullrecon
+
+
+
+
+
+
+

@@ -1,0 +1,51 @@
+Particle Class
+
+Note1 : PID class objects are not created (as default).
+	When PID routines of each detectors will be prepared 
+	and become usable, this class should be changed largely
+	to use them.
+
+Note2 : Search of "decay.dec"
+	1. $QQ_DECAY_TABLE
+	2. $BELLE_TOP_DIR/share/data-files/qq98/decay.dec
+	3. decay.dec at the current directory
+
+Note3 : Search of "user.dec"
+	1. $QQ_USER_TABLE
+	2. without user.dec
+
+Note4 : When you obtain the following message, you check Note2 and 3.
+
+	| (Particle Class)PANTHER table for QQ not found                |
+	| (Particle Class)creating from "decay.dec" and "user.dec" ...  |
+	| (Particle Class)FAILUR in creation!                           |
+
+1. Supported Files by Particle Class Group(?)
+
+	particle/Particle.h
+	particle/Momentum.h
+	particle/Relation.h
+	particle/PType.h
+	particle/PID.h
+	particle/FittedMomentum.h
+	particle/static_particle.h
+	particle/constant.h
+	particle/ParticleUserInfo.h
+
+2. Supported Files by Each Author
+
+	...No File
+
+3. Sub Supported Files by Each Author
+	Functions and Classes in this files may be rewritten by each author
+	without announcement of BELLE White Borad. We can read them as samples.
+
+	jtanaka@tkybel1.phys.s.u-tokyo.ac.jp
+		particle/combination.h
+		particle/utility.h
+		basf_if/exjpsiks.cc
+		basf_if/exdln.cc
+
+	yiwasaki@bmail.kek.jp
+		particle/ParticleManager.h
+		basf_if/lana.cc

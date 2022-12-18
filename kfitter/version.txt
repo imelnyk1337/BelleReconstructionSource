@@ -1,0 +1,16 @@
+Program name : KFitter
+Author  name : Jun-ichi Tanaka
+E-mail       : jtanaka@belaxp1.phys.s.u-tokyo.ac.jp
+
+Version Information
+Date          Version    Comment
+1997/09/26    0.8         Realse
+1998/01/20    2.0         New Interface
+1998/05/07    2.1         Bugs fixed
+1998/10/18    2.x         Bugs fixed
+1999/03/29    3.0         New Class Structures
+1999/05/26    3.1         Speed Up of Vertex Fit(No Colleration Type)
+1999/06/20    3.2         Beam Position
+1999/12/11    3.3         Refitter for slowpion(known vertex fitter)
+2000/03/07    3.4         Check Source Codes --> Bugs fixed
+2002/03/28    3.5         New Fitter in Mass-Constraint Fit

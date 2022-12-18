@@ -57,8 +57,6 @@ string pclType(int id) {
     else if (id == -14) sid = "anti-nu_mu";
     else if (id ==  15) sid = "tau+";
     else if (id == -15) sid = "tau-";
-    else if (id ==  14) sid = "nu_tau";
-    else if (id == -14) sid = "anti-nu_tau";
     else if (id ==  21) sid = "g";
     else if (id ==  22) sid = "gamma";
     else if (id ==  23) sid = "Z0";
@@ -284,7 +282,7 @@ void withGammaInPi0(std::vector<Particle>& Gamma, std::vector<Particle>& pi0,
     }
 }
 //***********************************************************
-int IDhep(Particle part) {
+int IDhep(Particle& part) {
     if(!part.genHepevt()) return 0;
     return part.genHepevt().idhep();
 }
@@ -415,9 +413,9 @@ void withdRdZcut(std::vector<Particle>& list, const HepPoint3D& ip_position, dou
     }
 }
 //**********************************************************
-bool withPi0MassGamGamCut(Particle& p, double M_min, double M_max) {
-    Particle& g1 = p.child(0);
-    Particle& g2 = p.child(1);
+bool withPi0MassGamGamCut(Particle& pi0, double M_min, double M_max) {
+    Particle& g1 = pi0.child(0);
+    Particle& g2 = pi0.child(1);
     double msPi0_gg = (g1.p() + g2.p()).m();
     if (msPi0_gg < M_min) return false;
     if (msPi0_gg > M_max) return false;
@@ -434,12 +432,12 @@ bool withPi0GammPCut(Particle& p, double p_min) {
 //**********************************************************
 void withPi0MassGamGamCut(std::vector<Particle>& pi0, double dM_max) {
     double massPi0_PDG = Ptype(111).mass();
-    for(std::vector<Particle>::iterator i=pi0.begin(); i!=pi0.end();) {
-        Particle &g1 = i->child(0);
-        Particle &g2 = i->child(1);
-        double msPi0_gg = ( g1.p()+g2.p() ).m();
+    for (std::vector<Particle>::iterator i = pi0.begin(); i != pi0.end();) {
+        Particle& g1 = i->child(0);
+        Particle& g2 = i->child(1);
+        double msPi0_gg = (g1.p() + g2.p()).m();
             
-        if(abs(msPi0_gg - massPi0_PDG) > dM_max) pi0.erase(i);
+        if (abs(msPi0_gg - massPi0_PDG) > dM_max) pi0.erase(i);
         else
             ++i;
     }
@@ -448,7 +446,7 @@ void withPi0MassGamGamCut(std::vector<Particle>& pi0, double dM_max) {
 //**********************************************************
 void withPi0GammPCut(std::vector<Particle>& pi0, double p_min) {
     for (std::vector<Particle>::iterator i = pi0.begin(); i != pi0.end();)
-        if(i->child(0).ptot() < p_min || i->child(1).ptot() < p_min )
+        if (i->child(0).ptot() < p_min || i->child(1).ptot() < p_min)
             pi0.erase(i);
         else
             ++i;
@@ -462,27 +460,27 @@ void createUserInfo(Particle& p) {
     bool useTube = false;
     double wMass = dM_Dgr;
 
-    if ((abs(lund)>500) && (abs(lund)<600)) { // B0, Bc
-        useTube = true; 
+    if ((abs(lund) > 500) && (abs(lund) < 600)) { // B0, Bc
+        useTube = true;
         wMass = wB;
-    } else if ((lund==310) || (abs(lund)==3122) || (lund==333)) { // K0s, Lam0, Phi0
+    } else if ((lund      == 310) || (abs(lund) == 3122) || (lund == 333)) { // K0s, Lam0, Phi0
         wMass = dM_V0;
-    } else if (abs(lund)==313) { // K*0
+    } else if (abs(lund)  == 313) { // K*0
         wMass = dM_Ksr0;
-    } else if ((abs(lund)==113) || (abs(lund)==213)) { // RHO0,+.-
+    } else if ((abs(lund) == 113) || (abs(lund) == 213)) { // RHO0,+.-
         wMass = dM_Rho;
-    } else if ((abs(lund)==413) || (abs(lund)==423)) { // D*+, D*0feve
+    } else if ((abs(lund) == 413) || (abs(lund) == 423)) { // D*+, D*0feve
         useTube = true; 
         wMass = wDst;
-    } else if (abs(lund)==431) { // DS+
+    } else if (abs(lund)  == 431) { // DS+
         wMass = dM_Dss;
-    } else if (abs(lund)==433) { // D*S+
+    } else if (abs(lund)  == 433) { // D*S+
         useTube = true; 
         wMass = dM_Dsst;
-    } else if (abs(lund)==10431) { // D**S+(D_sJ(2317))
-        useTube = true; 
+    } else if (abs(lund)  == 10431) { // D**S+(D_sJ(2317))
+        useTube = true;
         wMass = dM_2317;
-    } else if (abs(lund)==443) { // J/psi
+    } else if (abs(lund)  == 443) { // J/psi
         useTube = true; 
     }
     
@@ -494,6 +492,13 @@ void createUserInfo(Particle& p) {
     info.isAdoptCut(true);
     info.chisqKvf(-1.);
     info.helicity(-1.);
+}
+
+void createUserInfo(std::vector<Particle>& p_list) {
+    std::vector<Particle>::iterator particle;
+    for (particle = p_list.begin(); particle != p_list.end(); ++particle) {
+        if (!&(*particle).userInfo()) createUserInfo(*particle);
+    }
 }
 //***********************************************************
 void setBadVtx(Particle& p) {
@@ -1506,11 +1511,13 @@ void Reco::event(BelleEvent *evptr, int *status) {
             printTrkPID(trkV[itr], trkTit[itr], "after");
     }
 
+    // =================   WORKING WITH Gamma CANDIDATES ================= //
     makeGamma(gammaV);
     withPCut(gammaV, eGammaMin);
+
     if(useVTX) {
         for (std::vector<Particle>::iterator it = gammaV.begin(); it != gammaV.end(); ++it) {
-            setGammasError(*it, ip_position, ip_error);
+            setGammaError(*it, ip_position, ip_error);
         }
     }
 
@@ -1518,6 +1525,10 @@ void Reco::event(BelleEvent *evptr, int *status) {
     if (McFlag) {
         setGenHepInfoG(gammaV);
     }
+
+    createUserInfo(gammaV);
+
+
     // =================   WORKING WITH PI0 CANDIDATES ================= // 
     makePi0(pi0);
     withPi0GammPCut(pi0, minPi0GammP);
@@ -1531,7 +1542,7 @@ void Reco::event(BelleEvent *evptr, int *status) {
 
     // Match candidates with genhep info 
     if (McFlag) {
-        for (int itr = 0; itr < nTrk; itr++) setGenHepInfoF(trkV[itr]);
+        for (int itr = 0; itr < nTrk; ++itr) setGenHepInfoF(trkV[itr]);
         setGenHepInfoP(pi0);
     }    
     
@@ -1591,7 +1602,7 @@ void Reco::event(BelleEvent *evptr, int *status) {
 //     }
     
     if (debugDss_2317) {
-        if (Dss_p_2317.size()+Dss_m_2317.size() > 0) {
+        if (Dss_p_2317.size() + Dss_m_2317.size() > 0) {
             printf("\n **** debugDss_2317 ****** exp:%2i,  run:%2i, evt:%i,  *******\n", expNo, runNo, evtNo);
             printVectPclWithChildren(Dss_p_2317, "DsJ(2317)+");
             printVectPclWithChildren(Dss_m_2317, "DsJ(2317)-");

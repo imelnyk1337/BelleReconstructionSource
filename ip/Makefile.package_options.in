@@ -1,0 +1,2 @@
+
+LIB_DEPENDS_ON = -lparticle -lpntdb -lbelleutil -ltables $(CLHEP_LIBS)

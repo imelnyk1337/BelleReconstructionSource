@@ -1,0 +1,9 @@
+dnl
+dnl ----- Process this file with autoconf to produce a configure script -----
+dnl
+AC_INIT(qqlist.pl.in)
+AC_CONFIG_FILES(../script/qqlist.pl:qqlist.pl.in)
+AC_PATH_PROG(PERL,perl,perl)
+dnl AC_CONFIG_COMMANDS_POST(sed 1D qqlist.tmp > ../script/qqlist;rm qqlist.tmp)
+
+

@@ -1,0 +1,2 @@
+
+LIB_DEPENDS_ON = -lhelix -lbelleutil -ltables $(CLHEP_LIBS)

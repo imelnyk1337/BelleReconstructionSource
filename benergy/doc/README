@@ -1,0 +1,126 @@
+////////////////////////////////////////////////////////////////////////
+
+     Usage of BeamEnergy Class
+
+       First Creation : 2004.03.02
+
+     Author         : T.Shibata(shibata@bmail.kek.jp)
+     		     *modified by T.Matsumoto (matumot@bmail.kek.jp)
+    
+     Comment;
+     2004.05.27 : add Run-independent Beam energy information
+  
+////////////////////////////////////////////////////////////////////////
+
+  BeamEnergy class is prepared for interface of Beam_Energy database.
+  The usage of the BeamEnergy class is almost the same as "IpProfile" class.
+  ( i.e. You don't need to access database by yourself. )
+
+  * Information is also available under http://belle.kek.jp/secured/benergy/
+
+  How to use "BeamEnergy" class ? 
+
+  ***** Set up *****
+
+  b) library
+
+       Please don't forget to add -lbenergy in your Makefile.
+
+  b) header file
+
+       Please include "benergy/BeamEnergy.h" in your code. 
+
+  c) initialization
+
+      Please put "BeamEnergy::begin_run();" in your begin_run function.
+     This function fetch the values from Beam_Energy database.
+ 
+     void ????::begin_run( BelleEvent*, int* ) {
+
+       BeamEnergy::begin_run();
+       ~~~~~~~~~~~~~~~~~~~~~~~~
+     }
+
+
+  d) module parameters
+
+        You can set module parameters of BeamEnergy class as your module 
+      parameters with following setting.
+ 
+       extern "C" Module_descr *mdcl_????() {
+          ???? *module   = new ????;
+          Module_descr *dscr = new Module_descr("????", module);
+
+          BeamEnergy::define_global(dscr);
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           return dscr;
+       }
+ 
+
+  e) setting of module parameters in your basf script.
+
+      module put_parameter ???? flag_rundep\2
+                           ~~~~~~~~~~~~~~~~~~~  
+      module put_parameter ???? beam_enegy_version\1
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      module put_parameter ???? flag_db\0   
+                           ~~~~~~~~~~~~~~ 
+        flag_rundep        ... flag for Beam energy type [ default = 0 ]
+
+                        0  : Run-dependent Beam Energy
+                        1  : Default Beam Energy 
+                        2  : Second Default Beam Energy
+                        3  : Run-Independent Beam Energy
+                             ( Mean Value of Run-dependent Beam Energy )
+
+        beam_enegy_version ... database version of Beam Energy. [ default = 1 ]
+
+                        0  : Do not use this value  
+                        1  : For Run-dependent Beam Energy 
+                        2  : For Run-independent Beam Energy
+
+        flag_db            ... Read database at every run or every 100 runs. [ default = 1 ]
+	
+                        0  : Read databse by each run
+                       >0  : Read databse by 100  runs 
+
+ ***** Usage *****
+
+    a)  example to use member functions in 'BeamEnergy' class.
+
+        void ????::event( BelleEvent*, int* status){
+
+            HepLorentzVector pbeam = BeamEnergy::p_beam();
+                                     ~~~~~~~~~~~~~~~~~~~~~
+            double E_beam_corr = BeamEnergy::Ebeam_corr();
+                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+         }
+
+
+    b) Lists of member functions in 'BeamEnergy' class
+
+     int    Run_flag()          :   run flag
+                                    = 1:on_resonance
+                                    = 2:continuum    
+                                    = 3:energy_scan
+                                    = 0:others
+     double E_beam_corr()       :  E_beam after  correction     (GeV)
+     double E_beam_orig()       :  E_beam before correction     (GeV)
+     double E_beam2()           :  return E_beam_corr for on_resonance runs,
+		                   return 5.29 GeV for other runs.
+       			           ( this is same as value used in Benergy function. )
+     double E_beam_err()        :  Error of E_beam (GeV)
+     double E_HER()             :  HER energy after correction  (GeV)
+     double E_LER()             :  HER energy after correction  (GeV)
+     double Cross_angle()       :  crossing angle (rad)
+     double E_HER_orig()        :  HER energy before correction (GeV)
+     double E_LER_orig()        :  LER energy before correction (GeV)
+
+     HepLorentzVector p_beam()  : 4 Momemtum Vector of e+e- in Lab system
+     HepLorentzVector p_beam2() : 4 Momemtum Vector of e+e- in Lab system( based on E_beam2 )
+
+     double           Ecm()     : Total Energy ( = sqrt(s) )( GeV )
+     Hep3Vector       CMBoost() : Boost Vector of e+e-
+     HepLorentzVector p_cm( HepLorentzVector p )
+                                : return momentum after Lorentz transformation
+                                  from Lab system to CM system.

@@ -1,0 +1,4 @@
+
+LIB_DEPENDS_ON = -lpntdb -lbelleutil -ltables
+
+

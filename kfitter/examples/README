@@ -1,0 +1,14 @@
+[Old example]
+Makefile combination.cc exkfitter.ccutility.cc
+
+[Examples]
+Makefile1 d0kpi_v.cc userinfo.cc
+Makefile2 d0kpi_m.cc userinfo.cc
+Makefile3 d0kpi_mv.cc userinfo.cc
+Makefile4 d0kpipipi_mv.cc userinfo.cc
+Makefile5 d0kpipi0_mv.cc userinfo.cc
+Makefile6 bmd0pi.cc userinfo.cc
+Makefile7 d0kpipipi_v_mv.cc userinfo.cc
+Makefile8 dsd0pi.cc userinfo.cc
+Makefile9 dprhopi.cc userinfo.cc
+MakefileA d0kpi_v_m.cc userinfo.cc

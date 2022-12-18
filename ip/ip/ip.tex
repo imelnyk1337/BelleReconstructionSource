@@ -1,0 +1,31 @@
+\section{ip.tdf}
+
+\noindent
+\begin{minipage}{\linewidth}
+{\LARGE $\bullet$ \verb+Fill_Ip_Vertex+} (1)
+\label{Fill_Ip_Vertex}
+\begin{verbatim}
+Interaction Point information
+\end{verbatim}
+\begin{tabular}{|l|l|l|l|}\hline
+Variable & Type & Comment\\ \hline\hline
+\verb+flag        + & \verb+INTEGER+ & \verb"Event type and quality flag: =0x0001: HadronC event; =0x0003: Hadr"\\
+ & & \verb"onC event passed through the cuts; =0x0010: Bhabha event; =0x0030:"\\
+ & & \verb" Bhabha event passed through the cuts; =0x0100: Mu-pair event; =0x"\\
+ & & \verb"0300: Mu-pair event passed through the cuts; =0x1000: the other ev"\\
+ & & \verb"ent."\\
+\verb+v(3)        + & \verb+REAL   + & \verb"Vertex position of IP (cm)                                         "\\
+\verb+vx          + & \verb+ALIAS  + & \verb"=v(1), X component of Vertex                                       "\\
+\verb+vy          + & \verb+ALIAS  + & \verb"=v(2), Y component of Vertex                                       "\\
+\verb+vz          + & \verb+ALIAS  + & \verb"=v(3), Z component of Vertex                                       "\\
+\verb+error(6)    + & \verb+REAL   + & \verb"Error matrix of vertex, [0][0],[1][0],[1][1],...                   "\\
+\verb+ndf         + & \verb+INTEGER+ & \verb"Degrees of freedom in vertex fit                                   "\\
+\verb+chisq       + & \verb+REAL   + & \verb"Chi^2 of vertex fit                                                "\\
+\verb+cl          + & \verb+REAL   + & \verb"Confidence level of vertex fit                                     "\\
+\hline
+\end{tabular}
+\end{minipage}
+\vskip 8mm
+%\begin{theindex}
+%\item \verb+Fill_Ip_Vertex+ \dotfill\pageref{Fill_Ip_Vertex}
+%\end{theindex}

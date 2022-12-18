@@ -1,0 +1,6 @@
+../basf_if/Makefile.in
+../classes/Makefile.in
+../functions/Makefile.in
+../particle/Makefile.in
+../src/Makefile.in
+../Makefile.in
