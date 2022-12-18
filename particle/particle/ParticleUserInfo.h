@@ -10,10 +10,10 @@ class ParticleUserInfo {
   
 public:
   /// Default constructor
-  ParticleUserInfo(){};
+  ParticleUserInfo() {};
 
   /// Copy constructor
-  ParticleUserInfo(const ParticleUserInfo&){};
+  ParticleUserInfo(const ParticleUserInfo&) {};
 
   /// Destructor
   virtual ~ParticleUserInfo(){};
@@ -25,7 +25,7 @@ public:
   virtual ParticleUserInfo & operator = (const ParticleUserInfo &x){ return *this; }
 
   /// append daughter
-  virtual void append(ParticleUserInfo &){}
+  virtual void append(ParticleUserInfo &) {}
 };
 
 #if defined(BELLE_NAMESPACE)
