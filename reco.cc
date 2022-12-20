@@ -211,9 +211,9 @@ void setPi0Error(Particle& p) {
     HepSymMatrix tmpErr(3, 0);
     HepPoint3D org(0., 0., 0.);
     if (!p.child(0).mdstGamma() || !p.child(1).mdstGamma()) return;
-    for (unsigned i = 0; i < 2; ++i) 
+    for (unsigned i = 0; i < 2; ++i)
         setGammaError(p.child(i));
-//         setGammaError( p.child(i), org, tmpErr );
+//         setGammaError( p.child(i), org, tmpErr);
 
 //     kmassfitter kmv;
     kmassvertexfitter kmv;
@@ -223,7 +223,7 @@ void setPi0Error(Particle& p) {
         addTrack2fit(kmv, p.child(i));
 //     kmv.vertex(org);
 //     kmv.atDecayPoint();
-    int err=kmv.fit();
+    int err = kmv.fit();
     if (!err) {
         kmakemother kmm2;
         if (useBF) kmm2.magneticField(BF);
@@ -1059,26 +1059,27 @@ VectorL getGenVectorL(int idhPcl) {
 }
 //***********************************************************
 void pi0_dump(BelleTuple* tt, Particle& p0, string sfx, bool debugDump) {
+
     double E_HER = BeamEnergy::E_HER();
     double E_LER = BeamEnergy::E_LER();
-    // string s_pi_d17 =  " gen_p0_d eg1_p0_d  eg2_p0_d  psr_p0_d  mgg_p0_d ";
-    
+
     Particle& g1 = p0.child(0);
     Particle& g2 = p0.child(1);
+
     double msPi0_gg = (g1.p() + g2.p()).m();
-    double ptot_cm = pStar(p0.p(), E_HER, E_LER).vect().mag();
+    double psrPi0 = pStar(p0.p(), E_HER, E_LER).vect().mag();
 
     bool gen_pi0 = IDhep(p0) == 0 ? false : true;
     bool gen_g1  = IDhep(g1) == 0 ? false : true;
     bool gen_g2  = IDhep(g2) == 0 ? false : true;
 
-    const int nValI = 1; 
-    const int nValD = 6; 
+    const int nValI = 1;
+    const int nValD = 6;
 
     string pclTitI[nValI] = {"gen"};
     int valPclI[nValI]    = {gen_pi0};
     string pclTitD[nValD] = {"eg1",     "eg2",     "psr",   "mgg",    "gg1",  "gg2"};
-    double valPclD[nValD] = {g1.ptot(), g2.ptot(), ptot_cm, msPi0_gg, gen_g1, gen_g2};
+    double valPclD[nValD] = {g1.ptot(), g2.ptot(), psrPi0, msPi0_gg, gen_g1, gen_g2};
     
     if (debugDump) {
         printf("  ==== val_dump ==== pi0 (%s): ", sfx.c_str());
@@ -1088,10 +1089,8 @@ void pi0_dump(BelleTuple* tt, Particle& p0, string sfx, bool debugDump) {
             printf("(%s:%6.3f) ", (pclTitD[iVal] + sfx ).c_str(), valPclD[iVal]);
         printf("\n");
     }
-    for (int iVal = 0; iVal < nValI; iVal++) 
-        tt->column(pclTitI[iVal] + sfx, valPclI[iVal]);
-    for (int iVal = 0; iVal < nValD; iVal++) 
-        tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
+    for (int iVal = 0; iVal < nValI; ++iVal) tt->column(pclTitI[iVal] + sfx, valPclI[iVal]);
+    for (int iVal = 0; iVal < nValD; ++iVal) tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
 }
 
 //***********************************************************
@@ -1504,8 +1503,8 @@ void Reco::event(BelleEvent *evptr, int *status) {
     withPCut(gammaV, eGammaMin);
 
     if(useVTX) {
-        for (std::vector<Particle>::iterator it = gammaV.begin(); it != gammaV.end(); ++it) {
-            setGammaError(*it, ip_position, ip_error); // changed from setGammasError
+        for (std::vector<Particle>::iterator itr = gammaV.begin(); itr != gammaV.end(); ++itr) {
+            setGammaError(*itr, ip_position, ip_error); // changed from setGammasError
         }
     }
 
@@ -1521,7 +1520,14 @@ void Reco::event(BelleEvent *evptr, int *status) {
     makePi0(pi0);
     withPi0GammPCut(pi0, minPi0GammP);
     withPi0MassGamGamCut(pi0, wMassPi0GG);
-    setPi0Error(pi0);
+    createUserInfo(pi0);
+    // Setting error matrices for both pi0 doughters gamma
+    for (std::vector<Particle>::iterator itr = pi0.begin(); itr != pi0.end(); ++itr) {
+        setGammasError(*itr, ip_position, ip_error);
+    }
+
+
+//    setPi0Error(pi0);
 
     if (debugPi0) {
         printf(" pi0[%i]  \n", pi0.size());
