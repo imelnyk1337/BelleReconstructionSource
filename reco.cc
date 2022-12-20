@@ -518,129 +518,155 @@ double distanceToIP(Particle& p) {
     return vtx_D_IP.mag();
 }
 //***********************************************************
-void vertex_staged(Particle& Mother, bool debugDump=false, bool useKmvf=false) {
+void makeVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = false) {
     // fit DecayMother -> DecayChild1 + DecayChild2 + ... + trk1 + trk2 + ...
-//         Particle &Child ( Mother.child(0) );  // Daughter Decaying particle
-    
-        if (!&Mother.userInfo()) createUserInfo(Mother);
-        UserInfo& infoMother = dynamic_cast<UserInfo&>(Mother.userInfo());
+    //         Particle &Child ( Mother.child(0) );  // Daughter Decaying particle
 
-        int lundMother = (int)Mother.lund();
-        string motherType = pclType(lundMother);
+    // Looking for userInfo object connected to the Mother particle ====
+    // If it does not exist, creating it and casting to UserInfo type ==
+    if (!&Mother.userInfo()) createUserInfo(Mother);
+    UserInfo& infoMother = dynamic_cast<UserInfo&>(Mother.userInfo());
+    // =================================================================
+    // =================================================================
+
+    int lundMother = (int)Mother.lund();
+    string motherType = pclType(lundMother);
+
+
+    // =============== Printing option for debugging =================
+    // ===== Does not have a physics- or reconstruction sence ========
+    // May just skip, set to True to display and/or print in stdout ==
+    if (debugDump) {
+        printf("\n ========  makeVertexFit ==========   %s [%i] --> ",
+            motherType.c_str(), Mother.nChildren());
+        for (int jChild = 0; jChild < Mother.nChildren(); ++jChild) {
+            string dghtType = pclType((int)Mother.child(jChild).lund());
+            printf("%s ", dghtType.c_str());
+        }
+        printf("\n");
+    }
+    // ================================================================
+    // ================================================================
+    // ================================================================
+
+
+    kvertexfitter kvfMother;
+    if (useBF) kvfMother.magneticField(BF);
+    int err;
+    for (int jChild = 0; jChild < Mother.nChildren(); ++jChild) {
+        Particle& Child = Mother.child(jChild);
+        int lundChild   = (int)Child.lund();
+        bool isTrkChild = isLikeTrk(lundChild);
+        if (!isTrkChild) {
+            if (!&Child.userInfo()) createUserInfo(Child);
+            UserInfo& infoChild = dynamic_cast<UserInfo&>(Child.userInfo());
+            double chisqChild = infoChild.chisqKvf(); // -1.; //
+            if (chisqChild < 0.) {
+                // the particle has not been vertexed yet
+                bool idUseTube = false;
+                bool idAddMF   = true;   /*false*/  // magneticField (is it necessary??)
+                makeVertexFit(Child, debugDump);
+            }
+        }
+        addTrack2fit(kvfMother, Child);
+    }
+
+    if (infoMother.useTube()) addTube2fit(kvfMother);
+    err = kvfMother.fit();
+
+    // If OK, 0 is returned
+    if(err) {
+        setBadVtx(Mother);
+
+        // =============== Printing option for debugging =================
+        // ===== Does not have a physics- or reconstruction sence ========
+        // May be just skipped, set to True to display and/or print in stdout ==
         if (debugDump) {
-            printf("\n ========  vertex_staged ==========   %s [%i] --> ", 
-                   motherType.c_str(), Mother.nChildren() );
-            for (int j = 0; j < Mother.nChildren(); ++j) {
-                string dghtType = pclType((int)Mother.child(j).lund());
-                printf("%s ", dghtType.c_str());
-            }
-            printf("\n");
+            printf( "-----  bad vertexing!!! ---- \n\n" );
         }
+        // ================================================================
+        // ================================================================
+        // ================================================================
+        return;
+    }
 
-        kvertexfitter kvfMother;
-        if (useBF) kvfMother.magneticField(BF);
-        int err;
-        for (int jM = 0; jM < Mother.nChildren(); ++jM) {
-            Particle& Child = Mother.child(jM);
-            int lundChild = (int)Child.lund();
-            bool isTrkChild = isLikeTrk(lundChild);
-            if (!isTrkChild) {
-                if (!&Child.userInfo()) createUserInfo(Child);
-                UserInfo& infoChild = dynamic_cast<UserInfo&>(Child.userInfo());
-                double chisqChild = infoChild.chisqKvf(); // -1.; //
-                if (chisqChild < 0.) {
-                    // particle not vertexed yet
-                    bool idUseTube = false;
-                    bool idAddMF = true; /*false*/  // magneticField (needed?)
-                    vertex_staged(Child, debugDump);
-                }
-            }
-            addTrack2fit(kvfMother, Child);
+    makeMother(kvfMother, Mother);
+    infoMother.msKvf(Mother.p().m());
+    infoMother.chisq(kvfMother.chisq());
+    infoMother.chisqKvf(kvfMother.chisq());
+    infoMother.cl(kvfMother.cl());
+    infoMother.clKvf(kvfMother.cl());
+    infoMother.dist2IP(distanceToIP(Mother));
 
+    for (int jChild = 0; jChild < Mother.nChildren(); ++jChild) {
+        Particle& Child = Mother.child(jChild);
+        int lundChild = (int)Child.lund();
+        bool isTrkChild = isLikeTrk(lundChild);
+        if (!isTrkChild) {
+            if (!&Child.userInfo()) createUserInfo(Child);
+            UserInfo& infoChild = dynamic_cast<UserInfo&>(Child.userInfo());
+            double dx = Mother.momentum().decayVertex().x() - Child.momentum().decayVertex().x();
+            double dy = Mother.momentum().decayVertex().y() - Child.momentum().decayVertex().y();
+            double dz = Mother.momentum().decayVertex().z() - Child.momentum().decayVertex().z();
+            double dist2Mother = sqrt(dx*dx + dy*dy + dz*dz);
+            infoChild.dist2Mother(dist2Mother);
         }
-        if (infoMother.useTube()) addTube2fit(kvfMother);
-        err = kvfMother.fit();
-//         double chisq = 1.e3;
-        if(err) { 
-            setBadVtx(Mother); 
-            if (debugDump) {
-                printf( "-----  bad vertexing!!! ---- \n\n" );
-            }
-            return;
-        }
-//         chisq = kvfMother.chisq();
-        makeMother(kvfMother, Mother);
-        infoMother.msKvf(Mother.p().m());
-        infoMother.chisq(kvfMother.chisq());
-        infoMother.chisqKvf(kvfMother.chisq());
-        infoMother.cl(kvfMother.cl());
-        infoMother.clKvf(kvfMother.cl());
-        infoMother.dist2IP(distanceToIP(Mother));
-        for (int jM = 0; jM < Mother.nChildren(); ++jM) {
-            Particle& Child = Mother.child(jM);
-            int lundChild = (int)Child.lund() ;
-            bool isTrkChild = isLikeTrk(lundChild);
-            if (!isTrkChild) {
-                if (!&Child.userInfo()) createUserInfo(Child);
-                UserInfo& infoChild = dynamic_cast<UserInfo&>(Child.userInfo());
-                double dx = Mother.momentum().decayVertex().x() - Child.momentum().decayVertex().x();
-                double dy = Mother.momentum().decayVertex().y() - Child.momentum().decayVertex().y();
-                double dz = Mother.momentum().decayVertex().z() - Child.momentum().decayVertex().z();
-                double dist2Mother = sqrt(dx*dx + dy*dy + dz*dz);
-                infoChild.dist2Mother(dist2Mother);
-            }
-        }
+    }
                 
         // check on long-lived particles as criteria to use mass-vertex
-        double cTauMother = Ptype(lundMother).cTau();
-        // bool useKmvf = false;
+    double cTauMother = Ptype(lundMother).cTau();
+    // bool useKmvf = false;
 //         if (cTauMother>1.e-5) useKmvf =  true;
-        if (abs(lundMother)==10431) useKmvf = false;
+    if (abs(lundMother) == 10431) useKmvf = false;
 
-        infoMother.useKmvf(useKmvf);
+    infoMother.useKmvf(useKmvf);
         
-        if (infoMother.useKmvf()) { 
-            // use additional mass-vertex fitter to correct position (?) and LV
-            kmassvertexfitter kmvMother;
-            if (useBF) kmvMother.magneticField(BF);
-            kmvMother.invariantMass(Mother.pType().mass());
-            for (int j = 0; j < Mother.nChildren(); ++j)
-                addTrack2fit(kmvMother, Mother.child(j));
-            err = kmvMother.fit();
-            if (err) {
-                setBadVtx(Mother);
-                return;
-            }
-            makeMother(kmvMother, Mother);
-//             chisq = kmvMother.chisq();
-            Mother.momentum().decayVertex(kmvMother.vertex(), kmvMother.errVertex());
-            infoMother.chisq(kmvMother.chisq());
-            infoMother.cl(kmvMother.cl());
-            infoMother.dist2IPmvf(distanceToIP(Mother));
+    if (infoMother.useKmvf()) {
+        // use additional mass-vertex fitter to correct position (?) and LV
+        kmassvertexfitter kmvMother;
+        if (useBF) kmvMother.magneticField(BF);
+        kmvMother.invariantMass(Mother.pType().mass());
+        for (int jChild = 0; jChild < Mother.nChildren(); ++jChild) addTrack2fit(kmvMother, Mother.child(jChild));
+        err = kmvMother.fit();
+        if (err) {
+            setBadVtx(Mother);
+            return;
         }
-        
-        if (debugDump) {
-            printPclDebug( Mother, "(Mother)" );
-            printf("Mother  --- vtx:[%8.5f,%8.5f,%8.5f], err[00,11,22]:[%8.5f,%8.5f,%8.5f]\n", 
-                Mother.momentum().decayVertex().x(), 
-                Mother.momentum().decayVertex().y(), 
-                Mother.momentum().decayVertex().z(), 
-                sqrt(kvfMother.errVertex()[0][0]), 
-                sqrt(kvfMother.errVertex()[1][1]), 
-                sqrt(kvfMother.errVertex()[2][2]) 
-            );
-            string sind[5] = { "(pcl_1)", "(pcl_2)", "(pcl_3)", "(pcl_4)" , "(pcl_5)" };
-            for(int jM = 0; jM<Mother.nChildren(); ++jM) {
-                printPclDebug( Mother.child(jM), sind[jM] );
-            }
-            printf("\n");
+        makeMother(kmvMother, Mother);
+        Mother.momentum().decayVertex(kmvMother.vertex(), kmvMother.errVertex());
+        infoMother.chisq(kmvMother.chisq());
+        infoMother.cl(kmvMother.cl());
+        infoMother.dist2IPmvf(distanceToIP(Mother));
+    }
+
+    // =============== Printing option for debugging =================
+    // ===== Does not have a physics- or reconstruction sence ========
+    // May just skip, set to True to display and/or print in stdout ==
+    if (debugDump) {
+        printPclDebug( Mother, "(Mother)" );
+        printf("Mother  --- vtx:[%8.5f,%8.5f,%8.5f], err[00,11,22]:[%8.5f,%8.5f,%8.5f]\n",
+            Mother.momentum().decayVertex().x(),
+            Mother.momentum().decayVertex().y(),
+            Mother.momentum().decayVertex().z(),
+            sqrt(kvfMother.errVertex()[0][0]),
+            sqrt(kvfMother.errVertex()[1][1]),
+            sqrt(kvfMother.errVertex()[2][2])
+        );
+        string sind[5] = { "(pcl_1)", "(pcl_2)", "(pcl_3)", "(pcl_4)" , "(pcl_5)" };
+        for (int jChild = 0; jChild<Mother.nChildren(); ++jChild) {
+            printPclDebug( Mother.child(jChild), sind[jChild] );
         }
+        printf("\n");
+    }
+    // ================================================================
+    // ================================================================
+    // ================================================================
 }
 //***********************************************************
-void vertex_staged(vector<Particle>& plist, bool debugDump=false) {
+void makeVertexFit(vector<Particle>& plist, bool debugDump=false) {
     // fit DecayMother -> DecayChild1 + DecayChild2 + ... + trk1 + trk2 + ...
     for (int i = 0;i < plist.size(); ++i) {
-        vertex_staged(plist[i], debugDump);
+        makeVertexFit(plist[i], debugDump);
     }
 }
 //***********************************************************
@@ -1058,7 +1084,7 @@ VectorL getGenVectorL(int idhPcl) {
     return pclL;
 }
 //***********************************************************
-void pi0_dump(BelleTuple* tt, Particle& p0, string sfx, bool debugDump) {
+void dumpPi0(BelleTuple* tt, Particle& p0, string sfx, bool debugDump) {
 
     double E_HER = BeamEnergy::E_HER();
     double E_LER = BeamEnergy::E_LER();
@@ -1143,7 +1169,7 @@ void dumpDssChild(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
     if (info.chisqKvf() < 0.) {
         // particle not vertexed yet
-        vertex_staged(P, debugDump);
+        makeVertexFit(P, debugDump);
     }
 
     double massPDG = Ptype(lund).mass();
@@ -1227,7 +1253,7 @@ void dumpDss(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=fals
 
     if (info.chisqKvf() < 0.) {
         // particle not vertexed yet
-        vertex_staged(P, debugDump, true);
+        makeVertexFit(P, debugDump, true);
     }
     
     double massPDG = Ptype(lund).mass();
@@ -1298,7 +1324,7 @@ void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=f
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
     if (info.chisqKvf() < 0.) {
         // particle not vertexed yet
-        vertex_staged(P, debugDump);
+        makeVertexFit(P, debugDump);
     }
     
     double chisq        = info.chisqKvf(); // -1.; //
@@ -1345,7 +1371,7 @@ void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=f
 
     val_dump( tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
     gen_val_dump(tt, gen_d17, ds17L, genDgrSuff, debugDump);
-    pi0_dump(tt, pi0_2317, "_p0_d", debugDump);
+    dumpPi0(tt, pi0_2317, "_p0_d", debugDump);
     
     dumpDss(tt, Child, sfxDs, false, false, debugDump);
 
@@ -1361,7 +1387,7 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump=false,
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
     if (info.chisqKvf() < 0.) {
         // particle not vertexed yet
-        vertex_staged(P, debugDump);
+        makeVertexFit(P, debugDump);
     }
     double chisq  = info.chisqKvf(); // -1.; // 
     double msKvf  = info.msKvf(); // dgr.p().m() ; // 
@@ -1406,8 +1432,8 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump=false,
     }
     
     val_dump(  tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, "_bs", debugDump );
-    pi0_dump(  tt, pi0_Bs0,    "_p0_b",            debugDump);
-    pi0_dump(  tt, pi0_Ds2317, "_p0_d",            debugDump);
+    dumpPi0(  tt, pi0_Bs0,    "_p0_b",            debugDump);
+    dumpPi0(  tt, pi0_Ds2317, "_p0_d",            debugDump);
     dumpDss(   tt, Dss_Bs0,     "1", false, false, debugDump);
     dumpDs2317(tt, Dss2317_Bs0, "2", false, false, debugDump);
 
@@ -1525,6 +1551,8 @@ void Reco::event(BelleEvent *evptr, int *status) {
     for (std::vector<Particle>::iterator itr = pi0.begin(); itr != pi0.end(); ++itr) {
         setGammasError(*itr, ip_position, ip_error);
     }
+        makeVertexFit()
+
 
 
 //    setPi0Error(pi0);
@@ -1548,9 +1576,9 @@ void Reco::event(BelleEvent *evptr, int *status) {
     setGenHepInfoT(Ksr0bar);
     
 //     if(useVTX) {
-//         vertex_staged( phi0, debugVtx );
-//         vertex_staged( Ksr0, debugVtx );
-//         vertex_staged( Ksr0bar, debugVtx );
+//         makeVertexFit( phi0, debugVtx );
+//         makeVertexFit( Ksr0, debugVtx );
+//         makeVertexFit( Ksr0bar, debugVtx );
 //     }
     
     if (debugPhiKsr) {
@@ -1570,8 +1598,8 @@ void Reco::event(BelleEvent *evptr, int *status) {
     // checkKaonPionPID(Dss_p);
     
 //     if(useVTX) {
-//         vertex_staged( Dss_p, debugVtx );
-//         vertex_staged( Dss_m, debugVtx );
+//         makeVertexFit( Dss_p, debugVtx );
+//         makeVertexFit( Dss_m, debugVtx );
 //     }
     
     if (debugDss) {
@@ -1591,8 +1619,8 @@ void Reco::event(BelleEvent *evptr, int *status) {
     setGenHepInfoT(Dss_p_2317);
     
 //     if(useVTX) {
-//         vertex_staged( Dss_p_2317, debugVtx );
-//         vertex_staged( Dss_m_2317, debugVtx );
+//         makeVertexFit( Dss_p_2317, debugVtx );
+//         makeVertexFit( Dss_m_2317, debugVtx );
 //     }
     
     if (debugDss_2317) {
@@ -1611,8 +1639,8 @@ void Reco::event(BelleEvent *evptr, int *status) {
     setGenHepInfoT(Bs0bar);
     
 //     if(useVTX) {
-//         vertex_staged( Bs0, debugVtx );
-//         vertex_staged( Bs0bar, debugVtx );
+//         makeVertexFit( Bs0, debugVtx );
+//         makeVertexFit( Bs0bar, debugVtx );
 //     }
     
 //     combination( BsStar0,    Ptype( 533), Bs0,    gammaV, dM_Bs0 );
