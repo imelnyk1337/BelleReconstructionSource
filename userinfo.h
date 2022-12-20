@@ -12,24 +12,27 @@ using namespace std;
 
 class UserInfo : public ParticleUserInfo {
 private:
-    double m_msComb; // mass after combination
-    double m_msKvf;  // mass after vertex fitter
-    double m_msKmv;
-    double m_chisq;     // chi2 after last vertexing
-    double m_chisqKvf;  // chi2 after Kvf vertexing
-    double m_cl;        // cl after last vertexing
-    double m_clKvf;     // cl after Kvf vertexing
-    double m_dist2IP;       // distance to IP after vertex
-    double m_dist2IPmvf;    // distance to IP after mass-vertex fitter
-    double m_dist2Mother;   // distance to Mother
-    bool m_useTube;  // use tube in vertexing
-    bool m_useKmvf;  // use mass-vertex fitter to correct momentum
-    bool m_isAdoptCut; // pass through cuts
-    double m_wMass;
-    double m_maxChi2;
-    double m_helicity;
-    double m_pid;   // probability of particle identification for Dss children, def value = -1
-    Particle* particle;
+    double m_msComb;             // invariant mass after combination
+    double m_msKvf;              // invariant mass after Kvf vertex fitting
+    double m_msKmvf;             // invariant mass after Kmvf vertex fitting (mass-constraint fit)
+    double m_chisq;              // chi2 after the last vertexing (vertex fitting)
+    double m_chisqKvf;           // chi2 after Kvf vertex fitting
+    double m_chisqProbKvf;       // Prob_chi2 after Kvf vertex fitting
+    double m_chisqKmvf;          // chi2 after Kmvf vertex fitting (mass-constraint fit)
+    double m_chisqProbKmvf;      // Prob_chi2 after Kmvf vertex fitting (mass-constraint fit)
+    double m_cl;                 // cl after the last vertexing
+    double m_clKvf;              // cl after Kvf vertexing
+    double m_dist2IP;            // distance to IP after vertex
+    double m_dist2IPmvf;         // distance to IP after Kmvf vertex fitting (mass-constraint fit)
+    double m_dist2Mother;        // distance to Mother
+    bool   m_useTube;            // use tube in vertexing
+    bool   m_useKmvf;            // use mass-constraint fit (Kmvf) to correct momentum
+    bool   m_isAdoptCut;         // pass through cuts
+    double m_wMass;              // mass window for particle pre-selection (soft cuts)
+    double m_maxChi2;            // maximum chi2 of vertexing
+    double m_helicity;           // cos of helicity angle Theta for Dss children (which one exactly .. ??)
+    double m_pid;                // probability of particle identification for Dss children, def value = -1.
+    Particle* particle;          // pointer to the source instance (Particle class object)
 
     void init();
 
@@ -60,14 +63,23 @@ public:
     void msKvf(double v);
     double msKvf() const;
 
-    void msKmv(double v);
-    double msKmv() const;
+    void msKmvf(double v);
+    double msKmvf() const;
 
     void chisq(double v);
     double chisq() const;
 
     void chisqKvf(double v);
     double chisqKvf() const;
+
+    void probChi2Kvf(double v);
+    double probChi2Kvf() const;
+
+    void chisqKmvf(double v);
+    double chisqKmvf() const;
+
+    void probChi2Kmvf(double v);
+    double probChi2Kmvf() const;
 
     void cl(double v);
     double cl() const;

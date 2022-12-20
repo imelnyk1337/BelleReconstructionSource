@@ -6,24 +6,29 @@ namespace Belle {
 
 // UserInfo Class
 
+
+// Object initialization
 void UserInfo::init() {
-    m_msComb = -1.;
-    m_msKvf = -1.;
-    m_msKmv = -1;
-    m_chisq = -1.;
-    m_chisqKvf = -1.;
-    m_cl = -1.;
-    m_clKvf = -1.;
-    m_dist2IP = -1.;
-    m_dist2IPmvf = -1.;
-    m_dist2Mother = -1.;
-    m_useTube = false;
-    m_useKmvf = false;
-    m_isAdoptCut = true;
-    double m_wMass = 1000.;
-    double m_maxChi2 = 1.e6;
+    m_msComb          = -1.;
+    m_msKvf           = -1.;
+    m_msKmvf          = -1.;
+    m_chisq           = -1.;
+    m_chisqKvf        = -1.;
+    m_chisqProbKvf    = -1.;
+    m_chisqKmvf       = -1.;
+    m_chisqProbKmvf   = -1.;
+    m_cl              = -1.;
+    m_clKvf           = -1.;
+    m_dist2IP         = -1.;
+    m_dist2IPmvf      = -1.;
+    m_dist2Mother     = -1.;
+    m_useTube         = false;
+    m_useKmvf         = false;
+    m_isAdoptCut      = true;
+    double m_wMass    = 1000.;
+    double m_maxChi2  = 1.e6;
     double m_helicity = -1.;
-    double m_pid = -1.;
+    double m_pid      = -1.;
 }
     
     
@@ -39,24 +44,27 @@ UserInfo::UserInfo(Particle& a_particle) {
 }
 
 UserInfo::UserInfo(const UserInfo& x) : ParticleUserInfo(x) {
-    m_msComb = x.m_msComb;
-    m_msKvf = x.m_msKvf;
-    m_msKmv = x.m_msKmv; 
-    m_chisq = x.m_chisq; 
-    m_chisqKvf = x.m_chisqKvf; 
-    m_cl = x.m_cl;
-    m_clKvf = x.m_clKvf;
-    m_dist2IP = x.m_dist2IP;
-    m_dist2IPmvf = x.m_dist2IPmvf;
+    m_msComb        = x.m_msComb;
+    m_msKvf         = x.m_msKvf;
+    m_msKmvf        = x.m_msKmvf;
+    m_chisq         = x.m_chisq;
+    m_chisqKvf      = x.m_chisqKvf;
+    m_chisqProbKvf  = x.m_chisqProbKvf;
+    m_chisqProbKmvf = x.m_chisqProbKmvf;
+    m_chisqKmvf   = x.m_chisqKmvf;
+    m_cl          = x.m_cl;
+    m_clKvf       = x.m_clKvf;
+    m_dist2IP     = x.m_dist2IP;
+    m_dist2IPmvf  = x.m_dist2IPmvf;
     m_dist2Mother = x.m_dist2Mother;
-    m_useTube = x.m_useTube;
-    m_useKmvf = x.m_useKmvf;
-    m_isAdoptCut = x.m_isAdoptCut;
-    m_wMass = x.m_wMass;
-    m_maxChi2 = x.m_maxChi2;
-    m_helicity = x.m_helicity;
-    m_pid = x.m_pid;
-    particle = x.particle;
+    m_useTube     = x.m_useTube;
+    m_useKmvf     = x.m_useKmvf;
+    m_isAdoptCut  = x.m_isAdoptCut;
+    m_wMass       = x.m_wMass;
+    m_maxChi2     = x.m_maxChi2;
+    m_helicity    = x.m_helicity;
+    m_pid         = x.m_pid;
+    particle      = x.particle;
 }
 
 UserInfo* UserInfo::clone(void) const {
@@ -74,14 +82,23 @@ double UserInfo::msComb() const {return m_msComb;}
 void UserInfo::msKvf(double v) {m_msKvf = v;}
 double UserInfo::msKvf() const {return m_msKvf;}
 
-void UserInfo::msKmv(double v) {m_msKmv = v;};
-double UserInfo::msKmv() const {return m_msKmv;};
+void UserInfo::msKmvf(double v) {m_msKmvf = v;}
+double UserInfo::msKmvf() const {return m_msKmvf;}
 
 void UserInfo::chisq(double v) {m_chisq = v;}
 double UserInfo::chisq() const {return m_chisq;}
 
 void UserInfo::chisqKvf(double v) {m_chisqKvf = v;}
 double UserInfo::chisqKvf() const {return m_chisqKvf;}
+
+void UserInfo::probChi2Kvf(double v) {m_chisqProbKvf = v;}
+double UserInfo::probChi2Kvf() const {return m_chisqProbKvf;}
+
+void UserInfo::chisqKmvf(double v) {m_chisqKmvf = v;}
+double UserInfo::chisqKmvf() const {return m_chisqKmvf;}
+
+void UserInfo::probChi2Kmvf(double v) {m_chisqProbKmvf = v;}
+double UserInfo::probChi2Kmvf() const {return m_chisqProbKmvf;}
 
 void UserInfo::cl(double v) {m_cl = v;}
 double UserInfo::cl() const {return m_cl;}
