@@ -687,7 +687,7 @@ void printTrkPID(vector<Particle> &trkList, string pType, string comment = "") {
     printf("\n");
 }
 //***********************************************************
-void printVtxDebug( std::vector<Particle> &plist, string comment="", string comment2="" ){
+void printVtxDebug( std::vector<Particle>& plist, string comment="", string comment2="" ){
     int np = plist.size();
     printf("\n----- Vtx (%i) %9s %s ---\n", np, comment.c_str(), comment2.c_str() );
     for (int i = 0; i < np; ++i) {
