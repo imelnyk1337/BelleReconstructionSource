@@ -40,7 +40,7 @@ string pclType(int id) {
     string sid;
     if      (id ==   0) sid = "--";
     else if (id ==   1) sid = "d";
-    else if (id==  -1) sid = "anti-d";
+    else if (id ==  -1) sid = "anti-d";
     else if (id ==   2) sid = "u";
     else if (id ==  -2) sid = "anti-u";
     else if (id ==   3) sid = "s";
@@ -264,19 +264,19 @@ double getMsGammaInPi0(Particle& gam) {
 // ***********************************************************
 void withGammaInPi0(std::vector<Particle>& Gamma, std::vector<Particle>& pi0, 
             double minMsPi0=0.118, double maxMsPi0=0.150) {
-    for(int i = 0; i < (int)Gamma.size(); ++i) {
-        bool idErase = false;
+    for (size_t i = 0; i < Gamma.size(); ++i) {
+        bool isErase = false;
         for (int iPi0 = 0; iPi0 < pi0.size(); ++iPi0) {
             Particle& g1 = pi0[iPi0].child(0);
             Particle& g2 = pi0[iPi0].child(1);
             double ms_gg = (g1.p() + g2.p()).m();
             if (ms_gg > minMsPi0 && ms_gg < maxMsPi0) {
-                if (abs(g1.ptot() - Gamma[i].ptot()) < 1.e-3) idErase = true;
-                if (abs(g2.ptot() - Gamma[i].ptot()) < 1.e-3) idErase = true;
+                if (abs(g1.ptot() - Gamma[i].ptot()) < 1.e-3) isErase = true;
+                if (abs(g2.ptot() - Gamma[i].ptot()) < 1.e-3) isErase = true;
             }
         }
 
-        if(idErase) {
+        if(isErase) {
             Gamma.erase(Gamma.begin() + i);
             --i;
         }
@@ -287,17 +287,14 @@ int IDhep(Particle& part) {
     if(!part.genHepevt()) return 0;
     return part.genHepevt().idhep();
 }
-
 // ***********************************************************
-bool isLikeTrk(int lund, string chrgType="Charged_pi0") {
+bool isLikeTrk(int lund, string chrgType = "Charged_pi0") {
     int ln = abs(lund);
-    bool isTrk = (ln==11) || (ln==13) || (ln==211) || 
-            (ln==321) || (ln==11) || (ln==2212); // el, mu, pi, K, p
-    if ( chrgType!="onlyCharged" )
-        isTrk = isTrk || (ln==111) || (ln==22) ;  // pi0 & gamma
+    bool isTrk = (ln == 11) || (ln == 13) || (ln == 211) ||(ln == 321) || (ln == 11) || (ln == 2212); // el, mu, pi, K, p
+    if ( chrgType != "onlyCharged" )
+        isTrk = isTrk || (ln == 111) || (ln == 22) ;  // pi0 & gamma
     return isTrk;
 }
-
 // ***********************************************************
 void printPclDebug(Particle& p, string comment = "", string comment2 = "") {
     int expNo, runNo, evtNo;
@@ -341,32 +338,29 @@ void printPclDebug(Particle& p, string comment = "", string comment2 = "") {
                ID, IDhep(p), pclType( IDhep(p) ).c_str() );
     }
 }
-
 // ***********************************************************
-void printPclDebug(vector<Particle>& plist, string comment="", string comment2=""){
-    int np = plist.size();
-    printf("\n----- List of Particles (%i) %9s %s ---\n", np, comment.c_str(), comment2.c_str() );
-    for (int i=0; i<np; i++) {
-        printPclDebug( plist[i], comment, comment);
+void printPclDebug(vector<Particle>& p_list, string comment = "", string comment2 = "") {
+    size_t np = p_list.size();
+    printf("\n----- List of Particles (%i) %9s %s ---\n", np, comment.c_str(), comment2.c_str());
+    for (size_t i = 0; i < np; ++i) {
+        printPclDebug( p_list[i], comment, comment);
     }
 }
-
 // ***********************************************************
 void printUserInfo(Particle& p) {
-    UserInfo &info = dynamic_cast<UserInfo&>(p.userInfo());
+    UserInfo& info = dynamic_cast<UserInfo&>(p.userInfo());
     printf("----- printUserInfo -----  msComb:%8.5f, msKvf:%8.5f, chisq:%8.3f, chisqKvf:%8.3f, cl:%8.6f, clKvf:%8.6f, \n              dist2IP:%8.5f, dist2IPmvf:%8.5f, useTube:%i, useKmvf:%i,  isAdoptCut:%i, wMass:%8.5f, maxChi2:%8.3f,  helicity:%6.4f \n", 
-           info.msComb(), info.msKvf(), info.chisq(), info.chisqKvf(), info.cl(), info.clKvf(), info.dist2IP(), info.dist2IPmvf(), 
+           info.msComb(), info.msKvf(), info.chisq(), info.chisqKvf(), info.cl(), info.clKvf(), info.dist2IP(), info.dist2IPKmvf(),
            (int)info.useTube(), (int)info.useKmvf(), (int)info.isAdoptCut(), info.wMass(), info.maxChi2(), info.helicity() );
 }
 // ***********************************************************
-
 void dRdZ(const Mdst_charged& charged, int massHyp, const HepPoint3D& ip_position,
-                                                            double& dR, double& dZ) {
+                                                            double dR, double dZ) {
 
     if (charged.trk()) {
         Mdst_trk& trk = charged.trk();
         if (trk.mhyp(massHyp)) {
-            Mdst_trk_fit &trkFit = trk.mhyp(massHyp);
+            Mdst_trk_fit& trkFit = trk.mhyp(massHyp);
 
             HepPoint3D pivot;
             pivot.setX((double) trkFit.pivot(0));
@@ -392,12 +386,10 @@ void dRdZ(const Mdst_charged& charged, int massHyp, const HepPoint3D& ip_positio
     dR = 100.;
     dZ = 100.;
 }
-
 // ***********************************************************
-
-void withdRdZcut(std::vector<Particle>& list, const HepPoint3D& ip_position, double dRcut, double dZcut) {
-    for (int i = 0; i < (int) list.size(); ++i) {
-        int id = abs(list[i].pType().lund());
+void withdRdZcut(std::vector<Particle>& p_list, const HepPoint3D& ip_position, double dRcut, double dZcut) {
+    for (size_t i = 0; i < p_list.size(); ++i) {
+        int id = abs(p_list[i].pType().lund());
 
         int mhyp;
         if (id == 11) mhyp = 0;
@@ -408,10 +400,10 @@ void withdRdZcut(std::vector<Particle>& list, const HepPoint3D& ip_position, dou
         else mhyp = 2;
 
         double dr, dz;
-        dRdZ(list[i].mdstCharged(), mhyp, ip_position, dr, dz);
+        dRdZ(p_list[i].mdstCharged(), mhyp, ip_position, dr, dz);
 
         if (dr > dRcut || dz > dZcut) {
-            list.erase(list.begin() + i);
+            p_list.erase(p_list.begin() + i);
             --i;
         }
     }
@@ -446,12 +438,12 @@ void withPi0MassGamGamCut(std::vector<Particle>& pi0, double dM_max) {
             ++i;
     }
 }
-
 /* **********************************************************
  * performs a neutral pion's (pi0) gammas' energies in order
  * to select better candidates. Operates with gammas that
  * belong to a pi0
 */
+// ***********************************************************
 void withPi0GammPCut(std::vector<Particle>& pi0, double p_min) {
     for (std::vector<Particle>::iterator i = pi0.begin(); i != pi0.end();)
         if (i->child(0).ptot() < p_min || i->child(1).ptot() < p_min)
@@ -460,43 +452,43 @@ void withPi0GammPCut(std::vector<Particle>& pi0, double p_min) {
             ++i;
 }
 // ***********************************************************
-void createUserInfo(Particle& p) {
-    p.userInfo(*(new UserInfo(p)));
-    UserInfo& info = dynamic_cast<UserInfo&>(p.userInfo());
-    int lund = (int)p.lund();
+void createUserInfo(Particle& particle) {
+    particle.userInfo(*(new UserInfo(particle)));
+    UserInfo& info = dynamic_cast<UserInfo&>(particle.userInfo());
+    int lund = (int)particle.lund();
     double cTau = Ptype(lund).cTau();
     bool useTube = false;
     double wMass = dM_Dgr;
 
-    if ((abs(lund) > 500) && (abs(lund) < 600)) { // B0, Bc
+    if ((abs(lund) > 500) && (abs(lund) < 600)) {                         // B0, Bc
         useTube = true;
         wMass = wB;
     } else if ((lund      == 310) || (abs(lund) == 3122) || (lund == 333)) { // K0s, Lam0, Phi0
         wMass = dM_V0;
-    } else if (abs(lund)  == 313) { // K*0
+    } else if (abs(lund)  == 313) {                                          // K*0
         wMass = dM_Ksr0;
-    } else if ((abs(lund) == 113) || (abs(lund) == 213)) { // RHO0,+.-
+    } else if ((abs(lund) == 113) || (abs(lund) == 213)) {                // RHO0,+.-
         wMass = dM_Rho;
-    } else if ((abs(lund) == 413) || (abs(lund) == 423)) { // D*+, D*0feve
+    } else if ((abs(lund) == 413) || (abs(lund) == 423)) {                // D*+, D*0feve
         useTube = true; 
         wMass = wDst;
-    } else if (abs(lund)  == 431) { // DS+
+    } else if (abs(lund)  == 431) {                                          // DS+
         wMass = dM_Dss;
-    } else if (abs(lund)  == 433) { // D*S+
+    } else if (abs(lund)  == 433) {                                          // D*S+
         useTube = true; 
         wMass = dM_Dsst;
-    } else if (abs(lund)  == 10431) { // D**S+(D_sJ(2317))
+    } else if (abs(lund)  == 10431) {                                        // D**S+(D_sJ(2317))
         useTube = true;
         wMass = dM_2317;
-    } else if (abs(lund)  == 443) { // J/psi
+    } else if (abs(lund)  == 443) {                                          // J/psi
         useTube = true; 
     }
     
-    info.msComb(p.p().m());
-    info.maxChi2(maxChisq);
+    info.msComb(particle.p().m());
+    info.maxChi2(-1.);
     info.wMass(wMass);
     info.useTube(useTube);
-    info.useKmvf(cTau > 1.e-5 ? true : false);
+    info.useKmvf(cTau > 1.e-5);
     info.isAdoptCut(true);
     info.chisqKvf(-1.);
     info.chisqKmvf(-1.);
@@ -504,7 +496,7 @@ void createUserInfo(Particle& p) {
     info.probChi2Kmvf(-1.);
     info.helicity(-1.);
 }
-
+// ***********************************************************
 void createUserInfo(std::vector<Particle>& p_list) {
     std::vector<Particle>::iterator particle;
     for (particle = p_list.begin(); particle != p_list.end(); ++particle) {
@@ -520,7 +512,6 @@ void setBadVtx(Particle& particle) {
     info.isAdoptCut(false);
 }
 // ***********************************************************
-
 double distanceToIP(Particle& particle) {
     const HepPoint3D& ip_position = IpProfile::position();
     Hep3Vector vtxIP(IpProfile::position().x(), IpProfile::position().y(), 0.0);
@@ -529,12 +520,13 @@ double distanceToIP(Particle& particle) {
     return vtx_D_IP.mag();
 }
 // ***********************************************************
-void makeVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = false) {
+void makeVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = false,
+                   bool addBeam = false) {
     /*
      * Fitting DecayMother -> DecayChild1 + DecayChild2 + ... + trk1 + trk2 + ...
      * another string
      * here should be documentation for this function --
-     * makeVertexFit(Particle&, bool, bool)
+     * makeVertexFit(Particle&, bool, bool, bool)
      */
 
 
@@ -585,17 +577,17 @@ void makeVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = fals
             }
         }
         addTrack2fit(kvfMother, Child);
+        if (addBeam && IpProfile::usable()) addBeam2fit(kvfMother);
     }
 
     if (infoMother.useTube()) addTube2fit(kvfMother);
     err = kvfMother.fit();
 
     // If OK, 0 is returned
-
     if (err) {
         setBadVtx(Mother);
 
-        // =============== Printing option for debugging =======================
+        // =============== The printing option for debugging =======================
         // ===== Does not have a physics- or reconstruction-related sence ======
         // May be just skipped, set to True to display and/or print in stdout ==
         if (debugDump) {
@@ -626,15 +618,15 @@ void makeVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = fals
             double dx = Mother.momentum().decayVertex().x() - Child.momentum().decayVertex().x();
             double dy = Mother.momentum().decayVertex().y() - Child.momentum().decayVertex().y();
             double dz = Mother.momentum().decayVertex().z() - Child.momentum().decayVertex().z();
-            double dist2Mother = sqrt(dx*dx + dy*dy + dz*dz);
+            double dist2Mother = sqrt(dx * dx + dy * dy + dz * dz);
             infoChild.dist2Mother(dist2Mother);
         }
     }
                 
-        // check on long-lived particles as criteria to use mass-vertex
+    // Checking for long-living particles as a criteria of mass-constraint fit
     double cTauMother = Ptype(lundMother).cTau();
-    // bool useKmvf = false;
-    // if (cTauMother>1.e-5) useKmvf =  true;
+    if (cTauMother > 1.e-5) useKmvf =  true;
+    // making it unenabled for Ds2317. PDG id: 10431 of abs. units
     if (abs(lundMother) == 10431) useKmvf = false;
 
     infoMother.useKmvf(useKmvf);
@@ -652,9 +644,13 @@ void makeVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = fals
         }
         makeMother(kmvMother, Mother);
         Mother.momentum().decayVertex(kmvMother.vertex(), kmvMother.errVertex());
-        infoMother.chisq(kmvMother.chisq());
+        if (infoMother.chisq() <= kmvMother.chisq()) {
+            infoMother.chisq(kmvMother.chisq());
+        }
         infoMother.cl(kmvMother.cl());
-        infoMother.dist2IPmvf(distanceToIP(Mother));
+        infoMother.dist2IPKmvf(distanceToIP(Mother));
+        infoMother.msKmvf(Mother.p().m());
+        infoMother.probChi2Kmvf(kmvMother.dgf());
     }
 
     // =============== Printing option for debugging =================
@@ -751,7 +747,7 @@ void printVtxDebug( std::vector<Particle>& plist, string comment = "", string co
 // ***********************************************************
 void clearVectors() {
     // clear all vectors
-    for (int i=0; i<nTrk; i++) trkV[i].clear();
+    for (int i = 0; i < nTrk; ++i) trkV[i].clear();
     gammaV.clear();
     pi0.clear();
     phi0.clear();
@@ -806,36 +802,61 @@ double getHelicity(Particle& p, int indDough=0) {
 }
 
 // **********************************************************
-void checkAdoptCutMassChisqVtx(Particle& p, double pL, double pR, double maxChisq=1.e3, string status="", int iChild=0) {
-    // if maxChisq<0 vtx cuts not used
+void checkAdoptCutMassChisqKvf(Particle& particle, double pL, double pR,
+                               double maxChisq = 2.e2, string status = "", int iChild = 0) {
+    // If maxChisq < 0 vtx cuts are not used
     // status: "", "massdif"
-    UserInfo& info = dynamic_cast<UserInfo&>(p.userInfo());
-    double ms = info.msKvf();
-    // double ms = p.p().m();
+    UserInfo& info = dynamic_cast<UserInfo&>(particle.userInfo());
+    double ms      = info.msKvf();
+    // double ms = particle.p().m();
     if (status == "massdif") {
-        Particle& pChild = p.child(iChild);
+        Particle& pChild    = particle.child(iChild);
         UserInfo& infoChild = dynamic_cast<UserInfo&>(pChild.userInfo());
-        // ms -= p.relation().child(iChild).p().m();
-        ms = info.msComb() - infoChild.msComb();
+        ms                  = info.msComb() - infoChild.msComb();
     }
-    bool idErase = false;
-    double chisqCand = info.chisqKvf();
-    double vx = p.momentum().decayVertex().x();
-    double vy = p.momentum().decayVertex().y();
-    double vz = p.momentum().decayVertex().z();
+
+    bool isErase    = false;
+    double chisqKvf = info.chisqKvf();
+    double vx       = particle.momentum().decayVertex().x();
+    double vy       = particle.momentum().decayVertex().y();
+    double vz       = particle.momentum().decayVertex().z();
     if (maxChisq > 0.) {
-        idErase = (chisqCand > maxChisq || chisqCand < 0. || abs(vz) > 50. || sqrt(vx*vx + vy*vy) > 30. || ms < pL || ms > pR);
+        isErase = (chisqKvf > maxChisq || chisqKvf < 0. || abs(vz) > 50. || sqrt(vx * vx + vy * vy) > 30. || ms < pL || ms > pR);
     } else {
-        idErase = ms < pL || ms > pR;
+        isErase = ms < pL || ms > pR;
     }
-    if (idErase) {
+    if (isErase) {
         info.isAdoptCut(false);
     }
-    // printf("----checkAdoptCutMassChisqVtx [%s] --- ms:%f, pL:%f, pR:%f, maxChi2:%f, chisqCand:%f, vx:%f, vy:%f, vz:%f, --- idErase:%i \n",
-    // pclType((int)p.lund()).c_str(), ms, pL, pR, maxChisq, chisqCand, vx,vy,vz, (int)idErase);
+    // printf("----checkAdoptCutMassChisqKvf [%s] --- ms:%f, pL:%f, pR:%f, maxChi2:%f, chisqKvf:%f, vx:%f, vy:%f, vz:%f, --- isErase:%i \n",
+    // pclType((int)p.lund()).c_str(), ms, pL, pR, maxChisq, chisqKvf, vx,vy,vz, (int)isErase);
 }
+// **********************************************************
+void checkAdoptCutMassChisqKvf(std::vector<Particle>& p_list, double pL, double pR,
+                               double maxChisq = 1.e3, string status = "", int iChild = 0) {
+    for (size_t i = 0; i < p_list.size(); ++i) {
+        checkAdoptCutMassChisqKvf(p_list[i], pL, pR, maxChisq, status, iChild);
+    }
+}
+// **********************************************************
+void checkAdoptCutChisqKmvf(Particle& particle, double maxChisq = 2.e2) {
 
-void withKaonId(std::vector<Particle>& p_list, const double prob, int accq0, int tofq0, int cdcq0, int ids0, int idb0) {
+    // If maxChisq < 0 wtx cuts are not used
+    UserInfo& info   = dynamic_cast<UserInfo&>(particle.userInfo());
+    bool isErase     = false;
+    double chisqKmvf = info.chisqKmvf();
+    if (maxChisq > 0.) isErase = (chisqKmvf > maxChisq);
+    if (isErase) info.isAdoptCut(false);
+}
+// **********************************************************
+void checkAdoptCutChisqKmvf(std::vector<Particle>& p_list, double maxChisq = 2.e2) {
+    for (size_t i = 0; i < p_list.size(); ++i) {
+        checkAdoptCutChisqKmvf(p_list[i], maxChisq);
+    }
+}
+// **********************************************************
+void withKaonId(std::vector<Particle>& p_list, const double prob, int accq0,
+                                        int tofq0, int cdcq0, int ids0, int idb0) {
 
   atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
   for (size_t i = 0; i < p_list.size(); ++i) {
@@ -872,140 +893,6 @@ void withPionId(std::vector<Particle>& p_list, const double prob, int accq0, int
         --i;
     }
   }
-}
-
-void checkKaonPionPID(std::vector<Particle>& DssList, double k1MinProb=0.6, double k2MinProb=0.2, double piMaxProb = 0.9) {
-    for (size_t iDss = 0; iDss < DssList.size(); iDss++) {
-        // First Ds child
-        Particle& DssChild1 = DssList[iDss].child(0);
-        // Its children
-        Particle& DssChild11 = DssChild1.child(0);
-        Particle& DssChild12 = DssChild1.child(1);
-        // Second Ds child
-        Particle& DssChild2 = DssList[iDss].child(1);
-        int child1Lund = DssChild1.lund();
-        int child2Lund = DssChild2.lund();
-        std::string child1Name = pclType(child1Lund);
-        std::string child2Name = pclType(child2Lund);
-        std::cout << "First Ds child: " << child1Name << " , second Ds child: " << child2Name << std::endl;
-        // First Dss child children
-        int child11Lund = DssChild11.lund();
-        int child12Lund = DssChild12.lund();
-        std::string child11Name = pclType(child11Lund);
-        std::string child12Name = pclType(child12Lund);
-        std::cout << "--- First child of the 1st Ds child: " << child11Name << " , second child of the 1st Ds child: " << child12Name << std::endl;
-        
-        if (child1Lund == 333) {          // phi -> K+ K-, and the second Dss child is pi
-            Particle& kaon1 = DssChild11; // positive -- >= 0.6
-            Particle& kaon2 = DssChild12; // negative -- >= 0.2
-            Particle& pion  = DssChild2;  // pion     -- <  0.9
-            // PID kaon1PID_KPI(kaon1, 3, 1, 5, 3, 2);
-            // PID kaon2PID_KPI(kaon2, 3, 1, 5, 3, 2);
-            // double kaon1Prob_KPI = kaon1PID_KPI.kIdProb();
-            // double kaon2Prob_KPI = kaon2PID_KPI.kIdProb();
-
-            if (!&kaon1.userInfo()) createUserInfo(kaon1);
-            UserInfo& info_kaon1 = dynamic_cast<UserInfo&>(kaon1.userInfo());
-
-            if (!&kaon2.userInfo()) createUserInfo(kaon2);
-            UserInfo& info_kaon2 = dynamic_cast<UserInfo&>(kaon2.userInfo());
-
-            if (!&pion.userInfo()) createUserInfo(pion);
-            UserInfo& info_pion = dynamic_cast<UserInfo&>(pion.userInfo());
-
-            double kaon1Prob_KPI = info_kaon1.probpid();
-            double kaon2Prob_KPI = info_kaon2.probpid();
-            double pionProb_KPI = info_pion.probpid();
-            std::cout << "--- --- Compared to pion, the first kaon prob: " << kaon1Prob_KPI << " ,the second kaon prob: " << kaon2Prob_KPI << std::endl;
-            if (kaon1Prob_KPI >= k1MinProb && pionProb_KPI < piMaxProb) {
-                if (kaon2Prob_KPI < k2MinProb) {
-                    DssList.erase(DssList.begin() + iDss);
-                    std::cout << "--- --- --- Delete" << std::endl;
-                }
-            }
-            else if (kaon1Prob_KPI < k1MinProb || pionProb_KPI >= piMaxProb) {
-                    DssList.erase(DssList.begin() + iDss);
-                    std::cout << "--- --- --- Delete" << std::endl;
-            }   
-        }
-        else if (child1Lund == 313) {     // K*0 -> K+ pi-, and another Dss child is K
-            Particle& kaon1 = DssChild11; // positive kaon -- >= 0.6
-            Particle& kaon2 = DssChild2;  // negative kaon -- >= 0.2
-            Particle& pion = DssChild12;  // nagative pion  -- <  0.9
-
-            // PID kaon1PID_KPI(kaon1, 3, 1, 5, 3, 2);
-            // PID kaon2PID_KPI(kaon2, 3, 1, 5, 3, 2);
-            // double kaon1Prob_KPI = kaon1PID_KPI.kIdProb();
-            // double kaon2Prob_KPI = kaon2PID_KPI.kIdProb();
-
-            if (!&kaon1.userInfo()) createUserInfo(kaon1);
-            UserInfo& info_kaon1 = dynamic_cast<UserInfo&>(kaon1.userInfo());
-
-            if (!&kaon2.userInfo()) createUserInfo(kaon2);
-            UserInfo& info_kaon2 = dynamic_cast<UserInfo&>(kaon2.userInfo());
-
-            if (!&pion.userInfo()) createUserInfo(pion);
-            UserInfo& info_pion = dynamic_cast<UserInfo&>(pion.userInfo());
-
-            double kaon1Prob_KPI = info_kaon1.probpid();
-            double kaon2Prob_KPI = info_kaon2.probpid();
-            double pionProb_KPI = info_pion.probpid();
-
-            std::cout << "--- --- Compared to pion, first kaon prob: " << kaon1Prob_KPI << ", second kaon prob: " << kaon2Prob_KPI << std::endl;
-            if (kaon1Prob_KPI >= k1MinProb && pionProb_KPI < piMaxProb) {
-                if (kaon2Prob_KPI < k2MinProb) {
-                    DssList.erase(DssList.begin() + iDss);
-                    std::cout << "--- --- --- Delete" << std::endl;
-                }
-            }
-            else if (kaon1Prob_KPI < k1MinProb || pionProb_KPI >= piMaxProb) {
-                    DssList.erase(DssList.begin() + iDss);
-                    std::cout << "--- --- --- Delete" << std::endl;
-            }   
-        }
-        else if (child1Lund == -313) {    // K*0bar -> K- pi+, and another Dss child is K
-            Particle& kaon2 = DssChild11; // negative kaon -- >= 0.2
-            Particle& kaon1 = DssChild2;  // positive kaon -- >= 0.6
-            Particle& pion = DssChild12;  // positive pion  -- <  0.9
-            // PID kaon1PID_KPI(kaon1, 3, 1, 5, 3, 2);
-            // PID kaon2PID_KPI(kaon2, 3, 1, 5, 3, 2);
-            // double kaon1Prob_KPI = kaon1PID_KPI.kIdProb();
-            // double kaon2Prob_KPI = kaon2PID_KPI.kIdProb();
-
-            if (!&kaon1.userInfo()) createUserInfo(kaon1);
-            UserInfo& info_kaon1 = dynamic_cast<UserInfo&>(kaon1.userInfo());
-
-            if (!&kaon2.userInfo()) createUserInfo(kaon2);
-            UserInfo& info_kaon2 = dynamic_cast<UserInfo&>(kaon2.userInfo());
-
-            if (!&pion.userInfo()) createUserInfo(pion);
-            UserInfo& info_pion = dynamic_cast<UserInfo&>(pion.userInfo());
-
-            double kaon1Prob_KPI = info_kaon1.probpid();
-            double kaon2Prob_KPI = info_kaon2.probpid();
-            double pionProb_KPI = info_pion.probpid();
-
-            std::cout << "--- --- Compared to pion, first kaon prob: " << kaon1Prob_KPI << ", second kaon prob: " << kaon2Prob_KPI << std::endl;
-            if (kaon1Prob_KPI >= 0.6 && pionProb_KPI < 0.9) {
-                if (kaon2Prob_KPI < 0.2) {
-                    DssList.erase(DssList.begin() + iDss);
-                    std::cout << "--- --- --- Delete" << std::endl;
-                }
-            }
-            else if (kaon1Prob_KPI < 0.6 || pionProb_KPI >= 0.9) {
-                    DssList.erase(DssList.begin() + iDss);
-                    std::cout << "--- --- --- Delete" << std::endl;
-            }   
-        }
-    }
-}
-
-// **********************************************************
-void checkAdoptCutMassChisqVtx( std::vector<Particle>& plist, double pL, double pR, 
-            double maxChisq=1.e3, string status="", int iChild=0){
-    for (int i = 0; i < (int)plist.size(); ++i) {
-        checkAdoptCutMassChisqVtx(plist[i], pL, pR, maxChisq, status, iChild);
-    }
 }
 // **********************************************************
 int getEvtGenType() {
@@ -1142,10 +1029,11 @@ void gen_val_dump(BelleTuple* tt, bool gen_pcl, VectorL pclL, string sfx, bool d
     }
 }
 // ***********************************************************
-void dumpDssChild(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = false,
+void dumpDsChild(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = false,
              bool stDump = true, bool debugDump = false) {
-    // printf("\n======== dumpDssChild  ========= chg_dss_child:%i, ms_dss_child:%7.3f ) \n",
-    //                (int)P.lund(), P.p().m() );
+
+    // printf("\n======== dumpDsChild  ========= chg_dss_child:%i, ms_dss_child:%7.3f ) \n",
+    // (int)P.lund(), P.p().m() );
     if (evtInfoDump) evtInfo_dump(tt, debugDump);
     // printf("---- 1 ----- \n");
     
@@ -1162,7 +1050,7 @@ void dumpDssChild(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDu
     double msLimLeft  = massPDG - info.wMass();
     double msLimRight = massPDG + info.wMass();
 
-    checkAdoptCutMassChisqVtx(P, msLimLeft, msLimRight, info.maxChi2());
+    checkAdoptCutMassChisqKvf(P, msLimLeft, msLimRight, info.maxChi2());
     if (!info.isAdoptCut()) {
         if (debugDump) {
             printf("\n       *****  DssChild is not adopted ******\n" );
@@ -1181,7 +1069,7 @@ void dumpDssChild(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDu
     double d2m    = info.dist2Mother();
     double msKvf  = info.msKvf(); // dgr.p().m() ; //
     double msComb = info.msComb();
-//     double helic = getHelicity(dgr);
+    // double helic = getHelicity(dgr);
     double helic = info.helicity();
     double pidprob = info.probpid();
     
@@ -1219,7 +1107,7 @@ void dumpDssChild(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDu
     string pclTitD[nValD] = {"ms", "chi", "pt", "ph", "th"};
 
     if (debugDump) {
-        printf("\n======== dumpDssChild  ========= (%s) chg_dss_child:%i, ms_dss_child:%7.3f ) \n", 
+        printf("\n======== dumpDsChild  ========= (%s) chg_dss_child:%i, ms_dss_child:%7.3f ) \n",
                ChildPcl.c_str(), (int)P.lund(), msKvf);
         printUserInfo(P);
     }
@@ -1229,7 +1117,8 @@ void dumpDssChild(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDu
     if (stDump) tt->dumpData();
 }
 // ***********************************************************
-void dumpDss(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=false, bool stDump=true, bool debugDump=false) {
+void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = false,
+            bool stDump = true, bool debugDump = false) {
 
     if (evtInfoDump) evtInfo_dump(tt, debugDump);
     int lund = (int)P.lund();
@@ -1247,7 +1136,7 @@ void dumpDss(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=fals
     double msLimRight = massPDG + info.wMass();
 
     // validation of chi2 value
-    checkAdoptCutMassChisqVtx(P, msLimLeft, msLimRight, info.maxChi2());
+    checkAdoptCutMassChisqKvf(P, msLimLeft, msLimRight, info.maxChi2());
     if (!info.isAdoptCut()) {
         if (debugDump) {
             printf("\n       *****  Dss is not adopted ******\n" );
@@ -1298,7 +1187,7 @@ void dumpDss(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=fals
     tt->column("hel_ch" + sfxDs, helicChild1);
     val_dump(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
     gen_val_dump(tt, gen_pcl, dssL, genDgrSuff, debugDump);
-    dumpDssChild(tt, Child, sfxDs, false, false, debugDump);
+    dumpDsChild(tt, Child, sfxDs, false, false, debugDump);
     if (stDump) tt->dumpData();
 }
 // ***********************************************************
@@ -1359,7 +1248,7 @@ void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=f
     gen_val_dump(tt, gen_d17, ds17L, genDgrSuff, debugDump);
     dumpPi0(tt, pi0_2317, "_p0_d", debugDump);
     
-    dumpDss(tt, Child, sfxDs, false, false, debugDump);
+    dumpDs(tt, Child, sfxDs, false, false, debugDump);
 
     if (stDump) tt->dumpData();
 }   
@@ -1371,19 +1260,37 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
 
     if (!&P.userInfo()) createUserInfo(P);
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
+
+    /* Checking whether the particle candidate has been vertexed
+     * Mass-constraint fitting (Kmvf) is impossible to perform without using
+     * a simple vertex fit (Kvf). So, the chisqKvf != -1., is a valid criteria
+     * to find out the particle's vertex fit status.
+    */
     if (info.chisqKvf() < 0.) {
         // particle not vertexed yet
         makeVertexFit(P, debugDump);
     }
-    double chisq  = info.chisqKvf(); // -1.; // 
-    double msKvf  = info.msKvf(); // dgr.p().m() ; // 
+    // Retrieval of the values after vertex fitting
+    double chisqKvf      = info.chisqKvf();      // -1.; //
+    double chisqKmvf     = info.chisqKmvf();
+    double probChisqKvf  = info.probChi2Kvf();
+    double probChisqKmvf = info.probChi2Kmvf();
+    double msComb        = info.msComb();
+    double msKvf         = info.msKvf();         // dgr.p().m(); //
+    double msKmvf        = info.msKmvf();        // -1.; //
+    double cl            = info.cl();
+    double clKvf         = info.clKvf();
+    double clKmvf        = info.clKmvf();
 
     Particle& Dss_Bs0 = P.child(0);
     Particle& Dss2317_Bs0 = P.child(1);
     Particle& pi0_Bs0 = P.child(2);
     Particle& pi0_Ds2317 = Dss2317_Bs0.child(1);
     
-    Hep3Vector P3D(P.px(), P.py(), P.pz());
+    double px_bs = P.px();
+    double py_bs = P.py();
+    double pz_bs = P.pz();
+    Hep3Vector P3D(px_bs, py_bs, pz_bs);
     
     double vx = P.momentum().decayVertex().x();
     double vy = P.momentum().decayVertex().y();
@@ -1392,35 +1299,76 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     int chg_bs = (int)P.lund() > 0 ? 1 : -1;
     
 
-    VectorL pB  = pStar(P.p());
+    VectorL pB = pStar(P.p());
     double de_bs_old = pB.e() - Benergy();
     double de_bs = pB.e() - BeamEnergy::E_beam_corr();
     double mbc_bs_old = beamEnergyConstraint(P);
     
-    double energyEl = BeamEnergy::E_HER();
+    double energyEl  = BeamEnergy::E_HER();
     double energyPos = BeamEnergy::E_LER();
-    double angle = BeamEnergy::Cross_angle();
-    double mbc_bs = beamEnergyConstraint(P, energyEl, energyPos, angle);
-    // double mbc_bs = get_m_bc( P );
+    double angle     = BeamEnergy::Cross_angle();
+    double mbc_bs    = beamEnergyConstraint(P, energyEl, energyPos, angle);
     
     const int nValI = 2; 
-    const int nValD = 10; 
+    const int nValD = 21;
     int valPclI[nValI] = {chg_bs, gen_bs};
-    double valPclD[nValD] = {msKvf, chisq, vx, vy, vz, P3D.perp(), P3D.phi(), P3D.theta(), mbc_bs, de_bs};
+    double valPclD[nValD] = {msKvf,
+                             msKmvf,
+                             msComb,
+                             chisqKvf,
+                             chisqKmvf,
+                             probChisqKvf,
+                             probChisqKmvf,
+                             cl,
+                             clKvf,
+                             clKmvf,
+                             vx,
+                             vy,
+                             vz,
+                             px_bs,
+                             py_bs,
+                             pz_bs,
+                             P3D.perp(),
+                             P3D.phi(),
+                             P3D.theta(),
+                             mbc_bs,
+                             de_bs
+    };
     string pclTitI[nValI] = {"chg", "gen"};
-    string pclTitD[nValD] = {"ms", "chi", "vx", "vy", "vz", "pt", "ph", "th", "mbc", "de"};
+    string pclTitD[nValD] = {"msV",
+                             "msM",
+                             "msC",
+                             "chiV",
+                             "chiM",
+                             "prbV",
+                             "prbM",
+                             "cl",
+                             "clV",
+                             "clM",
+                             "px",
+                             "py",
+                             "pz",
+                             "vx",
+                             "vy",
+                             "vz",
+                             "pt",
+                             "ph",
+                             "th",
+                             "mbc",
+                             "de"
+    };
     
     
     if (debugDump) {
         printf("\n\n======== Bs0  ========= chg_bs:%i,  gen_bs:%i, ms_bs:%7.3f , de_bs: %7.3f , de_bs_old: %7.3f, mbc_bs: %7.3f , mbc_bs_old: %7.3f \n", 
-               chg_bs, gen_bs, msKvf, de_bs, de_bs_old, mbc_bs, mbc_bs_old );
-        printUserInfo( P );
+               chg_bs, gen_bs, msKvf, de_bs, de_bs_old, mbc_bs, mbc_bs_old);
+        printUserInfo(P);
     }
     
     val_dump(  tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, "_bs", debugDump );
     dumpPi0(  tt, pi0_Bs0,    "_p0_b",            debugDump);
     dumpPi0(  tt, pi0_Ds2317, "_p0_d",            debugDump);
-    dumpDss(   tt, Dss_Bs0,     "1", false, false, debugDump);
+    dumpDs(   tt, Dss_Bs0,     "1", false, false, debugDump);
     dumpDs2317(tt, Dss2317_Bs0, "2", false, false, debugDump);
 
     if (stDump) tt->dumpData();
@@ -1440,66 +1388,66 @@ void printVectPclWithChildren(std::vector<Particle>& pcl, string tit = "") {
 // ***********************************************************
 void Reco::event(BelleEvent *evptr, int *status) {
     *status = 0;
-    bool debugTrkPID = false;
-    bool debugVtx = false;
-    bool debugPi0 = false;
-    bool debugPhiKsr = false;
-    bool debugDss = false;
+    bool debugTrkPID   = false;
+    bool debugVtx      = false;
+    bool debugPi0      = false;
+    bool debugPhiKsr   = false;
+    bool debugDss      = false;
     bool debugDss_2317 = false;
-    bool debugBs0 = false;
+    bool debugBs0      = false;
     
-    bool debugDumpDss=false;
-    bool debugDump2317=false;
-    bool debugDumpBs0=false;
+    bool debugDumpDss  = false;
+    bool debugDump2317 = false;
+    bool debugDumpBs0  = false;
 
     const HepPoint3D &ip_position = IpProfile::position(1);
-    const HepSymMatrix &ip_error = IpProfile::position_err(1);
-//  Gen_hepevt_Manager& hepevt = Gen_hepevt_Manager::get_manager();
+    const HepSymMatrix& ip_error  = IpProfile::position_err(1);
+    // Gen_hepevt_Manager& hepevt = Gen_hepevt_Manager::get_manager();
 
     // Event Information
     int expNo = 0, runNo = 0, evtNo = 0;
     getEventInfo(expNo, runNo, evtNo, McFlag); // utility.cc
-//     printf("\n---- exp:%2i,  run:%2i, evt:%i, ip_position:[%f, %f, %f] ----\n", 
-//     expNo,runNo,evtNo, ip_position.x(), ip_position.y(), ip_position.z() );
+    // printf("\n---- exp:%2i,  run:%2i, evt:%i, ip_position:[%f, %f, %f] ----\n",
+    // expNo,runNo,evtNo, ip_position.x(), ip_position.y(), ip_position.z() );
     printf("\n\n***************** exp:%2i,  run:%2i, evt:%i *********************\n", expNo, runNo, evtNo);
   
     // Event Shape
     double r2 = -1.;
 
-    Evtcls_hadron_info_Manager &clsMgr = Evtcls_hadron_info_Manager::get_manager();
+    Evtcls_hadron_info_Manager& clsMgr = Evtcls_hadron_info_Manager::get_manager();
     if (clsMgr.count()) r2 = clsMgr[0].R2();
 
     ////////////////////  make charged particles - tracks //////////////////
     // makes Kaon and Pion from MdstCharged w/o cut. 1 : w/ good_charged, 0 : w/o
-    makeKPi(trkV[2], trkV[3], trkV[0], trkV[1], 0); //k_p, k_m, pi_p, pi_m
+    makeKPi(trkV[2], trkV[3], trkV[0], trkV[1], 1); //k_p, k_m, pi_p, pi_m
 
     if (debugTrkPID) {
         printf("\n");
         printf("---- exp:%2i,  run:%2i, evt:%i ----\n", expNo, runNo, evtNo);
-        for (int itr = 0; itr < nTrk; itr++)
+        for (int itr = 0; itr < nTrk; ++itr)
             printTrkPID(trkV[itr], trkTit[itr], "before");
     }
 
     double minProbPID_Kn = 0.2, minProbPID_Kp = 0.6,
     minProbProtPID = 0.0, maxProbEl = 1.0, maxProbPion = 0.9;  // preselected
-// If each plist element is not within atc_pID.prob >= prob,
-// its element is removed from plist.
+    // If each plist element is not within atc_pID.prob >= prob,
+    // its element is removed from plist.
     withKaonId(trkV[2], minProbPID_Kp, 3, 1, 5, 3, 2);      // K+ vs bg pi
     withKaonId(trkV[3], minProbPID_Kn, 3, 1, 5, 3, 2);      // K- vs bg pi
-    withKaonId(trkV[2], minProbPID_Kp, 3, 1, 5, 3, 4);       // K+ vs bg p
-    withKaonId(trkV[3], minProbPID_Kn, 3, 1, 5, 3, 4);       // K- vs bg p
+    withKaonId(trkV[2], minProbPID_Kp, 3, 1, 5, 3, 4);      // K+ vs bg p
+    withKaonId(trkV[3], minProbPID_Kn, 3, 1, 5, 3, 4);      // K- vs bg p
 
-// If each plist element is not within atc_pID.prob < prob,
-// its element is removed from plist.
-    withPionId(trkV[0], maxProbPion, 3, 1, 5, 2, 3); // pi+ vs bg K
-    withPionId(trkV[1], maxProbPion, 3, 1, 5, 2, 3); // pi- vs bg K
+    // If each plist element is not within atc_pID.prob < prob,
+    // its element is removed from plist.
+    withPionId(trkV[0], maxProbPion, 3, 1, 5, 2, 3);  // pi+ vs bg K
+    withPionId(trkV[1], maxProbPion, 3, 1, 5, 2, 3);  // pi- vs bg K
     withPionId(trkV[0], maxProbPion, 3, 1, 5, 2, 4);  // pi+ vs bg p
     withPionId(trkV[1], maxProbPion, 3, 1, 5, 2, 4);  // pi- vs bg p
 
 
-// If each plist element is not associated with rphi & z-svd hits
-// whose number is equal to or larger than nRSvdHit and nZSvdHit,
-// its element is removed from plist.
+    // If each plist element is not associated with rphi & z-svd hits
+    // whose number is equal to or larger than nRSvdHit and nZSvdHit,
+    // its element is removed from plist.
     for (int itr = 0; itr < nTrk; ++itr) {
         withSVD2(trkV[itr], 1, 1); // nRSvdHit, nZSvdHit
         withdRdZcut(trkV[itr], ip_position, 0.5, 3.0);
@@ -1561,7 +1509,7 @@ void Reco::event(BelleEvent *evptr, int *status) {
 
     if (debugPi0) {
         printf(" pi0[%i]  \n", pi0.size());
-    //         printPi0( pi0 );
+        // printPi0(pi0);
     }
 
     // Match candidates with genhep info 
@@ -1570,18 +1518,20 @@ void Reco::event(BelleEvent *evptr, int *status) {
         setGenHepInfoP(pi0);
     }    
     
-    combination(phi0,    Ptype("PHI"),  trkV[2],   trkV[3], dM_V0); // k_p, k_m
-    combination(Ksr0,    Ptype("K*0"),  trkV[2],   trkV[1], dM_Ksr0); // k_p, pi_m
-    combination(Ksr0bar, Ptype("K*B"),  trkV[3],   trkV[0], dM_Ksr0); // k_m, pi_p
+    combination(phi0,      Ptype("PHI"),  trkV[2],   trkV[3], dM_V0); // k_p, k_m
+    combination(Ksr0,      Ptype("K*0"),  trkV[2],   trkV[1], dM_Ksr0); // k_p, pi_m
+    combination(Ksr0bar,   Ptype("K*B"),  trkV[3],   trkV[0], dM_Ksr0); // k_m, pi_p
     setGenHepInfoT(phi0);
     setGenHepInfoT(Ksr0);
     setGenHepInfoT(Ksr0bar);
     
-//     if(useVTX) {
-//         makeVertexFit( phi0, debugVtx );
-//         makeVertexFit( Ksr0, debugVtx );
-//         makeVertexFit( Ksr0bar, debugVtx );
-//     }
+    /* if (useVTX) {
+     *     makeVertexFit(phi0, debugVtx);
+     *     makeVertexFit(Ksr0, debugVtx);
+     *     makeVertexFit(Ksr0bar, debugVtx);
+     * }
+    */
+
     
     if (debugPhiKsr) {
         printf("         phi0[%i]  \n", phi0.size());
@@ -1592,17 +1542,18 @@ void Reco::event(BelleEvent *evptr, int *status) {
     combination(Dss_p, Ptype("DS+"),    phi0,     trkV[0], dM_Dss); // phi0, pi_p
     combination(Dss_m, Ptype("DS-"),    phi0,     trkV[1], dM_Dss); // phi0, pi_m
     combination(Dss_p, Ptype("DS+"),    Ksr0bar,  trkV[2], dM_Dss); // K*0bar (K-pi+), k_p
-    combination(Dss_m, Ptype("DS-"),    Ksr0,     trkV[3], dM_Dss);  // K*0 (K+pi-), k_m
+    combination(Dss_m, Ptype("DS-"),    Ksr0,     trkV[3], dM_Dss); // K*0 (K+pi-), k_m
     setGenHepInfoT(Dss_p);
     setGenHepInfoT(Dss_m);
 
     // checkKaonPionPID(Dss_m);
     // checkKaonPionPID(Dss_p);
     
-    //     if (useVTX) {
-    //         makeVertexFit(Dss_p, debugVtx);
-    //         makeVertexFit(Dss_m, debugVtx);
-    //     }
+    /* if (useVTX) {
+     *     makeVertexFit(Dss_p, debugVtx);
+     *     makeVertexFit(Dss_m, debugVtx);
+     * }
+    */
     
     if (debugDss) {
         if (Dss_p.size() + Dss_m.size() > 0) {
@@ -1618,10 +1569,11 @@ void Reco::event(BelleEvent *evptr, int *status) {
     setGenHepInfoT(Dss_m_2317);
     setGenHepInfoT(Dss_p_2317);
     
-    //     if(useVTX) {
-    //         makeVertexFit( Dss_p_2317, debugVtx );
-    //         makeVertexFit( Dss_m_2317, debugVtx );
-    //     }
+    /* if (useVTX) {
+     *     makeVertexFit(Dss_p_2317, debugVtx);
+     *     makeVertexFit(Dss_m_2317, debugVtx);
+     * }
+    */
     
     if (debugDss_2317) {
         if (Dss_p_2317.size() + Dss_m_2317.size() > 0) {
@@ -1638,26 +1590,27 @@ void Reco::event(BelleEvent *evptr, int *status) {
     setGenHepInfoT(Bs0);
     setGenHepInfoT(Bs0bar);
     
-//     if(useVTX) {
-//         makeVertexFit( Bs0, debugVtx );
-//         makeVertexFit( Bs0bar, debugVtx );
-//     }
-    
-//     combination( BsStar0,    Ptype( 533), Bs0,    gammaV, dM_Bs0 );
-//     combination( BsStar0bar, Ptype(-533), Bs0bar, gammaV, dM_Bs0 );
-//     setGenHepInfoT(BsStar0);
-//     setGenHepInfoT(BsStar0bar);
+    /* if(useVTX) {
+     *     makeVertexFit(Bs0, debugVtx);
+     *     makeVertexFit(Bs0bar, debugVtx);
+     * }
+    */
 
-//     combination( Upsilon_5S, Ptype(9000553),  BsStar0, BsStar0bar, dM_Bs0 );
+    /* combination(BsStar0, Ptype(533), Bs0, gammaV, dM_Bs0);
+     * combination(BsStar0bar, Ptype(-533), Bs0bar, gammaV, dM_Bs0);
+     * setGenHepInfoT(BsStar0);
+     * setGenHepInfoT(BsStar0bar);
+     * combination(Upsilon_5S, Ptype(9000553),  BsStar0, BsStar0bar, dM_Bs0);
+     */
     
     // ----------------------------  Dump  ---------------------------
     //   Dss
     string sfxDs = "";
     if (stDumpDss) {
         for (int iEvt=0; iEvt < Dss_p.size(); iEvt++) 
-                dumpDss(TP_Dss, Dss_p[iEvt], sfxDs, true, stDumpDss, debugDumpDss);
+                dumpDs(TP_Dss, Dss_p[iEvt], sfxDs, true, stDumpDss, debugDumpDss);
         for (int iEvt=0; iEvt < Dss_m.size(); iEvt++) 
-                dumpDss(TP_Dss, Dss_m[iEvt], sfxDs, true, stDumpDss, debugDumpDss);
+                dumpDs(TP_Dss, Dss_m[iEvt], sfxDs, true, stDumpDss, debugDumpDss);
     }    
     //  Dss(2317)
     if (stDump2317) {
@@ -1673,13 +1626,13 @@ void Reco::event(BelleEvent *evptr, int *status) {
         for (int iEvt=0; iEvt < Bs0bar.size(); iEvt++)
                 dumpBs0(TP_Bs0, Bs0bar[iEvt], true, stDumpBs0, debugDumpBs0);
     }    
-//     printf("---------  clearVectors (final)   ---------------\n");
+    // printf("---------  clearVectors (final)   ---------------\n");
     clearVectors();
-//     printf("------------------  Reco end --------------------  \n");
+    // printf("------------------  Reco end --------------------  \n");
 
 }
 
 #if defined(BELLE_NAMESPACE)
-}//namespace Belle
+} // namespace Belle
 #endif
 

@@ -19,8 +19,9 @@ void UserInfo::init() {
     m_chisqProbKmvf   = -1.;
     m_cl              = -1.;
     m_clKvf           = -1.;
+    m_clKmvf          = -1.;
     m_dist2IP         = -1.;
-    m_dist2IPmvf      = -1.;
+    m_dist2IPKmvf     = -1.;
     m_dist2Mother     = -1.;
     m_useTube         = false;
     m_useKmvf         = false;
@@ -51,20 +52,21 @@ UserInfo::UserInfo(const UserInfo& x) : ParticleUserInfo(x) {
     m_chisqKvf      = x.m_chisqKvf;
     m_chisqProbKvf  = x.m_chisqProbKvf;
     m_chisqProbKmvf = x.m_chisqProbKmvf;
-    m_chisqKmvf   = x.m_chisqKmvf;
-    m_cl          = x.m_cl;
-    m_clKvf       = x.m_clKvf;
-    m_dist2IP     = x.m_dist2IP;
-    m_dist2IPmvf  = x.m_dist2IPmvf;
-    m_dist2Mother = x.m_dist2Mother;
-    m_useTube     = x.m_useTube;
-    m_useKmvf     = x.m_useKmvf;
-    m_isAdoptCut  = x.m_isAdoptCut;
-    m_wMass       = x.m_wMass;
-    m_maxChi2     = x.m_maxChi2;
-    m_helicity    = x.m_helicity;
-    m_pid         = x.m_pid;
-    particle      = x.particle;
+    m_chisqKmvf     = x.m_chisqKmvf;
+    m_cl            = x.m_cl;
+    m_clKvf         = x.m_clKvf;
+    m_clKmvf        = x.m_clKmvf;
+    m_dist2IP       = x.m_dist2IP;
+    m_dist2IPKmvf   = x.m_dist2IPKmvf;
+    m_dist2Mother   = x.m_dist2Mother;
+    m_useTube       = x.m_useTube;
+    m_useKmvf       = x.m_useKmvf;
+    m_isAdoptCut    = x.m_isAdoptCut;
+    m_wMass         = x.m_wMass;
+    m_maxChi2       = x.m_maxChi2;
+    m_helicity      = x.m_helicity;
+    m_pid           = x.m_pid;
+    particle        = x.particle;
 }
 
 UserInfo* UserInfo::clone(void) const {
@@ -106,11 +108,14 @@ double UserInfo::cl() const {return m_cl;}
 void UserInfo::clKvf(double v) {m_clKvf = v;}
 double UserInfo::clKvf() const {return m_clKvf;}
 
+void UserInfo::clKmvf(double v) {m_clKmvf = v;}
+double UserInfo::clKmvf() const {return m_clKmvf;};
+
 void UserInfo::dist2IP(double v) {m_dist2IP = v;}
 double UserInfo::dist2IP() const {return m_dist2IP;}
 
-void UserInfo::dist2IPmvf(double v) {m_dist2IPmvf = v;}
-double UserInfo::dist2IPmvf() const {return m_dist2IPmvf;}
+void UserInfo::dist2IPKmvf(double v) {m_dist2IPKmvf = v;}
+double UserInfo::dist2IPKmvf() const {return m_dist2IPKmvf;}
 
 void UserInfo::dist2Mother(double v) {m_dist2Mother = v;}
 double UserInfo::dist2Mother() const {return m_dist2Mother;}

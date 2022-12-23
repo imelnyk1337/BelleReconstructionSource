@@ -22,8 +22,9 @@ private:
     double m_chisqProbKmvf;      // Prob_chi2 after Kmvf vertex fitting (mass-constraint fit)
     double m_cl;                 // cl after the last vertexing
     double m_clKvf;              // cl after Kvf vertexing
+    double m_clKmvf;             // cl after Kmvf vertexing
     double m_dist2IP;            // distance to IP after vertex
-    double m_dist2IPmvf;         // distance to IP after Kmvf vertex fitting (mass-constraint fit)
+    double m_dist2IPKmvf;        // distance to IP after Kmvf vertex fitting (mass-constraint fit)
     double m_dist2Mother;        // distance to Mother
     bool   m_useTube;            // use tube in vertexing
     bool   m_useKmvf;            // use mass-constraint fit (Kmvf) to correct momentum
@@ -55,7 +56,7 @@ public:
     // Copy operator
     UserInfo& operator = (const UserInfo &);
 
-//    void SetParticlePointer(Particle *p) { particle = p; }
+    // void SetParticlePointer(Particle* p) {particle = p;}
 
     void msComb(double v);
     double msComb() const;
@@ -87,11 +88,14 @@ public:
     void clKvf(double v);
     double clKvf() const;
 
+    void clKmvf(double v);
+    double clKmvf() const;
+
     void dist2IP(double v);
     double dist2IP() const;
 
-    void dist2IPmvf(double v);
-    double dist2IPmvf() const;
+    void dist2IPKmvf(double v);
+    double dist2IPKmvf() const;
 
     void dist2Mother(double v);
     double dist2Mother() const;
