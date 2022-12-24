@@ -998,7 +998,8 @@ void dumpPi0(BelleTuple* tt, Particle& p0, string sfx, bool debugDump) {
     Particle& g2 = p0.child(1);
 
     double msPi0_gg = (g1.p() + g2.p()).m();
-    double psrPi0 = pStar(p0.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    double psrPi0   = pStar(p0.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    double pPi0     = p0.momentum().p().mag();
     // double pPi0 = .... // there should be pi0 momentum magnitude
 
     bool gen_pi0 = IDhep(p0) == 0 ? false : true;
@@ -1029,16 +1030,16 @@ void dumpPi0(BelleTuple* tt, Particle& p0, string sfx, bool debugDump) {
 void val_dump(BelleTuple* tt, int nValI, int nValD, int* valPclI, double* valPclD, string* pclTitI, string* pclTitD, 
                                                                                             string sfx, bool debugDump) {
     if (debugDump) {
-        printf("  ==== val_dump ==== dec:(%s): ", sfx.c_str() );
+        printf("  ==== val_dump ==== dec:(%s): ", sfx.c_str());
         for (int iVal=0; iVal<nValI; iVal++) 
             printf("(%s:%6i) ", ( pclTitI[iVal]+sfx ).c_str(), valPclI[iVal]);
         for (int iVal=0; iVal<nValD; iVal++) 
             printf("(%s:%6.3f) ", ( pclTitD[iVal]+sfx ).c_str(), valPclD[iVal]);
         printf("\n");
     }
-    for (int iVal = 0; iVal < nValI; iVal++) 
+    for (int iVal = 0; iVal < nValI; ++iVal)
         tt->column(pclTitI[iVal] + sfx, valPclI[iVal]);
-    for (int iVal = 0; iVal < nValD; iVal++) 
+    for (int iVal = 0; iVal < nValD; ++iVal)
         tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
 }
 // ***********************************************************
@@ -1150,8 +1151,7 @@ void dumpDsChild(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDum
     if (stDump) tt->dumpData();
 }
 // ***********************************************************
-void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = false,
-            bool stDump = true, bool debugDump = false) {
+void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = false, bool stDump = true, bool debugDump = false) {
 
     if (evtInfoDump) evtInfo_dump(tt, debugDump);
     int lund = (int)P.lund();
@@ -1160,15 +1160,15 @@ void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = f
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
 
     if (info.chisqKvf() < 0.) {
-        // particle not vertexed yet
+        // particle has not been vertexed yet
         makeVertexFit(P, debugDump, true);
     }
     
-    double massPDG = Ptype(lund).mass();
+    double massPDG    = Ptype(lund).mass();
     double msLimLeft  = massPDG - info.wMass();
     double msLimRight = massPDG + info.wMass();
 
-    // validation of chi2 value
+    // validation of chi2 values
     checkAdoptCutMassChisqKvf(P, msLimLeft, msLimRight, info.maxChi2());
     if (!info.isAdoptCut()) {
         if (debugDump) {
@@ -1184,7 +1184,7 @@ void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = f
     }
     double chisq  = info.chisqKvf(); // -1.; // ???
     double msKvf  = info.msKvf();    // dgr.p().m() ; // 
-    double helic = info.helicity();
+    double helic  = info.helicity();
 
 
     
