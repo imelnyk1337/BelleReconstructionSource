@@ -206,60 +206,36 @@ void setGammaError(std::vector<Particle>& p) {
 }
 
 // ************ Set error matrix (dpx) for pi0 ******************/
-void setPi0Error(Particle& p) {
-    if (p.nChildren() != 2) return;
+void setPi0Error(Particle& particle) {
+    if (particle.nChildren() != 2) return;
     HepSymMatrix tmpErr(3, 0);
     HepPoint3D org(0., 0., 0.);
-    if (!p.child(0).mdstGamma() || !p.child(1).mdstGamma()) return;
+    if (!particle.child(0).mdstGamma() || !particle.child(1).mdstGamma()) return;
     for (unsigned i = 0; i < 2; ++i)
-        setGammaError(p.child(i));
+        setGammaError(particle.child(i));
     // setGammaError( p.child(i), org, tmpErr);
 
     // kmassfitter kmv;
     kmassvertexfitter kmv;
     if (useBF) kmv.magneticField(BF);
-    kmv.invariantMass(p.pType().mass());
+    kmv.invariantMass(particle.pType().mass());
     for (unsigned i = 0; i < 2; ++i)
-        addTrack2fit(kmv, p.child(i));
+        addTrack2fit(kmv, particle.child(i));
     // kmv.vertex(org);
     // kmv.atDecayPoint();
     int err = kmv.fit();
     if (!err) {
         kmakemother kmm2;
         if (useBF) kmm2.magneticField(BF);
-        makeMother(kmm2, kmv, p, 0);
-        // makeMother(kmv,p);
-        p.momentum().vertex(kmv.vertex(), kmv.errVertex());
+        makeMother(kmm2, kmv, particle, 0);
+        // makeMother(kmv, particle);
+        particle.momentum().vertex(kmv.vertex(), kmv.errVertex());
     }
 }
 
-void setPi0Error(std::vector<Particle>& p) {
-  for (std::vector<Particle>::iterator itr = p.begin(); itr !=p.end(); ++itr)
+void setPi0Error(std::vector<Particle>& p_list) {
+  for (std::vector<Particle>::iterator itr = p_list.begin(); itr != p_list.end(); ++itr)
       setPi0Error(*itr);
-}
-// ***********************************************************
-double getMsGammaInPi0(Particle& gam) {
-
-    // std::vector<Particle> pi0;
-    // makePi0(pi0);
-    // withPi0GammPCut( pi0,  0.030 );
-    // withPi0pStarCut( pi0,  0.050 );
-
-    double msGG = 0.25;
-    for (int iPi0 = 0; iPi0 < pi0.size(); ++iPi0) {
-        Particle& g1 = pi0[iPi0].child(0);
-        Particle& g2 = pi0[iPi0].child(1);
-        bool idGamPi0 = false;
-        if (abs(g1.ptot() - gam.ptot()) < 1.e-3) idGamPi0 = true;
-        if (abs(g2.ptot() - gam.ptot()) < 1.e-3) idGamPi0 = true;
-        if (idGamPi0) {
-            double ms_gg = (g1.p() + g2.p()).m();
-            if (abs(ms_gg - Ptype("PI0").mass()) < msGG) 
-                msGG = ms_gg;
-        }
-    }
-    // pi0.clear();
-    return msGG;
 }
 // ***********************************************************
 void withGammaInPi0(std::vector<Particle>& Gamma, std::vector<Particle>& pi0, 
@@ -450,6 +426,30 @@ void withPi0GammPCut(std::vector<Particle>& pi0, double p_min) {
             pi0.erase(i);
         else
             ++i;
+}
+// ***********************************************************
+double getMsGammaInPi0(Particle& gamma) {
+
+    std::vector<Particle> pi0;
+    makePi0(pi0);
+    withPi0GammPCut(pi0,  0.030);
+//    withPi0pStarCut(pi0,  0.050);
+
+    double msGG = -1.;
+    for (size_t iPi0 = 0; iPi0 < pi0.size(); ++iPi0) {
+        Particle& g1 = pi0[iPi0].child(0);
+        Particle& g2 = pi0[iPi0].child(1);
+        bool idGamPi0 = false;
+        if (abs(g1.ptot() - gamma.ptot()) < 1.e-3) idGamPi0 = true;
+        if (abs(g2.ptot() - gamma.ptot()) < 1.e-3) idGamPi0 = true;
+        if (idGamPi0) {
+            double ms_gg = (g1.p() + g2.p()).m();
+            if (abs(ms_gg - Ptype("PI0").mass()) < msGG)
+                msGG = ms_gg;
+        }
+    }
+    pi0.clear();
+    return msGG;
 }
 // ***********************************************************
 void createUserInfo(Particle& particle) {
@@ -647,10 +647,11 @@ void makeVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = fals
         if (infoMother.chisq() <= kmvMother.chisq()) {
             infoMother.chisq(kmvMother.chisq());
         }
-        infoMother.cl(kmvMother.cl());
+        infoMother.clKmvf(kmvMother.cl());
         infoMother.dist2IPKmvf(distanceToIP(Mother));
         infoMother.msKmvf(Mother.p().m());
         infoMother.probChi2Kmvf(kmvMother.dgf());
+        infoMother.chisqKmvf(kmvMother.chisq());
     }
 
     // =============== Printing option for debugging =================
@@ -688,13 +689,14 @@ void printPi0(vector<Particle>& pi0, string comment = "") {
     printf("------  %s Pi0 (%i) -------\n", comment.c_str(), pi0.size());
     double E_HER = BeamEnergy::E_HER();
     double E_LER = BeamEnergy::E_LER();
+    double CROSS_ANGLE = BeamEnergy::Cross_angle();
     
     for (size_t iPi0 = 0; iPi0 < pi0.size(); ++iPi0) {
         Particle& p0 = pi0[iPi0];
         Particle& g1 = pi0[iPi0].child(0);
         Particle& g2 = pi0[iPi0].child(1);
         double msPi0_gg = (g1.p() + g2.p()).m();
-        double psrPi0 = pStar(p0.p(), E_HER, E_LER).vect().mag();
+        double psrPi0 = pStar(p0.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
         printf(" Pi0 (%i)  mass:%7.5f, [px,py,pz]:[%7.4f, %7.4f, %7.4f], p:%6.4f,  p_cm:%6.4f,  Eg(1,2): [%6.4f, %6.4f], ms_gg:%7.5f\n",
         iPi0, p0.mass(), p0.px(), p0.py(), p0.pz(), p0.ptot(), psrPi0, g1.ptot(), g2.ptot(), msPi0_gg);
     }
@@ -855,48 +857,77 @@ void checkAdoptCutChisqKmvf(std::vector<Particle>& p_list, double maxChisq = 2.e
     }
 }
 // **********************************************************
-void withKaonId(std::vector<Particle>& p_list, const double prob, int accq0,
-                                        int tofq0, int cdcq0, int ids0, int idb0) {
+void checkAdoptCutPStar(std::vector<Particle>& p_list, double minPStarValue) {
+    double E_HER       = BeamEnergy::E_HER();
+    double E_LER       = BeamEnergy::E_LER();
+    double CROSS_ANGLE = BeamEnergy::Cross_angle();
+    for (size_t i = 0; i < p_list.size(); ++i) {
+        Particle& particle = p_list[i];
+        double psr = pStar(particle.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+        if (psr > minPStarValue) {
+            continue;
+        }
+        else {
+            p_list.erase(p_list.begin() + i);
+        }
+    }
+}
+// **********************************************************
+void checkAdoptCutPStar(std::vector<Particle>& p_list, double minPStarValue, double maxPStarValue) {
+    double E_HER       = BeamEnergy::E_HER();
+    double E_LER       = BeamEnergy::E_LER();
+    double CROSS_ANGLE = BeamEnergy::Cross_angle();
+    for (size_t i = 0; i < p_list.size(); ++i) {
+        Particle& particle = p_list[i];
+        double psr = pStar(particle.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+        if (psr > minPStarValue && psr < maxPStarValue) {
+            continue;
+        }
+        else {
+            p_list.erase(p_list.begin() + i);
+        }
+    }
+}
+// **********************************************************
+void withKaonId(std::vector<Particle>& p_list, const double prob, int accq0, int tofq0, int cdcq0, int ids0, int idb0) {
+    atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
+    for (size_t i = 0; i < p_list.size(); ++i) {
+        Particle& P = p_list[i];
+        double probParticle = kid.prob(&(P.mdstCharged()));
 
-  atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
-  for (size_t i = 0; i < p_list.size(); ++i) {
-      Particle& P = p_list[i];
-      double probParticle = kid.prob(&(P.mdstCharged()));
+        if (P.mdstCharged() && probParticle >= prob) {
 
-	  if (P.mdstCharged() && probParticle >= prob) {
-
-         if (!&P.userInfo()) createUserInfo(P);
-         UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
-         info.probpid(probParticle);
-      }
-      else {
-          p_list.erase(p_list.begin() + i);
-          --i;
-      }
+            if (!&P.userInfo()) createUserInfo(P);
+            UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
+            info.probpid(probParticle);
+        }
+        else {
+            p_list.erase(p_list.begin() + i);
+            --i;
+        }
   }
 }
 
 void withPionId(std::vector<Particle>& p_list, const double prob, int accq0, int tofq0, int cdcq0, int ids0, int idb0) {
+    atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
+    for (size_t i = 0; i < p_list.size(); ++i) {
+        Particle& P = p_list[i];
+        double probParticle = kid.prob(&(P.mdstCharged()));
+        if (P.mdstCharged() && probParticle < prob) { // a big difference compated to withKaonId
 
-  atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
-  for (size_t i = 0; i < p_list.size(); ++i) {
-      Particle& P = p_list[i];
-      double probParticle = kid.prob(&(P.mdstCharged()));
-      if (P.mdstCharged() && probParticle < prob) { // a big difference compated to withKaonId
-
-         if (!&P.userInfo()) createUserInfo(P);
-         UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
-         info.probpid(probParticle);
+            if (!&P.userInfo()) createUserInfo(P);
+            UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
+            info.probpid(probParticle);
         }
-      else {
-        p_list.erase(p_list.begin() + i);
-        --i;
+        else {
+            p_list.erase(p_list.begin() + i);
+            --i;
     }
   }
 }
 // **********************************************************
 int getEvtGenType() {
-//    0:"Data", 1:"evtgen-charged", 2:"evtgen-mixed", 3:"evtgen-charm", 4:"evtgen-uds", 5:"evtgen-bsbs", 6:"evtgen-nonbsbs"
+    // 0:"Data", 1:"evtgen-charged", 2:"evtgen-mixed", 3:"evtgen-charm", 4:"evtgen-uds", 5:"evtgen-bsbs", 6:"evtgen-nonbsbs"
     Gen_hepevt_Manager &genMgr  = Gen_hepevt_Manager::get_manager();
     for(std::vector<Gen_hepevt>::iterator i = genMgr.begin(); 
                 i != genMgr.end(); ++i) {
@@ -939,7 +970,7 @@ void evtInfo_dump(BelleTuple* tt, bool debugDump=false) {
     //*************  MC  ****************
     tt->column("evtgen", idGenType );
 }
-
+// ***********************************************************
 VectorL getGenVectorL(int idhPcl) {
     VectorL pclL;
     int ID_Pcl = -1; 
@@ -959,14 +990,16 @@ VectorL getGenVectorL(int idhPcl) {
 // ***********************************************************
 void dumpPi0(BelleTuple* tt, Particle& p0, string sfx, bool debugDump) {
 
-    double E_HER = BeamEnergy::E_HER();
-    double E_LER = BeamEnergy::E_LER();
+    double E_HER       = BeamEnergy::E_HER();
+    double E_LER       = BeamEnergy::E_LER();
+    double CROSS_ANGLE = BeamEnergy::Cross_angle();
 
     Particle& g1 = p0.child(0);
     Particle& g2 = p0.child(1);
 
     double msPi0_gg = (g1.p() + g2.p()).m();
-    double psrPi0 = pStar(p0.p(), E_HER, E_LER).vect().mag();
+    double psrPi0 = pStar(p0.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    // double pPi0 = .... // there should be pi0 momentum magnitude
 
     bool gen_pi0 = IDhep(p0) == 0 ? false : true;
     bool gen_g1  = IDhep(g1) == 0 ? false : true;
@@ -1191,49 +1224,123 @@ void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = f
     if (stDump) tt->dumpData();
 }
 // ***********************************************************
-void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs="", bool evtInfoDump=false, bool stDump=true, bool debugDump=false) {
+void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = false, bool stDump = true, bool debugDump = false) {
 
     if (evtInfoDump) evtInfo_dump(tt,debugDump);
 
     if (!&P.userInfo()) createUserInfo(P);
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
     if (info.chisqKvf() < 0.) {
-        // particle not vertexed yet
+        // particle has not been vertexed yet
         makeVertexFit(P, debugDump);
     }
     
-    double chisq        = info.chisqKvf(); // -1.; //
-    double msKvf        = info.msKvf(); // dgr.p().m() ; // 
-    double helic_2317   = -1;
+    double chisqKvf      = info.chisqKvf();       // -1.; //
+    double chisqKmvf     = info.chisqKmvf();
+    double probChisqKvf  = info.probChi2Kvf();
+    double probChisqKmvf = info.probChi2Kmvf();
+    double msComb        = info.msComb();
+    double msKvf         = info.msKvf();         // dgr.p().m(); //
+    double msKmvf        = info.msKmvf();        // -1.; //
+    double cl            = info.cl();
+    double clKvf         = info.clKvf();
+    double clKmvf        = info.clKmvf();
+    double helic_2317    = -1.;
     
 
-    Particle& Child     = P.child(0);
-    Particle& pi0_2317  = P.child(1);
-    UserInfo& infoChild = dynamic_cast<UserInfo&>(Child.userInfo());
-    double msKvfChild   = infoChild.msKvf();
-    double E_HER        = BeamEnergy::E_HER();
-    double E_LER        = BeamEnergy::E_LER();
-    double psr_d17      = pStar(P.p(), E_HER, E_LER).vect().mag();
-    double px_d17       = P.px();
-    double py_d17       = P.py();
-    double pz_d17       = P.pz();
-    double vx_d17       = P.momentum().decayVertex().x();
-    double vy_d17       = P.momentum().decayVertex().y();
-    double vz_d17       = P.momentum().decayVertex().z();
+    Particle& Child           = P.child(0);
+    Particle& pi0_2317        = P.child(1);
+    UserInfo& infoChild       = dynamic_cast<UserInfo&>(Child.userInfo());
+    UserInfo& infoPi0_2317    = dynamic_cast<UserInfo&>(pi0_2317.userInfo());
+
+    double msKvfChild         = infoChild.msKvf();
+    double E_HER              = BeamEnergy::E_HER();
+    double E_LER              = BeamEnergy::E_LER();
+    double CROSS_ANGLE        = BeamEnergy::Cross_angle();
+
+    double psr_d17            = pStar(P.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    double px_d17             = P.px();
+    double py_d17             = P.py();
+    double pz_d17             = P.pz();
+    double p_d17              = P.momentum().p().mag();
+    double production_vx_d17  = P.momentum().vertex().x();
+    double production_vy_d17  = P.momentum().vertex().y();
+    double production_vz_d17  = P.momentum().vertex().z();
+    double xx_d17             = P.momentum().x().x();
+    double xy_d17             = P.momentum().x().y();
+    double xz_d17             = P.momentum().x().z();
+    double decay_vx_d17       = P.momentum().decayVertex().x();
+    double decay_vy_d17       = P.momentum().decayVertex().y();
+    double decay_vz_d17       = P.momentum().decayVertex().z();
 
 
     Hep3Vector P3D(px_d17, py_d17, pz_d17);
+    double perp_d17 = P3D.perp();
+    double phi_d17 = P3D.phi();
+    double theta_d17 = P3D.theta();
     int chg_d17 = (int)P.lund() >  0 ? 1 : -1;
     int gen_d17 = (int)IDhep(P) == 0 ? 0 :  1;
     
     const int nValI = 2;
-    const int nValD = 13; 
+    const int nValD = 26;
     int valPclI[nValI] = {chg_d17, gen_d17};
-    double valPclD[nValD] = {msKvf, chisq, P3D.perp(), psr_d17, P3D.phi(), P3D.theta(), helic_2317, px_d17, py_d17, pz_d17, vx_d17, vy_d17, vz_d17};
+    double valPclD[nValD] = {msKvf,
+                             msKmvf,
+                             msComb,
+                             chisqKvf,
+                             chisqKmvf,
+                             probChisqKvf,
+                             probChisqKmvf,
+                             cl,
+                             clKvf,
+                             clKmvf,
+                             production_vx_d17,
+                             production_vy_d17,
+                             production_vz_d17,
+                             xx_d17,
+                             xy_d17,
+                             xz_d17,
+                             decay_vx_d17,
+                             decay_vy_d17,
+                             decay_vz_d17,
+                             px_d17,
+                             py_d17,
+                             pz_d17,
+                             p_d17,
+                             perp_d17,
+                             phi_d17,
+                             theta_d17
+    };
     string pclTitI[nValI] = {"chg", "gen"};
-    string pclTitD[nValD] = {"ms", "chi", "pt", "psr", "ph", "th", "hel", "px", "py", "pz", "vx", "vy", "vz"};
+    string pclTitD[nValD] = {"msV",
+                             "msM",
+                             "msC",
+                             "chiV",
+                             "chiM",
+                             "prbV",
+                             "prbM",
+                             "cl",
+                             "clV",
+                             "clM",
+                             "px",
+                             "py",
+                             "pz",
+                             "p",
+                             "pVx",
+                             "pVx",
+                             "pVy",
+                             "xx",
+                             "xy",
+                             "xz",
+                             "dVz",
+                             "dVy",
+                             "dVz",
+                             "pt",
+                             "ph",
+                             "th"
+    };
 
-    string dgrSuff="_d17", genDgrSuff="_d17_t";
+    string dgrSuff = "_d17", genDgrSuff = "_d17_t";
     
     if (debugDump) {
         printf("\n======== Ds(2317)  ========= chg_2317:%i, gen_2317:%i, ms_2317:%7.3f , child ( ms:%7.3f ) \n", 
@@ -1286,15 +1393,29 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     Particle& Dss2317_Bs0 = P.child(1);
     Particle& pi0_Bs0 = P.child(2);
     Particle& pi0_Ds2317 = Dss2317_Bs0.child(1);
-    
+
     double px_bs = P.px();
     double py_bs = P.py();
     double pz_bs = P.pz();
+    double p_bs  = P.momentum().p().mag();
+
+    double xx_bs = P.momentum().x().x();
+    double xy_bs = P.momentum().x().y();
+    double xz_bs = P.momentum().x().z();
+
     Hep3Vector P3D(px_bs, py_bs, pz_bs);
-    
-    double vx = P.momentum().decayVertex().x();
-    double vy = P.momentum().decayVertex().y();
-    double vz = P.momentum().decayVertex().z();
+
+    double perp_bs = P3D.perp();
+    double phi_bs  = P3D.phi();
+    double theta_bs = P3D.theta();
+
+    double production_vx = P.momentum().vertex().x();
+    double production_vy = P.momentum().vertex().y();
+    double production_vz = P.momentum().vertex().z();
+
+    double decay_vx = P.momentum().decayVertex().x();
+    double decay_vy = P.momentum().decayVertex().y();
+    double decay_vz = P.momentum().decayVertex().z();
     int gen_bs = (int)IDhep(P) == 0 ? 0 : 1;
     int chg_bs = (int)P.lund() > 0 ? 1 : -1;
     
@@ -1310,7 +1431,7 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     double mbc_bs    = beamEnergyConstraint(P, energyEl, energyPos, angle);
     
     const int nValI = 2; 
-    const int nValD = 21;
+    const int nValD = 28;
     int valPclI[nValI] = {chg_bs, gen_bs};
     double valPclD[nValD] = {msKvf,
                              msKmvf,
@@ -1322,15 +1443,22 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
                              cl,
                              clKvf,
                              clKmvf,
-                             vx,
-                             vy,
-                             vz,
+                             production_vx,
+                             production_vy,
+                             production_vz,
+                             xx_bs,
+                             xy_bs,
+                             xz_bs,
+                             decay_vx,
+                             decay_vy,
+                             decay_vz,
                              px_bs,
                              py_bs,
                              pz_bs,
-                             P3D.perp(),
-                             P3D.phi(),
-                             P3D.theta(),
+                             p_bs,
+                             perp_bs,
+                             phi_bs,
+                             theta_bs,
                              mbc_bs,
                              de_bs
     };
@@ -1348,9 +1476,16 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
                              "px",
                              "py",
                              "pz",
-                             "vx",
-                             "vy",
-                             "vz",
+                             "p",
+                             "pVx",
+                             "pVx",
+                             "pVy",
+                             "xx",
+                             "xy",
+                             "xz",
+                             "dVz",
+                             "dVy",
+                             "dVz",
                              "pt",
                              "ph",
                              "th",
@@ -1365,10 +1500,10 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
         printUserInfo(P);
     }
     
-    val_dump(  tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, "_bs", debugDump );
-    dumpPi0(  tt, pi0_Bs0,    "_p0_b",            debugDump);
-    dumpPi0(  tt, pi0_Ds2317, "_p0_d",            debugDump);
-    dumpDs(   tt, Dss_Bs0,     "1", false, false, debugDump);
+    val_dump(  tt,  nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, "_bs", debugDump );
+    dumpPi0(   tt, pi0_Bs0,     "_p0_b", debugDump);
+    dumpPi0(   tt, pi0_Ds2317,  "_p0_d", debugDump);
+    dumpDs(    tt, Dss_Bs0,     "1", false, false, debugDump);
     dumpDs2317(tt, Dss2317_Bs0, "2", false, false, debugDump);
 
     if (stDump) tt->dumpData();

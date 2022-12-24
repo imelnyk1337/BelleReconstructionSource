@@ -104,7 +104,7 @@ namespace Belle {
         ~Reco(void) {};
 
         void init(int *) {
-            std::cout << "---- Reco initialization -----" << std::endl << std::endl;
+            std::cout << "---- Reco initialization -----" << std::endl;
             start = std::clock();
             /* initialization of Ptype is done inside Hamlet */
             // Hamlet::init();
@@ -138,6 +138,7 @@ namespace Belle {
 
 
     void Reco::begin_run(BelleEvent*, int *) {
+
         std::cout << std::endl << "---- Reco's begin_run function -----" << std::endl;
         eid::init_data();
         // Get IP profile data from $BELLE_POSTGRES_SERVER
@@ -170,7 +171,7 @@ namespace Belle {
         std::cout << "---- Reco's hist_def function -----" << std::endl; 
 
         std::string s_info        = " expn runn evtn r2 ipx ipy ipz evtgen ";
-        std::string s_B0s         = " gen_bs chg_bs mbc_bs de_bs msV_bs msM_bs msC_bs chiV_bs chiM_bs prbV_bs prbM_bs cl_bs clV_bs clM_bs px_bs py_bs pz_bs vx_bs vy_bs vz_bs pt_bs ph_bs th_bs ";
+        std::string s_B0s         = " gen_bs chg_bs mbc_bs de_bs msV_bs msM_bs msC_bs chiV_bs chiM_bs prbV_bs prbM_bs cl_bs clV_bs clM_bs px_bs py_bs pz_bs p_bs pVx_bs pVy_bs pVz_bs xx_bs xy_bs xz_bs dVx_bs dVy_bs dVz_bs pt_bs ph_bs th_bs eta_bs cth_bs ";
         std::string s_Dss         = " gen_ds chg_ds ms_ds chi_ds pt_ds ph_ds th_ds ";
         std::string s_Dss_1       = " gen_ds1 chg_ds1 ms_ds1 chi_ds1 pt_ds1 ph_ds1 th_ds1 ";
         std::string s_Dss_2       = " gen_ds2 chg_ds2 ms_ds2 chi_ds2 pt_ds2 ph_ds2 th_ds2 ";
@@ -197,8 +198,8 @@ namespace Belle {
         std::string s_2317_sum    = s_Dss_sum       + s_2317_wPi;
         std::string s_B0s_sum     = s_info  + s_B0s + s_Dss1_wCh + s_2317_wPi + s_Dss2_wCh + s_pi_B0s;
 
-        TP_Dss               = BASF_Histogram->ntuple("dss",    s_Dss_sum);
-        TP_Dss_2317          = BASF_Histogram->ntuple("ds2317", s_2317_sum);
+        TP_Dss               = BASF_Histogram->ntuple("Dss",    s_Dss_sum);
+        TP_Dss_2317          = BASF_Histogram->ntuple("Ds2317", s_2317_sum);
         TP_Bs0               = BASF_Histogram->ntuple("Bs0",    s_B0s_sum);
     }
 
