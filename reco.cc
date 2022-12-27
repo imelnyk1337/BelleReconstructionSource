@@ -805,7 +805,8 @@ double getHelicity(Particle& p, int indDough=0) {
 
 // **********************************************************
 void checkAdoptCutMassChisqKvf(Particle& particle, double pL, double pR,
-                               double maxChisq = 2.e2, string status = "", int iChild = 0) {
+                               double maxChisq = 2.e2, std::string mode = "vertex-fit", std::string status = "", int iChild = 0) {
+
     // If maxChisq < 0 vtx cuts are not used
     // status: "", "massdif"
     UserInfo& info = dynamic_cast<UserInfo&>(particle.userInfo());
@@ -819,6 +820,9 @@ void checkAdoptCutMassChisqKvf(Particle& particle, double pL, double pR,
 
     bool isErase    = false;
     double chisqKvf = info.chisqKvf();
+        switch (mode) {
+            case "":
+        }
     double vx       = particle.momentum().decayVertex().x();
     double vy       = particle.momentum().decayVertex().y();
     double vz       = particle.momentum().decayVertex().z();
