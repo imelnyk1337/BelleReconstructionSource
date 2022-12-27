@@ -173,8 +173,8 @@ namespace Belle {
         std::string s_info        = " expn runn evtn r2 ipx ipy ipz evtgen ";
         std::string s_B0s         = " gen_bs chg_bs mbc_bs de_bs msV_bs msM_bs msC_bs chiV_bs chiM_bs prbV_bs prbM_bs cl_bs clV_bs clM_bs px_bs py_bs pz_bs p_bs pVx_bs pVy_bs pVz_bs xx_bs xy_bs xz_bs dVx_bs dVy_bs dVz_bs pt_bs ph_bs th_bs eta_bs cth_bs ";
         std::string s_Dss         = " gen_ds chg_ds ms_ds chi_ds pt_ds ph_ds th_ds ";
-        std::string s_Dss_1       = " gen_ds1 chg_ds1 ms_ds1 chi_ds1 pt_ds1 ph_ds1 th_ds1 ";
-        std::string s_Dss_2       = " gen_ds2 chg_ds2 ms_ds2 chi_ds2 pt_ds2 ph_ds2 th_ds2 ";
+        std::string s_Dss_1       = " gen_ds1 chg_ds1 msV_ds1 msM_ds1 msC_ds1 chiV_ds1 chiM_ds1 prbV_ds1 prbM_ds1 cl_ds1 clV_ds1 clM_ds1 pVx_ds1 pVy_ds1 pVz_ds1 xx_ds1 xy_ds1 xz_ds1 dVx_ds1 dVy_ds1 dVz_ds1 psr_ds1 px_ds1 py_ds1 pz_ds1 p_ds1 pt_ds1 ph_ds1 th_ds1 id0_ds1 id1_ds1 ";
+        std::string s_Dss_2       = " gen_ds2 chg_ds2 msV_ds2 msM_ds2 msC_ds2 chiV_ds2 chiM_ds2 prbV_ds2 prbM_ds2 cl_ds2 clV_ds2 clM_ds2 pVx_ds2 pVy_ds2 pVz_ds2 xx_ds2 xy_ds2 xz_ds2 dVx_ds2 dVy_ds2 dVz_ds2 psr_ds2 px_ds2 py_ds2 pz_ds2 p_ds2 pt_ds2 ph_ds2 th_ds2 id0_ds2 id1_ds2 ";
         std::string s_Dss_gen     = " ms_ds_t px_ds_t py_ds_t pz_ds_t e_ds_t ";
         std::string s_Dss_gen_1   = " ms_ds_t1 px_ds_t1 py_ds_t1 pz_ds_t1 e_ds_t1 ";
         std::string s_Dss_gen_2   = " ms_ds_t2 px_ds_t2 py_ds_t2 pz_ds_t2 e_ds_t2 ";
@@ -184,7 +184,7 @@ namespace Belle {
         std::string s_child_1     = " gen_ch1 chg_ch1 ms_ch1 chi_ch1 pt_ch1 hel_ch1 ind_ch1 ";
         std::string s_child_2     = " gen_ch2 chg_ch2 ms_ch2 chi_ch2 pt_ch2 hel_ch2 ind_ch2 ";
 
-        std::string s_2317        = " gen_d17 chg_d17  ms_d17 chi_d17 pt_d17 psr_d17 ph_d17 th_d17 hel_d17 px_d17 py_d17 pz_d17 vx_d17 vy_d17 vz_d17 ";
+        std::string s_2317        = " gen_d17 chg_d17 msV_d17 msM_d17 msC_d17 chiV_d17 chiM_d17 prbV_d17 prbM_d17 cl_d17 clV_d17 clM_d17 pVx_d17 pVy_d17 pVz_d17 xx_d17 xy_d17 xz_d17 dVx_d17 dVy_d17 dVz_d17 psr_d17 px_d17 py_d17 pz_d17 p_d17 pt_d17 ph_d17 th_d17 hel_d17 ";
         std::string s_2317_gen    = " ms_d17_t px_d17_t py_d17_t pz_d17_t e_d17_t ";
 
         std::string s_pi_d17      = " gen_p0_d eg1_p0_d  eg2_p0_d  psr_p0_d  mgg_p0_d gg1_p0_d gg2_p0_d ";

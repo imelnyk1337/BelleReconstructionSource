@@ -259,9 +259,9 @@ void withGammaInPi0(std::vector<Particle>& Gamma, std::vector<Particle>& pi0,
     }
 }
 // ***********************************************************
-int IDhep(Particle& part) {
-    if(!part.genHepevt()) return 0;
-    return part.genHepevt().idhep();
+int IDhep(Particle& particle) {
+    if(!particle.genHepevt()) return 0;
+    return particle.genHepevt().idhep();
 }
 // ***********************************************************
 bool isLikeTrk(int lund, string chrgType = "Charged_pi0") {
@@ -1156,9 +1156,10 @@ void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = f
     if (evtInfoDump) evtInfo_dump(tt, debugDump);
     int lund = (int)P.lund();
 
+    // Creating an userInfo object for the Ds meson candidate
     if (!&P.userInfo()) createUserInfo(P);
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
-
+    // Making vertex fitting
     if (info.chisqKvf() < 0.) {
         // particle has not been vertexed yet
         makeVertexFit(P, debugDump, true);
@@ -1168,7 +1169,7 @@ void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = f
     double msLimLeft  = massPDG - info.wMass();
     double msLimRight = massPDG + info.wMass();
 
-    // validation of chi2 values
+    // Validation of chi2 values
     checkAdoptCutMassChisqKvf(P, msLimLeft, msLimRight, info.maxChi2());
     if (!info.isAdoptCut()) {
         if (debugDump) {
@@ -1182,45 +1183,147 @@ void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = f
         }
         return;
     }
-    double chisq  = info.chisqKvf(); // -1.; // ???
-    double msKvf  = info.msKvf();    // dgr.p().m() ; // 
-    double helic  = info.helicity();
+    double chisqKvf      = info.chisqKvf();       // -1.; //
+    double chisqKmvf     = info.chisqKmvf();
+    double probChisqKvf  = info.probChi2Kvf();
+    double probChisqKmvf = info.probChi2Kmvf();
+    double msComb        = info.msComb();
+    double msKvf         = info.msKvf();         // dgr.p().m(); //
+    double msKmvf        = info.msKmvf();        // -1.; //
+    double cl            = info.cl();
+    double clKvf         = info.clKvf();
+    double clKmvf        = info.clKmvf();
 
+    const static double E_HER        = BeamEnergy::E_HER();
+    const static double E_LER        = BeamEnergy::E_LER();
+    const static double CROSS_ANGLE  = BeamEnergy::Cross_angle();
 
-    
-    Particle& Child = P.child(0);    // phi0 (--> K+ K-) or K* (--> K+ pi-), or K*bar (--> K- pi+)
-    // Particle& Child = P.child(1);    // pi or K
-    Hep3Vector P3D(P.px(), P.py(), P.pz());
-    Hep3Vector Child3D(Child.px(), Child.py(), Child.pz());
-    
-    string dgrSuff = "_ds" + sfxDs, genDgrSuff = "_ds_t" + sfxDs;
-    int signPcl = (int)P.lund() > 0 ? 1 : -1;
-    bool gen_pcl = IDhep(P) == 0 ? false : true;
-    double vx = P.momentum().decayVertex().x();
-    double vy = P.momentum().decayVertex().y();
-    double vz = P.momentum().decayVertex().z();
-    // double chisq = -1.;
-    
+    double psr_ds           = pStar(P.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    double px_ds            = P.px();
+    double py_ds            = P.py();
+    double pz_ds            = P.pz();
+    Hep3Vector P3D          (px_ds, py_ds, pz_ds);
+    double perp_ds          = P3D.perp();
+    double phi_ds           = P3D.phi();
+    double theta_ds         = P3D.theta();
+    int    signPcl          = (int)P.lund() > 0 ? 1 : -1;
+    bool   gen_pcl          = IDhep(P) == 0 ? false : true;
+    double production_vx_ds = P.momentum().vertex().x();
+    double production_vy_ds = P.momentum().vertex().y();
+    double production_vz_ds = P.momentum().vertex().z();
+    double xx_ds            = P.momentum().x().x();
+    double xy_ds            = P.momentum().x().y();
+    double xz_ds            = P.momentum().x().z();
+    double decay_vx_ds      = P.momentum().decayVertex().x();
+    double decay_vy_ds      = P.momentum().decayVertex().y();
+    double decay_vz_ds      = P.momentum().decayVertex().z();
     double helicChild1 = getHelicity(P);
+
+    Particle& Child0 = P.child(0);   // phi0 (--> K+ K-) or K* (--> K+ pi-), or K*bar (--> K- pi+)
+    if (!&Child0.userInfo()) createUserInfo(Child0);
+    UserInfo& infoChild0 = dynamic_cast<UserInfo&>(Child0.userInfo());
+
+    double psr_ds_Ch0    = pStar(Child0.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    double px_ds_Ch0     = Child0.px();
+    double py_ds_Ch0     = Child0.py();
+    double pz_ds_Ch0     = Child0.pz();
+    // Probability of particle identification for the second Ds'd child
+    double probPidChild0 = infoChild0.probpid();
+
+    Hep3Vector Child03D(px_ds_Ch0, py_ds_Ch0, pz_ds_Ch0);
+
+    Particle& Child1 = P.child(1);   // pi or K
+    if (!&Child1.userInfo()) createUserInfo(Child1);
+    UserInfo& infoChild1 = dynamic_cast<UserInfo&>(Child1.userInfo());
+
+    double psr_ds_Ch1    = pStar(Child1.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    double px_ds_Ch1     = Child1.px();
+    double py_ds_Ch1     = Child1.py();
+    double pz_ds_Ch1     = Child1.pz();
+    // Probability of particle identification for the second Ds'd child
+    double probPidChild1 = infoChild1.probpid();
+    Hep3Vector Child13D  (px_ds_Ch1, py_ds_Ch1, pz_ds_Ch1);
+
+    string dgrSuff = "_ds" + sfxDs, genDgrSuff = "_ds_t" + sfxDs;
+
+
     
     const int nValI = 2; 
-    const int nValD = 6; 
+    const int nValD = 29;
     int valPclI[nValI]    = {signPcl, gen_pcl};
-    double valPclD[nValD] = {msKvf, chisq, P3D.perp(), P3D.phi(), P3D.theta(), helicChild1};
+    double valPclD[nValD] = {msKvf,
+                             msKmvf,
+                             msComb,
+                             chisqKvf,
+                             chisqKmvf,
+                             probChisqKvf,
+                             probChisqKmvf,
+                             cl,
+                             clKvf,
+                             clKmvf,
+                             production_vx_ds,
+                             production_vy_ds,
+                             production_vz_ds,
+                             xx_ds,
+                             xy_ds,
+                             xz_ds,
+                             decay_vx_ds,
+                             decay_vy_ds,
+                             decay_vz_ds,
+                             psr_ds,
+                             px_ds,
+                             py_ds,
+                             pz_ds,
+                             py_ds,
+                             perp_ds,
+                             phi_ds,
+                             theta_ds,
+                             probPidChild0,
+                             probPidChild1
+    };
     string pclTitI[nValI] = {"chg", "gen"};
-    string pclTitD[nValD] = {"ms", "chi", "pt", "ph", "th", "hel"};
+    string pclTitD[nValD] = {"msV",
+                             "msM",
+                             "msC",
+                             "chiV",
+                             "chiM",
+                             "prbV",
+                             "prbM",
+                             "cl",
+                             "clV",
+                             "clM",
+                             "pVx",
+                             "pVy",
+                             "pVz",
+                             "xx",
+                             "xy",
+                             "xz",
+                             "dVx",
+                             "dVy",
+                             "dVz",
+                             "psr",
+                             "px",
+                             "py",
+                             "pz",
+                             "p",
+                             "pt",
+                             "ph",
+                             "th",
+                             "id0",
+                             "id1"
+    };
 
     VectorL dssL = getGenVectorL(IDhep(P));
 
     if (debugDump) {
         printf("\n======== Dss  ========= sfx:%s, chg_ds:%i, gen_ds:%i, ms_ds:%7.3f , child ( ms:%7.3f ) \n", 
-               genDgrSuff.c_str(), signPcl, gen_pcl, msKvf, Child.p().m() );
+               genDgrSuff.c_str(), signPcl, gen_pcl, msKvf, Child0.p().m());
         printUserInfo(P);
     }
     tt->column("hel_ch" + sfxDs, helicChild1);
     val_dump(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
     gen_val_dump(tt, gen_pcl, dssL, genDgrSuff, debugDump);
-    dumpDsChild(tt, Child, sfxDs, false, false, debugDump);
+    dumpDsChild(tt, Child0, sfxDs, false, false, debugDump);
     if (stDump) tt->dumpData();
 }
 // ***********************************************************
@@ -1282,7 +1385,7 @@ void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump
     int gen_d17 = (int)IDhep(P) == 0 ? 0 :  1;
     
     const int nValI = 2;
-    const int nValD = 26;
+    const int nValD = 28;
     int valPclI[nValI] = {chg_d17, gen_d17};
     double valPclD[nValD] = {msKvf,
                              msKmvf,
@@ -1303,13 +1406,15 @@ void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump
                              decay_vx_d17,
                              decay_vy_d17,
                              decay_vz_d17,
+                             psr_d17,
                              px_d17,
                              py_d17,
                              pz_d17,
                              p_d17,
                              perp_d17,
                              phi_d17,
-                             theta_d17
+                             theta_d17,
+                             helic_2317
     };
     string pclTitI[nValI] = {"chg", "gen"};
     string pclTitD[nValD] = {"msV",
@@ -1322,22 +1427,24 @@ void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump
                              "cl",
                              "clV",
                              "clM",
+                             "pVx",
+                             "pVy",
+                             "pVz",
+                             "xx",
+                             "xy",
+                             "xz",
+                             "dVx",
+                             "dVy",
+                             "dVz",
+                             "psr",
                              "px",
                              "py",
                              "pz",
                              "p",
-                             "pVx",
-                             "pVx",
-                             "pVy",
-                             "xx",
-                             "xy",
-                             "xz",
-                             "dVz",
-                             "dVy",
-                             "dVz",
                              "pt",
                              "ph",
-                             "th"
+                             "th",
+                             "hel"
     };
 
     string dgrSuff = "_d17", genDgrSuff = "_d17_t";
