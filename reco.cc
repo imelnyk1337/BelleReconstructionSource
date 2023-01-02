@@ -820,9 +820,9 @@ void checkAdoptCutMassChisqKvf(Particle& particle, double pL, double pR,
 
     bool isErase    = false;
     double chisqKvf = info.chisqKvf();
-        switch (mode) {
-            case "":
-        }
+//        switch (mode) {
+//            case "":
+//        }
     double vx       = particle.momentum().decayVertex().x();
     double vy       = particle.momentum().decayVertex().y();
     double vz       = particle.momentum().decayVertex().z();
