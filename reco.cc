@@ -802,10 +802,22 @@ double getHelicity(Particle& p, int indDough=0) {
     
     return helic;
 }
+// ***********************************************************
+enum VertexMode {
+    vertexFit,
+    MassConstraintFit,
+    noFit
+};
 
-// **********************************************************
-void checkAdoptCutMassChisqKvf(Particle& particle, double pL, double pR,
-                               double maxChisq = 2.e2, std::string mode = "vertex-fit", std::string status = "", int iChild = 0) {
+VertexMode vertexModeHash(const std::string& vMode) {
+    if (vMode == "mass-constraint-fit") return MassConstraintFit;
+    else if (vMode == "no-fit") return noFit;
+    else return vertexFit;
+}
+
+void checkAdoptCutMassChisqKvf(Particle& particle, const double& pL, const double& pR,
+                               const double& maxChisq = 2.e2, const std::string& status = "", int iChild = 0,
+                               const std::string& vertexMode = "vertex-fit") {
 
     // If maxChisq < 0 vtx cuts are not used
     // status: "", "massdif"
@@ -818,16 +830,30 @@ void checkAdoptCutMassChisqKvf(Particle& particle, double pL, double pR,
         ms                  = info.msComb() - infoChild.msComb();
     }
 
-    bool isErase    = false;
-    double chisqKvf = info.chisqKvf();
-//        switch (mode) {
-//            case "":
-//        }
+    bool isErase     = false;
+    double chisqKvf  = info.chisqKvf();
+    double chisqKmvf = info.chisqKmvf();
+    double* chisq    = &chisqKvf;
+    switch (vertexModeHash(vertexMode)) {
+
+        case vertexFit: {
+            chisq = &chisqKvf;
+        }
+        case MassConstraintFit: {
+            chisq = &chisqKmvf;
+        }
+        default: {
+            chisq = &chisqKvf;
+        }
+
+    }
+    double _chisq = *chisq;
+    delete chisq;
     double vx       = particle.momentum().decayVertex().x();
     double vy       = particle.momentum().decayVertex().y();
     double vz       = particle.momentum().decayVertex().z();
     if (maxChisq > 0.) {
-        isErase = (chisqKvf > maxChisq || chisqKvf < 0. || abs(vz) > 50. || sqrt(vx * vx + vy * vy) > 30. || ms < pL || ms > pR);
+        isErase = (_chisq > maxChisq || _chisq < 0. || abs(vz) > 50. || sqrt(vx * vx + vy * vy) > 30. || ms < pL || ms > pR);
     } else {
         isErase = ms < pL || ms > pR;
     }
