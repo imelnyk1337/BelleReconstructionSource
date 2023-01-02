@@ -36,7 +36,7 @@ namespace Belle {
 //#endif
 
     //***********************************************************
-string pclType(int id) {
+std::string pclType(int id) {
     string sid;
     if      (id ==   0) sid = "--";
     else if (id ==   1) sid = "d";
@@ -475,7 +475,7 @@ void createUserInfo(Particle& particle) {
     } else if (abs(lund)  == 431) {                                          // DS+
         wMass = dM_Dss;
     } else if (abs(lund)  == 433) {                                          // D*S+
-        useTube = true; 
+        useTube = true;
         wMass = dM_Dsst;
     } else if (abs(lund)  == 10431) {                                        // D**S+(D_sJ(2317))
         useTube = true;
@@ -644,6 +644,7 @@ void makeVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = fals
         }
         makeMother(kmvMother, Mother);
         Mother.momentum().decayVertex(kmvMother.vertex(), kmvMother.errVertex());
+        // useless chunk of code: don't use .chisq() field as a valid chi2 vertexing value
         if (infoMother.chisq() <= kmvMother.chisq()) {
             infoMother.chisq(kmvMother.chisq());
         }
@@ -849,6 +850,7 @@ void checkAdoptCutMassChisqKvf(Particle& particle, const double& pL, const doubl
     }
     double _chisq = *chisq;
     delete chisq;
+
     double vx       = particle.momentum().decayVertex().x();
     double vy       = particle.momentum().decayVertex().y();
     double vz       = particle.momentum().decayVertex().z();
@@ -1201,9 +1203,10 @@ void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = f
 
     // Validation of chi2 values
     checkAdoptCutMassChisqKvf(P, msLimLeft, msLimRight, info.maxChi2());
+
     if (!info.isAdoptCut()) {
         if (debugDump) {
-            printf("\n       *****  Dss is not adopted ******\n" );
+            printf("\n       ***** The Ds candidate is not adopted ******\n" );
             printPclDebug(P);
             double vx = P.momentum().decayVertex().x();
             double vy = P.momentum().decayVertex().y();
@@ -1257,7 +1260,7 @@ void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = f
     double px_ds_Ch0     = Child0.px();
     double py_ds_Ch0     = Child0.py();
     double pz_ds_Ch0     = Child0.pz();
-    // Probability of particle identification for the second Ds'd child
+    // Probability of particle identification for the first Ds'd child
     double probPidChild0 = infoChild0.probpid();
 
     Hep3Vector Child03D(px_ds_Ch0, py_ds_Ch0, pz_ds_Ch0);

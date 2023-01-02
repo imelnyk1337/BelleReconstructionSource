@@ -55,9 +55,7 @@ namespace Belle {
     const float JPSI_MASS = 3.097;
     const float PI_MASS   = 0.1396;
 
-    // double dM_Ksr = 0.100;
     double dM_phi  = 0.020;
-    // double dM_Dss  = 0.050;
     double dM_2317 = 0.270;
     double M_2317_min = 2.25, M_2317_max = 2.40;
     double dM_Bs0  = 0.080;
