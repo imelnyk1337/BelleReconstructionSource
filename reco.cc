@@ -520,13 +520,13 @@ double distanceToIP(Particle& particle) {
     return vtx_D_IP.mag();
 }
 // ***********************************************************
-void makeVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = false,
+void makeRecursiveVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = false,
                    bool addBeam = false) {
     /*
      * Fitting DecayMother -> DecayChild1 + DecayChild2 + ... + trk1 + trk2 + ...
      * another string
      * here should be documentation for this function --
-     * makeVertexFit(Particle&, bool, bool, bool)
+     * makeRecursiveVertexFit(Particle&, bool, bool, bool)
      */
 
 
@@ -545,7 +545,7 @@ void makeVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = fals
     // ===== Does not have a physics- or reconstruction sence ========
     // May just skip, set to True to display and/or print in stdout ==
     if (debugDump) {
-        printf("\n ========  makeVertexFit ==========   %s [%i] --> ",
+        printf("\n ========  makeRecursiveVertexFit ==========   %s [%i] --> ",
             motherType.c_str(), Mother.nChildren());
         for (int jChild = 0; jChild < Mother.nChildren(); ++jChild) {
             string dghtType = pclType((int)Mother.child(jChild).lund());
@@ -573,7 +573,7 @@ void makeVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = fals
                 // The particle has not been vertexed yet
                 bool idUseTube = false;
                 bool idAddMF   = true;   /*false*/  // magneticField (is it necessary??)
-                makeVertexFit(Child, debugDump);
+                makeRecursiveVertexFit(Child, debugDump);
             }
         }
         addTrack2fit(kvfMother, Child);
@@ -679,10 +679,10 @@ void makeVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = fals
     // ================================================================
 }
 // ***********************************************************
-void makeVertexFit(vector<Particle>& p_list, bool debugDump = false, bool useKmvf = false) {
+void makeRecursiveVertexFit(vector<Particle>& p_list, bool debugDump = false, bool useKmvf = false) {
     // fit DecayMother -> DecayChild1 + DecayChild2 + ... + trk1 + trk2 + ...
     for (size_t i = 0; i < p_list.size(); ++i) {
-        makeVertexFit(p_list[i], debugDump, useKmvf);
+        makeRecursiveVertexFit(p_list[i], debugDump, useKmvf);
     }
 }
 // ***********************************************************
@@ -1109,7 +1109,7 @@ void dumpDsChild(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDum
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
     if (info.chisqKvf() < 0.) {
         // particle not vertexed yet
-        makeVertexFit(P, debugDump);
+        makeRecursiveVertexFit(P, debugDump);
     }
 
     double massPDG = Ptype(lund).mass();
@@ -1191,10 +1191,10 @@ void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = f
     // Creating an userInfo object for the Ds meson candidate
     if (!&P.userInfo()) createUserInfo(P);
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
-    // Making vertex fitting
+    // Making vertex fit
     if (info.chisqKvf() < 0.) {
         // particle has not been vertexed yet
-        makeVertexFit(P, debugDump, true);
+        makeRecursiveVertexFit(P, debugDump, true);
     }
     
     double massPDG    = Ptype(lund).mass();
@@ -1368,7 +1368,7 @@ void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
     if (info.chisqKvf() < 0.) {
         // particle has not been vertexed yet
-        makeVertexFit(P, debugDump);
+        makeRecursiveVertexFit(P, debugDump);
     }
     
     double chisqKvf      = info.chisqKvf();       // -1.; //
@@ -1515,7 +1515,7 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     */
     if (info.chisqKvf() < 0.) {
         // particle not vertexed yet
-        makeVertexFit(P, debugDump);
+        makeRecursiveVertexFit(P, debugDump);
     }
     // Retrieval of the values after vertex fitting
     double chisqKvf      = info.chisqKvf();      // -1.; //
@@ -1661,7 +1661,7 @@ void printVectPclWithChildren(std::vector<Particle>& pcl, string tit = "") {
     printf("\n");
 }
 // ***********************************************************
-void Reco::event(BelleEvent *evptr, int *status) {
+void Reco::event(BelleEvent* evptr, int* status) {
     *status = 0;
     bool debugTrkPID   = false;
     bool debugVtx      = false;
@@ -1767,13 +1767,13 @@ void Reco::event(BelleEvent *evptr, int *status) {
     }
 
     // Making a simple Kvf fit
-    makeVertexFit(pi0, false, false);
+    makeRecursiveVertexFit(pi0, false, false);
 
     // Selecting pi0 candidates considering their reconstructed mass (mass of 2 gammas)
     withPi0MassGamGamCut(pi0, wMassPi0GG);
 
     // Making a mass-constraint fit for pi0 candidate, which passed through all cuts (including gammas)
-    makeVertexFit(pi0, false, true);
+    makeRecursiveVertexFit(pi0, false, true);
 
 
 
@@ -1801,9 +1801,9 @@ void Reco::event(BelleEvent *evptr, int *status) {
     setGenHepInfoT(Ksr0bar);
     
     /* if (useVTX) {
-     *     makeVertexFit(phi0, debugVtx);
-     *     makeVertexFit(Ksr0, debugVtx);
-     *     makeVertexFit(Ksr0bar, debugVtx);
+     *     makeRecursiveVertexFit(phi0, debugVtx);
+     *     makeRecursiveVertexFit(Ksr0, debugVtx);
+     *     makeRecursiveVertexFit(Ksr0bar, debugVtx);
      * }
     */
 
@@ -1825,8 +1825,8 @@ void Reco::event(BelleEvent *evptr, int *status) {
     // checkKaonPionPID(Dss_p);
     
     /* if (useVTX) {
-     *     makeVertexFit(Dss_p, debugVtx);
-     *     makeVertexFit(Dss_m, debugVtx);
+     *     makeRecursiveVertexFit(Dss_p, debugVtx);
+     *     makeRecursiveVertexFit(Dss_m, debugVtx);
      * }
     */
     
@@ -1845,8 +1845,8 @@ void Reco::event(BelleEvent *evptr, int *status) {
     setGenHepInfoT(Dss_p_2317);
     
     /* if (useVTX) {
-     *     makeVertexFit(Dss_p_2317, debugVtx);
-     *     makeVertexFit(Dss_m_2317, debugVtx);
+     *     makeRecursiveVertexFit(Dss_p_2317, debugVtx);
+     *     makeRecursiveVertexFit(Dss_m_2317, debugVtx);
      * }
     */
     
@@ -1866,8 +1866,8 @@ void Reco::event(BelleEvent *evptr, int *status) {
     setGenHepInfoT(Bs0bar);
     
     /* if(useVTX) {
-     *     makeVertexFit(Bs0, debugVtx);
-     *     makeVertexFit(Bs0bar, debugVtx);
+     *     makeRecursiveVertexFit(Bs0, debugVtx);
+     *     makeRecursiveVertexFit(Bs0bar, debugVtx);
      * }
     */
 
