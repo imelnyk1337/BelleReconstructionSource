@@ -37,7 +37,7 @@ namespace Belle {
 
     //***********************************************************
 std::string pclType(int id) {
-    string sid;
+    std::string sid;
     if      (id ==   0) sid = "--";
     else if (id ==   1) sid = "d";
     else if (id ==  -1) sid = "anti-d";
@@ -264,7 +264,7 @@ int IDhep(Particle& particle) {
     return particle.genHepevt().idhep();
 }
 // ***********************************************************
-bool isLikeTrk(int lund, string chrgType = "Charged_pi0") {
+bool isLikeTrk(int lund, std::string chrgType = "Charged_pi0") {
     int ln = abs(lund);
     bool isTrk = (ln == 11) || (ln == 13) || (ln == 211) ||(ln == 321) || (ln == 11) || (ln == 2212); // el, mu, pi, K, p
     if ( chrgType != "onlyCharged" )
@@ -272,13 +272,13 @@ bool isLikeTrk(int lund, string chrgType = "Charged_pi0") {
     return isTrk;
 }
 // ***********************************************************
-void printPclDebug(Particle& p, string comment = "", string comment2 = "") {
+void printPclDebug(Particle& p, std::string comment = "", std::string comment2 = "") {
     int expNo, runNo, evtNo;
     bool McFlag;
     getEventInfo( expNo, runNo, evtNo, McFlag); // utility.cc
 
     int lund = (int)p.lund();
-    string trkType = pclType(lund);
+    std::string trkType = pclType(lund);
     int ln = abs(lund);
     bool isTrk = isLikeTrk( lund );
     Hep3Vector pcl3D( p.px(), p.py(), p.pz() );
@@ -301,7 +301,7 @@ void printPclDebug(Particle& p, string comment = "", string comment2 = "") {
         for (int jM =0 ; jM < p.nChildren(); ++jM) {
             Particle& Child = p.child(jM);
             int lundChild = (int)Child.lund() ;
-            string childType = pclType(lundChild);
+            std::string childType = pclType(lundChild);
             bool isTrkChild = isLikeTrk( lundChild, "onlyCharged" );
             if (isTrkChild) printf("( %s : %i )  ", childType.c_str(), (int)Child.mdstCharged().get_ID() );
             else printf("( %s : -- )  ", childType.c_str() );
@@ -315,7 +315,7 @@ void printPclDebug(Particle& p, string comment = "", string comment2 = "") {
     }
 }
 // ***********************************************************
-void printPclDebug(vector<Particle>& p_list, string comment = "", string comment2 = "") {
+void printPclDebug(vector<Particle>& p_list, std::string comment = "", std::string comment2 = "") {
     size_t np = p_list.size();
     printf("\n----- List of Particles (%i) %9s %s ---\n", np, comment.c_str(), comment2.c_str());
     for (size_t i = 0; i < np; ++i) {
@@ -538,7 +538,7 @@ void makeRecursiveVertexFit(Particle& Mother, bool debugDump = false, bool useKm
     // =================================================================
 
     int lundMother = (int)Mother.lund();
-    string motherType = pclType(lundMother);
+    std::string motherType = pclType(lundMother);
 
 
     // =============== Printing option for debugging =================
@@ -548,7 +548,7 @@ void makeRecursiveVertexFit(Particle& Mother, bool debugDump = false, bool useKm
         printf("\n ========  makeRecursiveVertexFit ==========   %s [%i] --> ",
             motherType.c_str(), Mother.nChildren());
         for (int jChild = 0; jChild < Mother.nChildren(); ++jChild) {
-            string dghtType = pclType((int)Mother.child(jChild).lund());
+            std::string dghtType = pclType((int)Mother.child(jChild).lund());
             printf("%s ", dghtType.c_str());
         }
         printf("\n");
@@ -668,7 +668,7 @@ void makeRecursiveVertexFit(Particle& Mother, bool debugDump = false, bool useKm
             sqrt(kvfMother.errVertex()[1][1]),
             sqrt(kvfMother.errVertex()[2][2])
         );
-        string sind[5] = { "(pcl_1)", "(pcl_2)", "(pcl_3)", "(pcl_4)" , "(pcl_5)" };
+        std::string sind[5] = { "(pcl_1)", "(pcl_2)", "(pcl_3)", "(pcl_4)" , "(pcl_5)" };
         for (int jChild = 0; jChild<Mother.nChildren(); ++jChild) {
             printPclDebug( Mother.child(jChild), sind[jChild] );
         }
@@ -686,7 +686,7 @@ void makeRecursiveVertexFit(vector<Particle>& p_list, bool debugDump = false, bo
     }
 }
 // ***********************************************************
-void printPi0(vector<Particle>& pi0, string comment = "") {
+void printPi0(vector<Particle>& pi0, std::string comment = "") {
     printf("------  %s Pi0 (%i) -------\n", comment.c_str(), pi0.size());
     double E_HER = BeamEnergy::E_HER();
     double E_LER = BeamEnergy::E_LER();
@@ -703,7 +703,7 @@ void printPi0(vector<Particle>& pi0, string comment = "") {
     }
 }
 // ***********************************************************
-void printTrkPID(vector<Particle>& trkList, string pType, string comment = "") {
+void printTrkPID(vector<Particle>& trkList, std::string pType, std::string comment = "") {
     int ip, ibg1, ibg2;
     if ((pType == "pi+") || (pType == "pi-")) {
         ip   = 2;
@@ -730,7 +730,7 @@ void printTrkPID(vector<Particle>& trkList, string pType, string comment = "") {
     printf("\n");
 }
 // ***********************************************************
-void printVtxDebug( std::vector<Particle>& plist, string comment = "", string comment2 = "") {
+void printVtxDebug( std::vector<Particle>& plist, std::string comment = "", std::string comment2 = "") {
     size_t np = plist.size();
     printf("\n----- Vtx (%i) %9s %s ---\n", np, comment.c_str(), comment2.c_str() );
     for (size_t i = 0; i < np; ++i) {
@@ -867,7 +867,7 @@ void checkAdoptCutMassChisqKvf(Particle& particle, const double& pL, const doubl
 }
 // **********************************************************
 void checkAdoptCutMassChisqKvf(std::vector<Particle>& p_list, double pL, double pR,
-                               double maxChisq = 1.e3, string status = "", int iChild = 0) {
+                               double maxChisq = 1.e3, std::string status = "", int iChild = 0) {
     for (size_t i = 0; i < p_list.size(); ++i) {
         checkAdoptCutMassChisqKvf(p_list[i], pL, pR, maxChisq, status, iChild);
     }
@@ -1020,7 +1020,7 @@ VectorL getGenVectorL(int idhPcl) {
     return pclL;
 }
 // ***********************************************************
-void dumpPi0(BelleTuple* tt, Particle& p0, string sfx, bool debugDump) {
+void dumpPi0(BelleTuple* tt, Particle& p0, std::string sfx, bool debugDump) {
 
     double E_HER       = BeamEnergy::E_HER();
     double E_LER       = BeamEnergy::E_LER();
@@ -1041,9 +1041,9 @@ void dumpPi0(BelleTuple* tt, Particle& p0, string sfx, bool debugDump) {
     const int nValI = 1;
     const int nValD = 6;
 
-    string pclTitI[nValI] = {"gen"};
+    std::string pclTitI[nValI] = {"gen"};
     int valPclI[nValI]    = {gen_pi0};
-    string pclTitD[nValD] = {"eg1",     "eg2",     "psr",   "mgg",    "gg1",  "gg2"};
+    std::string pclTitD[nValD] = {"eg1",     "eg2",     "psr",   "mgg",    "gg1",  "gg2"};
     double valPclD[nValD] = {g1.ptot(), g2.ptot(), psrPi0, msPi0_gg, gen_g1, gen_g2};
     
     if (debugDump) {
@@ -1059,8 +1059,8 @@ void dumpPi0(BelleTuple* tt, Particle& p0, string sfx, bool debugDump) {
 }
 
 // ***********************************************************
-void val_dump(BelleTuple* tt, int nValI, int nValD, int* valPclI, double* valPclD, string* pclTitI, string* pclTitD, 
-                                                                                            string sfx, bool debugDump) {
+void val_dump(BelleTuple* tt, int nValI, int nValD, int* valPclI, double* valPclD, std::string* pclTitI, std::string* pclTitD,
+                                                                                            std::string sfx, bool debugDump) {
     if (debugDump) {
         printf("  ==== val_dump ==== dec:(%s): ", sfx.c_str());
         for (int iVal=0; iVal<nValI; iVal++) 
@@ -1075,9 +1075,9 @@ void val_dump(BelleTuple* tt, int nValI, int nValD, int* valPclI, double* valPcl
         tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
 }
 // ***********************************************************
-void gen_val_dump(BelleTuple* tt, bool gen_pcl, VectorL pclL, string sfx, bool debugDump) {
+void gen_val_dump(BelleTuple* tt, bool gen_pcl, VectorL pclL, std::string sfx, bool debugDump) {
     const int nValD = 5; 
-    string pclTitD[nValD] = {"ms", "px", "py", "pz", "e"};
+    std::string pclTitD[nValD] = {"ms", "px", "py", "pz", "e"};
     double valPclD[nValD] = {pclL.m(), pclL.px(), pclL.py(), pclL.pz(), pclL.e()};
     if (!gen_pcl) 
         for (int iVal = 0; iVal < nValD; iVal++)
@@ -1095,14 +1095,14 @@ void gen_val_dump(BelleTuple* tt, bool gen_pcl, VectorL pclL, string sfx, bool d
     }
 }
 // ***********************************************************
-void dumpDsChild(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = false,
-             bool stDump = true, bool debugDump = false) {
+void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
+                 bool evtInfoDump = false,
+                 bool stDump = true, bool debugDump = false) {
 
     // printf("\n======== dumpDsChild  ========= chg_dss_child:%i, ms_dss_child:%7.3f ) \n",
     // (int)P.lund(), P.p().m() );
     if (evtInfoDump) evtInfo_dump(tt, debugDump);
-    // printf("---- 1 ----- \n");
-    
+
     int lund = (int)P.lund();
     
     if (!&P.userInfo()) createUserInfo(P);
@@ -1129,19 +1129,22 @@ void dumpDsChild(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDum
         }
         return;
     }
+
+    double chisqKvf      = info.chisqKvf();       // -1.; //
+    double chisqKmvf     = info.chisqKmvf();
+    double probChisqKvf  = info.probChi2Kvf();
+    double probChisqKmvf = info.probChi2Kmvf();
+    double msComb        = info.msComb();
+    double msKvf         = info.msKvf();         // dgr.p().m(); //
+    double msKmvf        = info.msKmvf();        // -1.; //
+    double cl            = info.cl();
+    double clKvf         = info.clKvf();
+    double clKmvf        = info.clKmvf();
+    double helic         = info.helicity();
     
-    double chisq  = info.chisqKvf(); // -1.; //
-    double cl     = info.clKvf(); // -1.; // 
-    double d2m    = info.dist2Mother();
-    double msKvf  = info.msKvf(); // dgr.p().m() ; //
-    double msComb = info.msComb();
-    // double helic = getHelicity(dgr);
-    double helic = info.helicity();
-    double pidprob = info.probpid();
-    
-    int ind_ch1;
-    int lundChild = P.lund();
-    string ChildPcl;
+    int ind_ch1 = 0;
+    int lundChild = (int)P.lund();
+    std::string ChildPcl;
     if (abs(lundChild) == 333) {
         ChildPcl ="phipi";
         ind_ch1  = 1;
@@ -1151,10 +1154,24 @@ void dumpDsChild(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDum
         ind_ch1  = 2;
     }
 
-    Hep3Vector P3D(P.px(), P.py(), P.pz());
-    // printf("---- 2 ----- \n");
-    
-    string dgrSuff = "_ch" + sfxDs;
+    double psr_ds_child           = pStar(P.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    double px_ds_child            = P.px();
+    double py_ds_child            = P.py();
+    double pz_ds_child            = P.pz();
+    double p_ds_child             = P.momentum().p().mag();
+    double production_vx_ds_child = P.momentum().vertex().x();
+    double production_vy_ds_child = P.momentum().vertex().y();
+    double production_vz_ds_child = P.momentum().vertex().z();
+    double xx_ds_child            = P.momentum().x().x();
+    double xy_ds_child            = P.momentum().x().y();
+    double xz_ds_child            = P.momentum().x().z();
+    double decay_vx_ds_child      = P.momentum().decayVertex().x();
+    double decay_vy_ds_child      = P.momentum().decayVertex().y();
+    double decay_vz_ds_child      = P.momentum().decayVertex().z();
+
+    Hep3Vector P3D                (px_ds_child, py_ds_child, pz_ds_child);
+
+    std::string dgrSuff = "_ch" + sfxDs;
     int signPcl = (int)P.lund() > 0 ? 1 : -1;
     bool gen_pcl = IDhep(P) == 0 ? false : true;
     double vx = P.momentum().decayVertex().x();
@@ -1163,14 +1180,33 @@ void dumpDsChild(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDum
 
     
     // double helicChild1 = getHelicity( P );
-    // printf("---- 3 ----- \n");
-    
+
     const int nValI = 3; 
-    const int nValD = 5; 
-    int valPclI[nValI] = {signPcl, gen_pcl, ind_ch1};
-    double valPclD[nValD] = {msKvf, chisq, P3D.perp(), P3D.phi(), P3D.theta()};
-    string pclTitI[nValI] = {"chg", "gen", "ind"};
-    string pclTitD[nValD] = {"ms", "chi", "pt", "ph", "th"};
+    const int nValD = 5;
+    int valPclI[nValI] = {
+            signPcl,
+            gen_pcl,
+            ind_ch1
+    };
+    double valPclD[nValD] = {
+            msKvf,
+            chisq,
+            P3D.perp(),
+            P3D.phi(),
+            P3D.theta()
+    };
+    std::string pclTitI[nValI] = {
+            "chg",
+            "gen",
+            "ind"
+    };
+    std::string pclTitD[nValD] = {
+            "ms",
+            "chi",
+            "pt",
+            "ph",
+            "th"
+    };
 
     if (debugDump) {
         printf("\n======== dumpDsChild  ========= (%s) chg_dss_child:%i, ms_dss_child:%7.3f ) \n",
@@ -1183,7 +1219,7 @@ void dumpDsChild(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDum
     if (stDump) tt->dumpData();
 }
 // ***********************************************************
-void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = false, bool stDump = true, bool debugDump = false) {
+void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDump = false, bool stDump = true, bool debugDump = false) {
 
     if (evtInfoDump) evtInfo_dump(tt, debugDump);
     int lund = (int)P.lund();
@@ -1214,6 +1250,11 @@ void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = f
             printf("msKvf:%f, msLimLeft:%f, msLimRight:%f, maxChi2:%f, vx:%f, vy:%f, vz:%f \n",
                    info.msKvf(), msLimLeft, msLimRight, info.maxChi2(), vx, vy, vz);
         }
+        /* !!!! A crucial step: if info.isAdoptCut() equals 0, return statement will be invoked at this point
+         * and the dumpDs stack frame is popped out from the Reco::event() call stack;
+         * the unadopted candidates are not going to be recorded or involved in further steps of reconstruction
+         * they are also not included in the following combinations
+        */
         return;
     }
     double chisqKvf      = info.chisqKvf();       // -1.; //
@@ -1273,11 +1314,12 @@ void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = f
     double px_ds_Ch1     = Child1.px();
     double py_ds_Ch1     = Child1.py();
     double pz_ds_Ch1     = Child1.pz();
+
     // Probability of particle identification for the second Ds'd child
     double probPidChild1 = infoChild1.probpid();
     Hep3Vector Child13D  (px_ds_Ch1, py_ds_Ch1, pz_ds_Ch1);
 
-    string dgrSuff = "_ds" + sfxDs, genDgrSuff = "_ds_t" + sfxDs;
+    std::string dgrSuff = "_ds" + sfxDs, genDgrSuff = "_ds_t" + sfxDs;
 
 
     
@@ -1314,8 +1356,8 @@ void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = f
                              probPidChild0,
                              probPidChild1
     };
-    string pclTitI[nValI] = {"chg", "gen"};
-    string pclTitD[nValD] = {"msV",
+    std::string pclTitI[nValI] = {"chg", "gen"};
+    std::string pclTitD[nValD] = {"msV",
                              "msM",
                              "msC",
                              "chiV",
@@ -1360,7 +1402,7 @@ void dumpDs(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = f
     if (stDump) tt->dumpData();
 }
 // ***********************************************************
-void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump = false, bool stDump = true, bool debugDump = false) {
+void dumpDs2317(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDump = false, bool stDump = true, bool debugDump = false) {
 
     if (evtInfoDump) evtInfo_dump(tt,debugDump);
 
@@ -1410,12 +1452,12 @@ void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump
     double decay_vz_d17       = P.momentum().decayVertex().z();
 
 
-    Hep3Vector P3D(px_d17, py_d17, pz_d17);
-    double perp_d17 = P3D.perp();
-    double phi_d17 = P3D.phi();
-    double theta_d17 = P3D.theta();
-    int chg_d17 = (int)P.lund() >  0 ? 1 : -1;
-    int gen_d17 = (int)IDhep(P) == 0 ? 0 :  1;
+    Hep3Vector P3D            (px_d17, py_d17, pz_d17);
+    double perp_d17           = P3D.perp();
+    double phi_d17            = P3D.phi();
+    double theta_d17          = P3D.theta();
+    int chg_d17               = (int)P.lund() >  0 ? 1 : -1;
+    int gen_d17               = (int)IDhep(P) == 0 ? 0 :  1;
     
     const int nValI = 2;
     const int nValD = 28;
@@ -1449,8 +1491,8 @@ void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump
                              theta_d17,
                              helic_2317
     };
-    string pclTitI[nValI] = {"chg", "gen"};
-    string pclTitD[nValD] = {"msV",
+    std::string pclTitI[nValI] = {"chg", "gen"};
+    std::string pclTitD[nValD] = {"msV",
                              "msM",
                              "msC",
                              "chiV",
@@ -1480,7 +1522,7 @@ void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump
                              "hel"
     };
 
-    string dgrSuff = "_d17", genDgrSuff = "_d17_t";
+    std::string dgrSuff = "_d17", genDgrSuff = "_d17_t";
     
     if (debugDump) {
         printf("\n======== Ds(2317)  ========= chg_2317:%i, gen_2317:%i, ms_2317:%7.3f , child ( ms:%7.3f ) \n", 
@@ -1488,7 +1530,7 @@ void dumpDs2317(BelleTuple* tt, Particle& P, string sfxDs = "", bool evtInfoDump
         printUserInfo(P);
     }
 
-    // string s_2317_gen = " ms_d17_t px_d17_t py_d17_t pz_d17_t e_d17_t ";
+    // std::string s_2317_gen = " ms_d17_t px_d17_t py_d17_t pz_d17_t e_d17_t ";
     VectorL ds17L = getGenVectorL(IDhep(P));
 
     val_dump( tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
@@ -1602,8 +1644,8 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
                              mbc_bs,
                              de_bs
     };
-    string pclTitI[nValI] = {"chg", "gen"};
-    string pclTitD[nValD] = {"msV",
+    std::string pclTitI[nValI] = {"chg", "gen"};
+    std::string pclTitD[nValD] = {"msV",
                              "msM",
                              "msC",
                              "chiV",
@@ -1649,7 +1691,7 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     if (stDump) tt->dumpData();
 }
 // ***********************************************************
-void printVectPclWithChildren(std::vector<Particle>& pcl, string tit = "") {
+void printVectPclWithChildren(std::vector<Particle>& pcl, std::string tit = "") {
     if (pcl.size() > 0) {
         printf("    ---- %s [%i] ----- \n", tit.c_str(), pcl.size() );
         for (int i = 0; i < pcl.size(); i++) {
@@ -1880,7 +1922,7 @@ void Reco::event(BelleEvent* evptr, int* status) {
     
     // ----------------------------  Dump  ---------------------------
     //   Dss
-    string sfxDs = "";
+    std::string sfxDs = "";
     if (stDumpDss) {
         for (int iEvt=0; iEvt < Dss_p.size(); iEvt++) 
                 dumpDs(TP_Dss, Dss_p[iEvt], sfxDs, true, stDumpDss, debugDumpDss);
