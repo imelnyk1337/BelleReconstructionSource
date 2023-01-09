@@ -10,7 +10,9 @@ Charged particles identification;
 since we have two $D_{s}^{\pm}$ meson in the decay mode, we expect two deal with 6 charged tracks (3 from the 1st (ground) $D_{s}$ and other 3 from the secondary one). These 3 tracks are $K^{\pm}$, $K^{\mp}$, $\pi^{\pm}$.
 
 ** Likelihood ratio: $P(K/\pi) = L(K)/(L(K) + L(\pi))$:
-** ** $0.6$ for the 1st $K$;
-** ** $0.2$ for the 2nd $K$
+- $0.6$ for the 1st $K$;
+- $0.2$ for the 2nd $K$
+
+
 
 
