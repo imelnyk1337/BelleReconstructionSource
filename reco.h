@@ -45,7 +45,11 @@ namespace Belle {
 
     std::clock_t start;
     double duration;
-        
+
+    static const double E_HER          = BeamEnergy::E_HER();
+    static const double E_LER          = BeamEnergy::E_LER();
+    static const double CROSS_ANGLE    = BeamEnergy::Cross_angle();
+
 
     const float B_MASS    = 5.279;
     const float KP_MASS   = 0.4937;

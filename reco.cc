@@ -1170,6 +1170,10 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
     double decay_vz_ds_child      = P.momentum().decayVertex().z();
 
     Hep3Vector P3D                (px_ds_child, py_ds_child, pz_ds_child);
+    double perp_ds_child          = P3D.perp();
+    double phi_ds_child           = P3D.phi();
+    double theta_ds_child         = P3D.theta();
+
 
     std::string dgrSuff = "_ch" + sfxDs;
     int signPcl = (int)P.lund() > 0 ? 1 : -1;
@@ -1182,7 +1186,7 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
     // double helicChild1 = getHelicity( P );
 
     const int nValI = 3; 
-    const int nValD = 5;
+    const int nValD = 29;
     int valPclI[nValI] = {
             signPcl,
             gen_pcl,
@@ -1190,10 +1194,27 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
     };
     double valPclD[nValD] = {
             msKvf,
-            chisq,
-            P3D.perp(),
-            P3D.phi(),
-            P3D.theta()
+            msKmvf,
+            msComb,
+            chisqKvf,
+            chisqKmvf,
+            probChisqKvf,
+            probChisqKmvf,
+            cl,
+            clKvf,
+            clKmvf,
+            production_vx_ds_child,
+            production_vy_ds_child,
+            production_vz_ds_child,
+            xx_ds_child,
+            xy_ds_child,
+            xz_ds_child,
+            decay_vx_ds_child,
+            decay_vy_ds_child,
+            decay_vz_ds_child,
+            perp_ds_child,
+            phi_ds_child,
+            theta_ds_child
     };
     std::string pclTitI[nValI] = {
             "chg",
