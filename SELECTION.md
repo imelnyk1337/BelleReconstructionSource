@@ -14,8 +14,8 @@ since we have two $D_{s}^{\pm}$ meson in the decay mode, we expect two deal with
   - $0.2$ for the 2nd $K$
 
 - Distance to the POCA (the point of the closest approach):
-  - $d_{0} < 0.5 $ cm;
-  - $d_{z} < 3 $ cm
+  - $d_{0} < 0.5$ cm;
+  - $d_{z} < 3$ cm.
 
 
 
