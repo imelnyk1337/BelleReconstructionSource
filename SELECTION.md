@@ -20,7 +20,7 @@ since we have two $D_{s}^{\pm}$ meson in the decay mode, we expect two deal with
 - SVD (Silicon Vertex Detector) hits requirements:
   - ```withSVD2(trkV[itr], 1, 1); // nRSvdHit, nZSvdHit```
 - $D_{s}^{\pm}$ pre-selection criteria:
-  - $\phi^{0}(1020)$ mass window: $[1009.461 ,1029.461]$ MeV (the nominal mass is 1019.461)
-
+  - $\phi^{0}(1020) \rightarrow K^{+}K^{-}$ mass window: $[1009.461 ,1029.461]$ MeV (the nominal mass is $1019.461$ MeV)
+  - $K^{*}(892) \rightarrow K^{+}\pi^{-}$ mass window: $[845.81, 945.81]$ MeV (the nominal mass is $895.81$ MeV)
 
 
