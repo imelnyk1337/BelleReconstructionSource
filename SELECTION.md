@@ -27,6 +27,6 @@ since we have two $D_{s}^{\pm}$ meson in the decay mode, we expect two deal with
   - $E(\gamma) > 100$ MeV;
   - Reconstructed \pi^{0} invariant mass: $122 < m_{reco}(\pi^{0}) = m(\gamma\gamma) < 148$ MeV;
   - $\pi^{0}$ momentum: $p(\pi^{0}) > 150$ MeV;
-  - Vertex fit (mass-constraint fit to \pi nominal mass): $\chi^{2}_{vertexing} < 200$
+  - Vertex fit (mass-constraint fit to $\pi^{0}$ nominal mass): $\chi^{2}_{vertexing} < 200$
 
 
