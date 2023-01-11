@@ -341,39 +341,38 @@ void combination_type07(std::vector<Particle> &new_p,
 /************/
 /* 2 bodies */
 /************/
-void 
-combination(std::vector<Particle> &new_p,
-	    const Ptype &ptype,
-	    std::vector<Particle> &p1,
-	    std::vector<Particle> &p2){
-  if(&p1 != &p2){
-    combination_type01(new_p, ptype, p1, p2);
-  }else{
-    combination_type02(new_p, ptype, p1, p2);
-  }
+void combination(std::vector<Particle>& new_p,
+                 const Ptype& ptype,
+                 std::vector<Particle>& p1,
+                 std::vector<Particle>& p2) {
+    if (&p1 != &p2) {
+        combination_type01(new_p, ptype, p1, p2);
+    }
+    else {
+        combination_type02(new_p, ptype, p1, p2);
+    }
 }
 
-void 
-combination(std::vector<Particle> &new_p,
-	    const Ptype &ptype,
-	    std::vector<Particle> &p1,
-	    std::vector<Particle> &p2,
-	    const double &mass_width){
-  if(&p1 != &p2){
-    combination_type01(new_p, ptype, p1, p2, mass_width, mass_width);
-  }else{
-    combination_type02(new_p, ptype, p1, p2, mass_width, mass_width);
-  }
+void combination(std::vector<Particle>& new_p,
+                 const Ptype& ptype,
+	             std::vector<Particle>& p1,
+	             std::vector<Particle>& p2,
+	             const double& mass_width) {
+    if (&p1 != &p2) {
+        combination_type01(new_p, ptype, p1, p2, mass_width, mass_width);
+    }
+    else {
+        combination_type02(new_p, ptype, p1, p2, mass_width, mass_width);
+    }
 }
 
-void 
-combination(std::vector<Particle> &new_p,
-	    const Ptype &ptype,
-	    std::vector<Particle> &p1,
-	    std::vector<Particle> &p2,
-	    const double &massL,
-	    const double &massR){
-  if(&p1 != &p2){
+void combination(std::vector<Particle>& new_p,
+                 const Ptype& ptype,
+                 std::vector<Particle>& p1,
+	             std::vector<Particle>& p2,
+	             const double& massL,
+	             const double& massR) {
+  if (&p1 != &p2){
     combination_type01(new_p, ptype, p1, p2, massL, massR);
   }else{
     combination_type02(new_p, ptype, p1, p2, massL, massR);
