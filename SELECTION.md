@@ -22,7 +22,7 @@ since we have two $D_{s}^{\pm}$ meson in the decay mode, we expect two deal with
 - $D_{s}^{\pm}$ pre-selection criteria:
   - $\phi^{0}(1020) \rightarrow K^{+}K^{-}$ mass window: $[1009.461 ,1029.461]$ MeV (the nominal mass is $1019.461$ MeV)
   - $K^{*}(892) \rightarrow K^{+}\pi^{-}$ mass window: $[845.81, 945.81]$ MeV (the nominal mass is $895.81$ MeV)
-  - $D_{s}^{\pm}$ mass window: $[1.955, 1.979] MeV (the nominal mass is $1968.30$ MeV)$
+  - $D_{s}^{\pm}$ mass window: $[1.955, 1.979]$ MeV (the nominal mass is $1968.30$ MeV)$
 - $D_{s_{0}}^{*}(2317)^{\pm} \rightarrow D_{s}^{\pm} \pi^{0}$:
   - $E(\gamma) > 100$ MeV;
   - Reconstructed \pi^{0} invariant mass: $122 < m_{reco}(\pi^{0}) = m(\gamma\gamma) < 148$ MeV;
