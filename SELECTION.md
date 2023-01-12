@@ -34,4 +34,4 @@ since we have two $D_{s}^{\pm}$ meson in the decay mode, we expect two deal with
 - A second Fox-Wolfram momentum $R_{2}$:
   - should be greater than 0.8 to get rid of $B\bar{B}$ contribution ?;
 - $\phi^{0}$ helicity angle:
-  - $|\cos{\Theta_{H}}| > 0.42$ 
+  - $|\cos{\theta_{H}}| > 0.42$ 
