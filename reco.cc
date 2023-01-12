@@ -1214,7 +1214,11 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
             decay_vz_ds_child,
             perp_ds_child,
             phi_ds_child,
-            theta_ds_child
+            theta_ds_child,
+            psr_ds_child,
+            px_ds_child,
+            py_ds_child,
+            pz_ds_child
     };
     std::string pclTitI[nValI] = {
             "chg",
@@ -1222,11 +1226,32 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
             "ind"
     };
     std::string pclTitD[nValD] = {
-            "ms",
-            "chi",
+            "msV",
+            "msM",
+            "msC",
+            "chiV",
+            "chiM",
+            "prbV",
+            "prbM",
+            "cl",
+            "clV",
+            "clM",
+            "pVx",
+            "pVy",
+            "pVz",
+            "xx",
+            "xy",
+            "xz",
+            "dVx",
+            "dVy",
+            "dVz",
             "pt",
             "ph",
-            "th"
+            "th",
+            "psr",
+            "px",
+            "py",
+            "pz"
     };
 
     if (debugDump) {
