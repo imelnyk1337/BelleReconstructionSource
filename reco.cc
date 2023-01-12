@@ -1729,6 +1729,10 @@ void printVectPclWithChildren(std::vector<Particle>& pcl, std::string tit = "") 
     printf("\n");
 }
 // ***********************************************************
+
+/*
+ * The main function. Events processing takes place here
+*/
 void Reco::event(BelleEvent* evptr, int* status) {
     *status = 0;
     bool debugTrkPID   = false;
@@ -1968,10 +1972,10 @@ void Reco::event(BelleEvent* evptr, int* status) {
                 dumpBs0(TP_Bs0, Bs0[iEvt], true, stDumpBs0, debugDumpBs0);
         for (int iEvt=0; iEvt < Bs0bar.size(); iEvt++)
                 dumpBs0(TP_Bs0, Bs0bar[iEvt], true, stDumpBs0, debugDumpBs0);
-    }    
-    // printf("---------  clearVectors (final)   ---------------\n");
+    }
+    printf("---------  clearVectors (final)   ---------------\n");
     clearVectors();
-    // printf("------------------  Reco end --------------------  \n");
+    printf("------------------  Reco end --------------------  \n");
 
 }
 
