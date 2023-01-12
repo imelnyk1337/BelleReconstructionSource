@@ -688,9 +688,6 @@ void makeRecursiveVertexFit(vector<Particle>& p_list, bool debugDump = false, bo
 // ***********************************************************
 void printPi0(vector<Particle>& pi0, std::string comment = "") {
     printf("------  %s Pi0 (%i) -------\n", comment.c_str(), pi0.size());
-    double E_HER = BeamEnergy::E_HER();
-    double E_LER = BeamEnergy::E_LER();
-    double CROSS_ANGLE = BeamEnergy::Cross_angle();
     
     for (size_t iPi0 = 0; iPi0 < pi0.size(); ++iPi0) {
         Particle& p0 = pi0[iPi0];
@@ -890,9 +887,6 @@ void checkAdoptCutChisqKmvf(std::vector<Particle>& p_list, double maxChisq = 2.e
 }
 // **********************************************************
 void checkAdoptCutPStar(std::vector<Particle>& p_list, double minPStarValue) {
-    double E_HER       = BeamEnergy::E_HER();
-    double E_LER       = BeamEnergy::E_LER();
-    double CROSS_ANGLE = BeamEnergy::Cross_angle();
     for (size_t i = 0; i < p_list.size(); ++i) {
         Particle& particle = p_list[i];
         double psr = pStar(particle.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
@@ -906,9 +900,6 @@ void checkAdoptCutPStar(std::vector<Particle>& p_list, double minPStarValue) {
 }
 // **********************************************************
 void checkAdoptCutPStar(std::vector<Particle>& p_list, double minPStarValue, double maxPStarValue) {
-    double E_HER       = BeamEnergy::E_HER();
-    double E_LER       = BeamEnergy::E_LER();
-    double CROSS_ANGLE = BeamEnergy::Cross_angle();
     for (size_t i = 0; i < p_list.size(); ++i) {
         Particle& particle = p_list[i];
         double psr = pStar(particle.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
@@ -1021,10 +1012,6 @@ VectorL getGenVectorL(int idhPcl) {
 }
 // ***********************************************************
 void dumpPi0(BelleTuple* tt, Particle& p0, std::string sfx, bool debugDump) {
-
-    double E_HER       = BeamEnergy::E_HER();
-    double E_LER       = BeamEnergy::E_LER();
-    double CROSS_ANGLE = BeamEnergy::Cross_angle();
 
     Particle& g1 = p0.child(0);
     Particle& g2 = p0.child(1);
@@ -1314,9 +1301,6 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
     double clKvf         = info.clKvf();
     double clKmvf        = info.clKmvf();
 
-    const static double E_HER        = BeamEnergy::E_HER();
-    const static double E_LER        = BeamEnergy::E_LER();
-    const static double CROSS_ANGLE  = BeamEnergy::Cross_angle();
 
     double psr_ds           = pStar(P.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
     double px_ds            = P.px();
@@ -1478,10 +1462,6 @@ void dumpDs2317(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInf
     UserInfo& infoPi0_2317    = dynamic_cast<UserInfo&>(pi0_2317.userInfo());
 
     double msKvfChild         = infoChild.msKvf();
-    double E_HER              = BeamEnergy::E_HER();
-    double E_LER              = BeamEnergy::E_LER();
-    double CROSS_ANGLE        = BeamEnergy::Cross_angle();
-
     double psr_d17            = pStar(P.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
     double px_d17             = P.px();
     double py_d17             = P.py();
