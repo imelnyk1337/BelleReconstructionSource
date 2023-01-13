@@ -1755,24 +1755,17 @@ void printVectPclWithChildren(std::vector<Particle>& pcl, const std::string& tit
 */
 void Reco::event(BelleEvent* evptr, int* status) {
     *status = 0;
-    bool debugTrkPID   = false;
-    bool debugVtx      = false;
-    bool debugPi0      = false;
-    bool debugPhiKsr   = false;
-    bool debugDss      = false;
-    bool debugDss_2317 = false;
-    bool debugBs0      = false;
-    bool debugDumpDss  = false;
-    bool debugDump2317 = false;
-    bool debugDumpBs0  = false;
+    bool debugTrkPID   = false,
+         debugVtx      = false,
+         debugPi0      = false,
+         debugPhiKsr   = false,
+         debugDss      = false,
+         debugDss_2317 = false,
+         debugBs0      = false,
+         debugDumpDss  = false,
+         debugDump2317 = false,
+         debugDumpBs0  = false;
 
-    const double minProbPID_Kn  = 0.2;
-    const double minProbPID_Kp  = 0.6;
-    const double minProbProtPID = 0.0;
-    const double maxProbEl      = 1.0;
-    const double maxProbPion    = 0.9;
-    const double dRcut          = 0.5;
-    const double dZcut          = 3.0;
 
     const HepPoint3D& ip_position = IpProfile::position(1);
     const HepSymMatrix& ip_error  = IpProfile::position_err(1);
