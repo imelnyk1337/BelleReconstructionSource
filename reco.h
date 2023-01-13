@@ -92,7 +92,7 @@ namespace Belle {
                            maxChisq = 200.;
 
 
-    static const bool McFlag = false;  // determined w/ getEventInfo
+    static bool McFlag = false;  // determined w/ getEventInfo
     
     static const bool stDumpBs0  = true;
     static const bool stDump2317 = false;
