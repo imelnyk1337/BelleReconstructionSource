@@ -79,30 +79,31 @@ namespace Belle {
                         minPi0GammP = 0.030,
                         minPi0pStar = 0.040;
 
-    double dM_Dgr   = 0.100;  // GeV, mass window for D ground tag
-    double dM_V0    = 0.060;  // GeV, peak mass window for V0 tag
-    double dM_Ksr0  = 0.120;  // GeV, peak mass window for K*0 tag
-    double dM_Rho   = 0.175;  // 0.275; // 0.130; // GeV, peak mass window for Rho tag
-    double dM_Dss   = 0.100;  // GeV, mass window for DS+
-    double dM_Dsst  = 0.100;  // GeV, mass window for D*S+
-    double wDst     = 0.020;  // 0.008; // wWideMassDs/2.;
-    double wB       = 0.110;  // 0.120; // wWideMassB/2.;
-    double maxR2    = 0.5;
-    double maxChisq = 200.;
+    static const double
+                           dM_Dgr   = 0.100,  // GeV, mass window for D ground tag
+                           dM_V0    = 0.060,  // GeV, peak mass window for V0 tag
+                           dM_Ksr0  = 0.120,  // GeV, peak mass window for K*0 tag
+                           dM_Rho   = 0.175,  // 0.275; // 0.130; // GeV, peak mass window for Rho tag
+                           dM_Dss   = 0.100,  // GeV, mass window for DS+
+                           dM_Dsst  = 0.100,  // GeV, mass window for D*S+
+                           wDst     = 0.020,  // 0.008; // wWideMassDs/2.;
+                           wB       = 0.110,  // 0.120; // wWideMassB/2.;
+                           maxR2    = 0.5,
+                           maxChisq = 200.;
 
 
-    bool McFlag = false;  // determined w/ getEventInfo
+    static const bool McFlag = false;  // determined w/ getEventInfo
     
-    bool stDumpBs0  = true;
-    bool stDump2317 = false;
-    bool stDumpDss  = false;
-  
-    const double BF = 1.5;
+    static const bool stDumpBs0  = true;
+    static const bool stDump2317 = false;
+    static const bool stDumpDss  = false;
+    // Magnetic field
+    static const double BF = 1.5;
     bool useBF = true;
     bool useVTX = true;
     bool debugHel = false;
 
-    const int nTrk = 4;
+    static const int nTrk = 4;
     std::vector< vector<Particle> > trkV(nTrk);
     string trkTit[nTrk] = {"pi+", "pi-", "K+", "K-"};
     
