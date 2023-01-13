@@ -45,29 +45,39 @@ namespace Belle {
 
     std::clock_t start;
     double duration;
-
-    static const double E_HER          = BeamEnergy::E_HER();
-    static const double E_LER          = BeamEnergy::E_LER();
-    static const double CROSS_ANGLE    = BeamEnergy::Cross_angle();
-
-
-    const float B_MASS    = 5.279;
-    const float KP_MASS   = 0.4937;
-    const float K0_MASS   = 0.4977;
-    const float DP_MASS   = 1.869;
-    const float D0_MASS   = 1.864;
-    const float JPSI_MASS = 3.097;
-    const float PI_MASS   = 0.1396;
-
-    double dM_phi  = 0.020;
-    double dM_2317 = 0.270;
-    double M_2317_min = 2.25, M_2317_max = 2.40;
-    double dM_Bs0  = 0.080;
-    
-    double eGammaMin   = 0.030;
-    double wMassPi0GG  = 0.020; // 0.020;
-    double minPi0GammP = 0.030;
-    double minPi0pStar = 0.040;
+    // Beam parameters
+    static const double E_HER       = BeamEnergy::E_HER();
+    static const double E_LER       = BeamEnergy::E_LER();
+    static const double CROSS_ANGLE = BeamEnergy::Cross_angle();
+    // Parameters for track selection
+    static const double
+                 minProbPID_Kn      = 0.2,
+                 minProbPID_Kp      = 0.6,
+                 minProbProtPID     = 0.0,
+                 maxProbEl          = 1.0,
+                 maxProbPion        = 0.9,
+                 dRcut              = 0.5,
+                 dZcut              = 3.0;
+    // Parameters for candidate selection
+    static const double
+                 B_MASS             = 5.279,
+                 KP_MASS            = 0.4937,
+                 K0_MASS            = 0.4977,
+                 DP_MASS            = 1.869,
+                 D0_MASS            = 1.864,
+                 JPSI_MASS          = 3.097,
+                 PI_MASS            = 0.1396,
+                 dM_phi             = 0.020,
+                 dM_2317            = 0.270,
+                 M_2317_min         = 2.25,
+                 M_2317_max         = 2.40,
+                 dM_Bs0             = 0.080;
+    // Photon and pi0 selection
+    static const double
+                        eGammaMin   = 0.030,
+                        wMassPi0GG  = 0.020, // 0.020;
+                        minPi0GammP = 0.030,
+                        minPi0pStar = 0.040;
 
     double dM_Dgr   = 0.100;  // GeV, mass window for D ground tag
     double dM_V0    = 0.060;  // GeV, peak mass window for V0 tag
@@ -170,7 +180,7 @@ namespace Belle {
 
         extern BelleTupleManager* BASF_Histogram;
 
-        std::cout << "---- Reco's hist_def function -----" << std::endl; 
+        std::cout << "---- Reco's hist_def function -----" << std::endl;
 
         std::string s_info        = " expn runn evtn r2 ipx ipy ipz evtgen ";
         std::string s_B0s         = " gen_bs chg_bs mbc_bs de_bs msV_bs msM_bs msC_bs chiV_bs chiM_bs prbV_bs"

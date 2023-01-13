@@ -1050,10 +1050,10 @@ void val_dump(BelleTuple* tt, int nValI, int nValD, int* valPclI, double* valPcl
                                                                                             std::string sfx, bool debugDump) {
     if (debugDump) {
         printf("  ==== val_dump ==== dec:(%s): ", sfx.c_str());
-        for (int iVal=0; iVal<nValI; iVal++) 
-            printf("(%s:%6i) ", ( pclTitI[iVal]+sfx ).c_str(), valPclI[iVal]);
-        for (int iVal=0; iVal<nValD; iVal++) 
-            printf("(%s:%6.3f) ", ( pclTitD[iVal]+sfx ).c_str(), valPclD[iVal]);
+        for (int iVal = 0; iVal < nValI; ++iVal)
+            printf("(%s:%6i) ", (pclTitI[iVal] + sfx).c_str(), valPclI[iVal]);
+        for (int iVal = 0; iVal < nValD; ++iVal)
+            printf("(%s:%6.3f) ", (pclTitD[iVal] + sfx).c_str(), valPclD[iVal]);
         printf("\n");
     }
     for (int iVal = 0; iVal < nValI; ++iVal)
@@ -1062,14 +1062,34 @@ void val_dump(BelleTuple* tt, int nValI, int nValD, int* valPclI, double* valPcl
         tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
 }
 // ***********************************************************
-void gen_val_dump(BelleTuple* tt, bool gen_pcl, VectorL pclL, std::string sfx, bool debugDump) {
-    const int nValD = 5; 
-    std::string pclTitD[nValD] = {"ms", "px", "py", "pz", "e"};
-    double valPclD[nValD] = {pclL.m(), pclL.px(), pclL.py(), pclL.pz(), pclL.e()};
-    if (!gen_pcl) 
-        for (int iVal = 0; iVal < nValD; iVal++)
+void gen_val_dump(BelleTuple* tt, bool gen_pcl, VectorL pclL, const std::string& sfx, bool debugDump) {
+    const int nValD = 9;
+    std::string pclTitD[nValD] = {
+            "ms",
+            "px",
+            "py",
+            "pz",
+            "e",
+            "th",
+            "cth",
+            "ph",
+            "rh"
+    };
+    double valPclD[nValD] = {
+            pclL.m(),
+            pclL.px(),
+            pclL.py(),
+            pclL.pz(),
+            pclL.e(),
+            pclL.theta(),
+            pclL.cosTheta(),
+            pclL.phi(),
+            pclL.rho()
+    };
+    if (!gen_pcl) {
+        for (int iVal = 0; iVal < nValD; ++iVal)
             valPclD[iVal] = -.99;
-
+    }
     if (debugDump) {
         printf("  ==== gen_val_dump ==== dec:(%s): ", sfx.c_str() );
         for (int iVal = 0; iVal < nValD; iVal++) 
@@ -1628,7 +1648,7 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     int chg_bs = (int)P.lund() > 0 ? 1 : -1;
     
 
-    VectorL pB = pStar(P.p());
+    VectorL pB = pStar(P.p()); // ??? have to ensure that it's been chosen properly
     double de_bs_old = pB.e() - Benergy();
     double de_bs = pB.e() - BeamEnergy::E_beam_corr();
     double mbc_bs_old = beamEnergyConstraint(P);
@@ -1636,7 +1656,7 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     double energyEl  = BeamEnergy::E_HER();
     double energyPos = BeamEnergy::E_LER();
     double angle     = BeamEnergy::Cross_angle();
-    double mbc_bs    = beamEnergyConstraint(P, energyEl, energyPos, angle);
+    double mbc_bs    = beamEnergyConstraint(P, E_HER, E_LER, CROSS_ANGLE);
     
     const int nValI = 2; 
     const int nValD = 28;
@@ -1717,7 +1737,7 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     if (stDump) tt->dumpData();
 }
 // ***********************************************************
-void printVectPclWithChildren(std::vector<Particle>& pcl, std::string tit = "") {
+void printVectPclWithChildren(std::vector<Particle>& pcl, const std::string& tit = "") {
     if (pcl.size() > 0) {
         printf("    ---- %s [%i] ----- \n", tit.c_str(), pcl.size() );
         for (int i = 0; i < pcl.size(); i++) {
@@ -1742,12 +1762,19 @@ void Reco::event(BelleEvent* evptr, int* status) {
     bool debugDss      = false;
     bool debugDss_2317 = false;
     bool debugBs0      = false;
-    
     bool debugDumpDss  = false;
     bool debugDump2317 = false;
     bool debugDumpBs0  = false;
 
-    const HepPoint3D &ip_position = IpProfile::position(1);
+    const double minProbPID_Kn  = 0.2;
+    const double minProbPID_Kp  = 0.6;
+    const double minProbProtPID = 0.0;
+    const double maxProbEl      = 1.0;
+    const double maxProbPion    = 0.9;
+    const double dRcut          = 0.5;
+    const double dZcut          = 3.0;
+
+    const HepPoint3D& ip_position = IpProfile::position(1);
     const HepSymMatrix& ip_error  = IpProfile::position_err(1);
     // Gen_hepevt_Manager& hepevt = Gen_hepevt_Manager::get_manager();
 
@@ -1775,8 +1802,6 @@ void Reco::event(BelleEvent* evptr, int* status) {
             printTrkPID(trkV[itr], trkTit[itr], "before");
     }
 
-    double minProbPID_Kn = 0.2, minProbPID_Kp = 0.6,
-    minProbProtPID = 0.0, maxProbEl = 1.0, maxProbPion = 0.9;  // preselected
     // If each plist element is not within atc_pID.prob >= prob,
     // its element is removed from plist.
     withKaonId(trkV[2], minProbPID_Kp, 3, 1, 5, 3, 2);      // K+ vs bg pi
@@ -1797,7 +1822,7 @@ void Reco::event(BelleEvent* evptr, int* status) {
     // its element is removed from plist.
     for (int itr = 0; itr < nTrk; ++itr) {
         withSVD2(trkV[itr], 1, 1); // nRSvdHit, nZSvdHit
-        withdRdZcut(trkV[itr], ip_position, 0.5, 3.0);
+        withdRdZcut(trkV[itr], ip_position, dRcut, dZcut);
     }
 
     if (debugTrkPID) {
@@ -1805,7 +1830,7 @@ void Reco::event(BelleEvent* evptr, int* status) {
             printTrkPID(trkV[itr], trkTit[itr], "after");
     }
 
-    // =================   WORKING WITH Gamma CANDIDATES ================= //
+    // ================= WORKING WITH Gamma CANDIDATES ================= //
     makeGamma(gammaV);
     withPCut(gammaV, eGammaMin);
 
@@ -1823,7 +1848,7 @@ void Reco::event(BelleEvent* evptr, int* status) {
     createUserInfo(gammaV);
 
 
-    // =================   WORKING WITH PI0 CANDIDATES ================= // 
+    // =================   WORKING WITH PI0 CANDIDATES ================= //
     makePi0(pi0);
     // Checking gammas' energies for all the pi0 daughters
     withPi0GammPCut(pi0, minPi0GammP);
@@ -1856,7 +1881,7 @@ void Reco::event(BelleEvent* evptr, int* status) {
 
     if (debugPi0) {
         printf(" pi0[%i]  \n", pi0.size());
-        // printPi0(pi0);
+        printPi0(pi0);
     }
 
     // Match candidates with genhep info 
@@ -1951,27 +1976,27 @@ void Reco::event(BelleEvent* evptr, int* status) {
      */
     
     // ----------------------------  Dump  ---------------------------
-    //   Dss
+    //   Ds
     std::string sfxDs = "";
     if (stDumpDss) {
-        for (int iEvt=0; iEvt < Dss_p.size(); iEvt++) 
-                dumpDs(TP_Dss, Dss_p[iEvt], sfxDs, true, stDumpDss, debugDumpDss);
-        for (int iEvt=0; iEvt < Dss_m.size(); iEvt++) 
-                dumpDs(TP_Dss, Dss_m[iEvt], sfxDs, true, stDumpDss, debugDumpDss);
+        for (int iEvt = 0; iEvt < Dss_p.size(); ++iEvt)
+            dumpDs(TP_Dss, Dss_p[iEvt], sfxDs, true, stDumpDss, debugDumpDss);
+        for (int iEvt = 0; iEvt < Dss_m.size(); ++iEvt)
+            dumpDs(TP_Dss, Dss_m[iEvt], sfxDs, true, stDumpDss, debugDumpDss);
     }    
-    //  Dss(2317)
+    //  Ds(2317)
     if (stDump2317) {
-        for (int iEvt=0; iEvt < Dss_p_2317.size(); iEvt++) 
-                dumpDs2317(TP_Dss_2317, Dss_p_2317[iEvt], sfxDs, true, stDump2317, debugDump2317);
-        for (int iEvt=0; iEvt < Dss_m_2317.size(); iEvt++) 
-                dumpDs2317(TP_Dss_2317, Dss_m_2317[iEvt], sfxDs, true, stDump2317, debugDump2317);
+        for (int iEvt = 0; iEvt < Dss_p_2317.size(); ++iEvt)
+            dumpDs2317(TP_Dss_2317, Dss_p_2317[iEvt], sfxDs, true, stDump2317, debugDump2317);
+        for (int iEvt = 0; iEvt < Dss_m_2317.size(); ++iEvt)
+            dumpDs2317(TP_Dss_2317, Dss_m_2317[iEvt], sfxDs, true, stDump2317, debugDump2317);
     }
     //  Bs0
     if (stDumpBs0) {
-        for (int iEvt=0; iEvt < Bs0.size(); iEvt++) 
-                dumpBs0(TP_Bs0, Bs0[iEvt], true, stDumpBs0, debugDumpBs0);
-        for (int iEvt=0; iEvt < Bs0bar.size(); iEvt++)
-                dumpBs0(TP_Bs0, Bs0bar[iEvt], true, stDumpBs0, debugDumpBs0);
+        for (int iEvt = 0; iEvt < Bs0.size(); ++iEvt)
+            dumpBs0(TP_Bs0, Bs0[iEvt], true, stDumpBs0, debugDumpBs0);
+        for (int iEvt = 0; iEvt < Bs0bar.size(); ++iEvt)
+            dumpBs0(TP_Bs0, Bs0bar[iEvt], true, stDumpBs0, debugDumpBs0);
     }
     printf("---------  clearVectors (final)   ---------------\n");
     clearVectors();
