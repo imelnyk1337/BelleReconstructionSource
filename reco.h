@@ -105,7 +105,7 @@ namespace Belle {
 
     static const int nTrk = 4;
     std::vector< vector<Particle> > trkV(nTrk);
-    string trkTit[nTrk] = {"pi+", "pi-", "K+", "K-"};
+    std::string trkTit[nTrk] = {"pi+", "pi-", "K+", "K-"};
     
     std::vector<Particle> gammaV, pi0, phi0, Ksr0, Ksr0bar, Dss_p, Dss_m, 
             Dss_p_2317, Dss_m_2317, Bs0, Bs0bar; //, BsStar0, BsStar0bar, Upsilon_5S;
