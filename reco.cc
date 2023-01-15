@@ -466,7 +466,7 @@ void createUserInfo(Particle& particle) {
         useTube = true;
         wMass = wB;
     }
-    // !!! used for this reconstruction
+    // !!! used for this reconstruction (only Phi0)
     else if ((lund == 310) || (abs(lund) == 3122) || (lund == 333)) { // K0s, Lam0, Phi0
         wMass = dM_V0;
     }

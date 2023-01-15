@@ -72,7 +72,7 @@ namespace Belle {
                              dM_2317        = 0.270,
                              M_2317_min     = 2.25,
                              M_2317_max     = 2.40,
-                             dM_Bs0         = 0.080;
+                             dM_Bs0         = 0.100;
     // Photon and pi0 selection
     static const double
                             eGammaMin       = 0.030, // 0.100;
@@ -81,14 +81,14 @@ namespace Belle {
                             minPi0pStar     = 0.040;
 
     static const double
-                           dM_Dgr           = 0.100,  // GeV, mass window for D ground tag;
-                           dM_V0            = 0.060,  // GeV, peak mass window for V0 tag;
-                           dM_Ksr0          = 0.120,  // GeV, peak mass window for K*0 tag;
+                           dM_Dgr           = 0.150,  // GeV, mass window for D ground tag;
+                           dM_V0            = 0.150,  // GeV, peak mass window for V0 tag;
+                           dM_Ksr0          = 0.150,  // GeV, peak mass window for K*0 tag;
                            dM_Rho           = 0.175,  // 0.275; // 0.130; // GeV, peak mass window for Rho tag;
-                           dM_Dss           = 0.100,  // GeV, mass window for DS+;
-                           dM_Dsst          = 0.100,  // GeV, mass window for D*S+;
-                           wDst             = 0.020,  // 0.008; // wWideMassDs/2.;
-                           wB               = 0.110,  // 0.120; // wWideMassB/2.;
+                           dM_Dss           = 0.150,  // GeV, mass window for DS+;
+                           dM_Dsst          = 0.150,  // GeV, mass window for D*S+;
+                           wDst             = 0.050,  // 0.008; // wWideMassDs/2.;
+                           wB               = 0.150,  // 0.120; // wWideMassB/2.;
                            maxR2            = 0.5,
                            maxChisq         = 200.;
 
