@@ -840,8 +840,8 @@ VertexMode vertexModeHash(const std::string& vMode) {
 }
 
 void checkAdoptCutMassChisqKvf(Particle& particle, const double& pL, const double& pR,
-                               const double& maxChisq = 2.e2, const std::string& status = "", int iChild = 0,
-                               const std::string& vertexMode = "vertex-fit") {
+                               const double& maxChisq = 2.e2, const std::string& vertexMode = "vertex-fit",
+                               const std::string& status = "", int iChild = 0) {
 
     // If maxChisq < 0 vtx cuts are not used
     // status: "", "massdif"
@@ -877,6 +877,7 @@ void checkAdoptCutMassChisqKvf(Particle& particle, const double& pL, const doubl
     double vx       = particle.momentum().decayVertex().x();
     double vy       = particle.momentum().decayVertex().y();
     double vz       = particle.momentum().decayVertex().z();
+
     if (maxChisq > 0.) {
         isErase = (_chisq > maxChisq || _chisq < 0. || abs(vz) > 50. || sqrt(vx * vx + vy * vy) > 30. || ms < pL || ms > pR);
     } else {
@@ -890,9 +891,11 @@ void checkAdoptCutMassChisqKvf(Particle& particle, const double& pL, const doubl
 }
 // **********************************************************
 void checkAdoptCutMassChisqKvf(std::vector<Particle>& p_list, double pL, double pR,
-                               double maxChisq = 1.e3, std::string status = "", int iChild = 0) {
+                               double maxChisq = 2.e2, const std::string& vertexMode = "vertex-fit",
+                               std::string status = "", int iChild = 0) {
+
     for (size_t i = 0; i < p_list.size(); ++i) {
-        checkAdoptCutMassChisqKvf(p_list[i], pL, pR, maxChisq, status, iChild);
+        checkAdoptCutMassChisqKvf(p_list[i], pL, pR, maxChisq, vertexMode, status, iChild);
     }
 }
 // **********************************************************
@@ -1176,14 +1179,14 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
     double msLimLeft  = massPDG - info.wMass();
     double msLimRight = massPDG + info.wMass();
 
-    checkAdoptCutMassChisqKvf(P, msLimLeft, msLimRight, info.maxChi2());
+    checkAdoptCutMassChisqKvf(P, msLimLeft, msLimRight, 2.e2, "vertex-fit");
     if (!info.isAdoptCut()) {
 
         // =============== Printing option for debugging =================
         // ===== Does not have a physics- or reconstruction sence ========
         // May just skip, set to True to display and/or print in stdout ==
         if (debugDump) {
-            printf("\n       *****  DssChild is not adopted ******\n" );
+            printf("\n       *****  DsChild is not adopted ******\n" );
             printPclDebug( P );
             double vx = P.momentum().decayVertex().x();
             double vy = P.momentum().decayVertex().y();
@@ -1359,7 +1362,7 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
     double msLimRight = massPDG + info.wMass();
 
     // Validation of chi2 values
-    checkAdoptCutMassChisqKvf(P, msLimLeft, msLimRight, info.maxChi2());
+    checkAdoptCutMassChisqKvf(P, msLimLeft, msLimRight, 2.e2, "mass-constraint-fit");
 
     if (!info.isAdoptCut()) {
 
