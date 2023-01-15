@@ -1127,7 +1127,7 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
     if (!&P.userInfo()) createUserInfo(P);
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
     if (info.chisqKvf() < 0.) {
-        // particle not vertexed yet
+        // the particle has not been vertexed yet
         makeRecursiveVertexFit(P, debugDump);
     }
 
