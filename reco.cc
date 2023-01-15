@@ -1075,7 +1075,7 @@ void val_dump(BelleTuple* tt, int nValI, int nValD, int* valPclI, double* valPcl
         tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
 }
 // ***********************************************************
-void gen_val_dump(BelleTuple* tt, bool gen_pcl, VectorL pclL, const std::string& sfx, bool debugDump) {
+void dumpGenValues(BelleTuple* tt, bool gen_pcl, VectorL pclL, const std::string& sfx, bool debugDump) {
     const int nValD = 9;
     std::string pclTitD[nValD] = {
             "ms",
@@ -1104,13 +1104,13 @@ void gen_val_dump(BelleTuple* tt, bool gen_pcl, VectorL pclL, const std::string&
             valPclD[iVal] = -.99;
     }
     if (debugDump) {
-        printf("  ==== gen_val_dump ==== dec:(%s): ", sfx.c_str() );
-        for (int iVal = 0; iVal < nValD; iVal++) 
-            printf("(%s:%6.3f) ", ( pclTitD[iVal] + sfx ).c_str(), valPclD[iVal]);
+        printf("  ==== dumpGenValues ==== dec:(%s): ", sfx.c_str());
+        for (int iVal = 0; iVal < nValD; ++iVal)
+            printf("(%s:%6.3f) ", (pclTitD[iVal] + sfx ).c_str(), valPclD[iVal]);
         printf("\n");
     }
-    for (int iVal = 0; iVal < nValD; iVal++) {
-        // printf("(%s:%6.3f) ", ( pclTitD[iVal]+sfx ).c_str(), valPclD[iVal]);
+    for (int iVal = 0; iVal < nValD; ++iVal) {
+        // printf("(%s:%6.3f) ", (pclTitD[iVal]+sfx ).c_str(), valPclD[iVal]);
         tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
     }
 }
@@ -1460,7 +1460,7 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
     }
     tt->column("hel_ch" + sfxDs, helicChild1);
     val_dump(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
-    gen_val_dump(tt, gen_pcl, dssL, genDgrSuff, debugDump);
+    dumpGenValues(tt, gen_pcl, dssL, genDgrSuff, debugDump);
     dumpDsChild(tt, Child0, sfxDs, false, false, debugDump);
     if (stDump) tt->dumpData();
 }
@@ -1593,7 +1593,7 @@ void dumpDs2317(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInf
     VectorL ds17L = getGenVectorL(IDhep(P));
 
     val_dump(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
-    gen_val_dump(tt, gen_d17, ds17L, genDgrSuff, debugDump);
+    dumpGenValues(tt, gen_d17, ds17L, genDgrSuff, debugDump);
     dumpPi0(tt, pi0_2317, "_p0_d", debugDump);
     
     dumpDs(tt, Child, sfxDs, false, false, debugDump);

@@ -181,7 +181,7 @@ namespace Belle {
 
         extern BelleTupleManager* BASF_Histogram;
 
-        std::cout << "---- Reco's hist_def function -----" << std::endl;
+        std::cout << "----- Reco's hist_def function -----" << std::endl;
 
         std::string s_info        = " expn runn evtn r2 ipx ipy ipz evtgen ";
         std::string s_B0s         = " gen_bs chg_bs mbc_bs de_bs msV_bs msM_bs msC_bs chiV_bs chiM_bs prbV_bs"
