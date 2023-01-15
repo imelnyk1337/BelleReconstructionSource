@@ -169,7 +169,7 @@ void setGammaError(Particle& gamma) {
   double  sp = sin(gamma.mdstGamma().ecl().phi());
   double  ct = cos(gamma.mdstGamma().ecl().theta());
   double  st = sin(gamma.mdstGamma().ecl().theta());
-  double   E =     gamma.mdstGamma().ecl().energy();
+  double  E  =     gamma.mdstGamma().ecl().energy();
 
   HepMatrix jacobian(4, 3, 0);
   jacobian[0][0] =       cp * st;
@@ -239,7 +239,8 @@ void setPi0Error(std::vector<Particle>& p_list) {
 }
 // ***********************************************************
 void withGammaInPi0(std::vector<Particle>& Gamma, std::vector<Particle>& pi0, 
-            double minMsPi0=0.118, double maxMsPi0=0.150) {
+            double minMsPi0 = 0.118, double maxMsPi0 = 0.150) {
+
     for (size_t i = 0; i < Gamma.size(); ++i) {
         bool isErase = false;
         for (int iPi0 = 0; iPi0 < pi0.size(); ++iPi0) {
@@ -264,7 +265,7 @@ int IDhep(Particle& particle) {
     return particle.genHepevt().idhep();
 }
 // ***********************************************************
-bool isLikeTrk(int lund, std::string chrgType = "Charged_pi0") {
+bool isLikeTrk(int lund, const std::string& chrgType = "Charged_pi0") {
     int ln = abs(lund);
     bool isTrk = (ln == 11) || (ln == 13) || (ln == 211) ||(ln == 321) || (ln == 11) || (ln == 2212); // el, mu, pi, K, p
     if ( chrgType != "onlyCharged" )
@@ -272,7 +273,7 @@ bool isLikeTrk(int lund, std::string chrgType = "Charged_pi0") {
     return isTrk;
 }
 // ***********************************************************
-void printPclDebug(Particle& p, std::string comment = "", std::string comment2 = "") {
+void printPclDebug(Particle& p, const std::string& comment = "", const std::string& comment2 = "") {
     int expNo, runNo, evtNo;
     bool McFlag;
     getEventInfo( expNo, runNo, evtNo, McFlag); // utility.cc
@@ -297,7 +298,7 @@ void printPclDebug(Particle& p, std::string comment = "", std::string comment2 =
         double vz = p.momentum().decayVertex().z();
         printf("              vtx:[%8.5f,%8.5f,%8.5f] ", vx, vy, vz );
         // printf( "      distanceToIP:%8.5f \n", distanceToIP(p) );
-        printf("Children  ID: ");
+        printf("Children ID: ");
         for (int jM =0 ; jM < p.nChildren(); ++jM) {
             Particle& Child = p.child(jM);
             int lundChild = (int)Child.lund() ;
@@ -315,7 +316,7 @@ void printPclDebug(Particle& p, std::string comment = "", std::string comment2 =
     }
 }
 // ***********************************************************
-void printPclDebug(vector<Particle>& p_list, std::string comment = "", std::string comment2 = "") {
+void printPclDebug(vector<Particle>& p_list, const std::string& comment = "", const std::string& comment2 = "") {
     size_t np = p_list.size();
     printf("\n----- List of Particles (%i) %9s %s ---\n", np, comment.c_str(), comment2.c_str());
     for (size_t i = 0; i < np; ++i) {
@@ -466,7 +467,7 @@ void createUserInfo(Particle& particle) {
         wMass = wB;
     }
     // !!! used for this reconstruction
-    else if ((lund      == 310) || (abs(lund) == 3122) || (lund == 333)) { // K0s, Lam0, Phi0
+    else if ((lund == 310) || (abs(lund) == 3122) || (lund == 333)) { // K0s, Lam0, Phi0
         wMass = dM_V0;
     }
     // !!! used for this reconstruction
@@ -1737,7 +1738,7 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     int chg_bs = (int)P.lund() > 0 ? 1 : -1;
     
 
-    VectorL pB = pStar(P.p()); // ??? have to ensure that it's been chosen properly
+    VectorL pB = pStar(P.p()); // ??? have to ensure that it's chosen properly
     double de_bs_old = pB.e() - Benergy();
     double de_bs = pB.e() - BeamEnergy::E_beam_corr();
     double mbc_bs_old = beamEnergyConstraint(P);
@@ -1837,7 +1838,7 @@ void printVectPclWithChildren(std::vector<Particle>& pcl, const std::string& tit
         printf("    ---- %s [%i] ----- \n", tit.c_str(), pcl.size());
         for (int i = 0; i < pcl.size(); ++i) {
             printPclDebug(pcl[i]);
-            for (int ich = 0; ich < pcl[i].nChildren(); ich++) 
+            for (int ich = 0; ich < pcl[i].nChildren(); ++ich)
                 printPclDebug(pcl[i].child(ich));
         }
     }
@@ -1978,7 +1979,7 @@ void Reco::event(BelleEvent* evptr, int* status) {
         setGenHepInfoP(pi0);
     }    
     
-    combination(phi0,      Ptype("PHI"),  trkV[2],   trkV[3], dM_V0); // k_p, k_m
+    combination(phi0,      Ptype("PHI"),  trkV[2],   trkV[3], dM_V0);   // k_p, k_m
     combination(Ksr0,      Ptype("K*0"),  trkV[2],   trkV[1], dM_Ksr0); // k_p, pi_m
     combination(Ksr0bar,   Ptype("K*B"),  trkV[3],   trkV[0], dM_Ksr0); // k_m, pi_p
     setGenHepInfoT(phi0);

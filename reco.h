@@ -46,69 +46,73 @@ namespace Belle {
     std::clock_t start;
     double duration;
     // Beam parameters
-    static const double E_HER       = BeamEnergy::E_HER();
-    static const double E_LER       = BeamEnergy::E_LER();
-    static const double CROSS_ANGLE = BeamEnergy::Cross_angle();
+    static const double E_HER               = BeamEnergy::E_HER();
+    static const double E_LER               = BeamEnergy::E_LER();
+    static const double CROSS_ANGLE         = BeamEnergy::Cross_angle();
+
     // Parameters for track selection
     static const double
-                 minProbPID_Kn      = 0.2,
-                 minProbPID_Kp      = 0.6,
-                 minProbProtPID     = 0.0,
-                 maxProbEl          = 1.0,
-                 maxProbPion        = 0.9,
-                 dRcut              = 0.5,
-                 dZcut              = 3.0;
+                             minProbPID_Kn  = 0.2,
+                             minProbPID_Kp  = 0.6,
+                             minProbProtPID = 0.0,
+                             maxProbEl      = 1.0,
+                             maxProbPion    = 0.9,
+                             dRcut          = 0.5,
+                             dZcut          = 3.0;
     // Parameters for candidate selection
     static const double
-                 B_MASS             = 5.279,
-                 KP_MASS            = 0.4937,
-                 K0_MASS            = 0.4977,
-                 DP_MASS            = 1.869,
-                 D0_MASS            = 1.864,
-                 JPSI_MASS          = 3.097,
-                 PI_MASS            = 0.1396,
-                 dM_phi             = 0.020,
-                 dM_2317            = 0.270,
-                 M_2317_min         = 2.25,
-                 M_2317_max         = 2.40,
-                 dM_Bs0             = 0.080;
+                             B_MASS         = 5.279,
+                             KP_MASS        = 0.4937,
+                             K0_MASS        = 0.4977,
+                             DP_MASS        = 1.869,
+                             D0_MASS        = 1.864,
+                             JPSI_MASS      = 3.097,
+                             PI_MASS        = 0.1396,
+                             dM_phi         = 0.020,
+                             dM_2317        = 0.270,
+                             M_2317_min     = 2.25,
+                             M_2317_max     = 2.40,
+                             dM_Bs0         = 0.080;
     // Photon and pi0 selection
     static const double
-                        eGammaMin   = 0.030, // 0.100;
-                        wMassPi0GG  = 0.030, // 0.020;
-                        minPi0GammP = 0.030,
-                        minPi0pStar = 0.040;
+                            eGammaMin       = 0.030, // 0.100;
+                            wMassPi0GG      = 0.030, // 0.020;
+                            minPi0GammP     = 0.030,
+                            minPi0pStar     = 0.040;
 
     static const double
-                           dM_Dgr   = 0.100,  // GeV, mass window for D ground tag;
-                           dM_V0    = 0.060,  // GeV, peak mass window for V0 tag;
-                           dM_Ksr0  = 0.120,  // GeV, peak mass window for K*0 tag;
-                           dM_Rho   = 0.175,  // 0.275; // 0.130; // GeV, peak mass window for Rho tag;
-                           dM_Dss   = 0.100,  // GeV, mass window for DS+;
-                           dM_Dsst  = 0.100,  // GeV, mass window for D*S+;
-                           wDst     = 0.020,  // 0.008; // wWideMassDs/2.;
-                           wB       = 0.110,  // 0.120; // wWideMassB/2.;
-                           maxR2    = 0.5,
-                           maxChisq = 200.;
+                           dM_Dgr           = 0.100,  // GeV, mass window for D ground tag;
+                           dM_V0            = 0.060,  // GeV, peak mass window for V0 tag;
+                           dM_Ksr0          = 0.120,  // GeV, peak mass window for K*0 tag;
+                           dM_Rho           = 0.175,  // 0.275; // 0.130; // GeV, peak mass window for Rho tag;
+                           dM_Dss           = 0.100,  // GeV, mass window for DS+;
+                           dM_Dsst          = 0.100,  // GeV, mass window for D*S+;
+                           wDst             = 0.020,  // 0.008; // wWideMassDs/2.;
+                           wB               = 0.110,  // 0.120; // wWideMassB/2.;
+                           maxR2            = 0.5,
+                           maxChisq         = 200.;
 
 
-    static bool McFlag = false;  // determined w/ getEventInfo
+    static bool            McFlag           = false;  // determined w/ getEventInfo
     
-    static const bool stDumpBs0  = true;
-    static const bool stDump2317 = false;
-    static const bool stDumpDss  = false;
+    static const bool      stDumpBs0        = true;
+    static const bool      stDump2317       = false;
+    static const bool      stDumpDss        = false;
     // Magnetic field
-    static const double BF = 1.5;
-    bool useBF = true;
-    bool useVTX = true;
-    bool debugHel = false;
+    static const double    BF               = 1.5;
+    bool                   useBF            = true;
+    bool                   useVTX           = true;
+    bool                   debugHel         = false;
+
+
+
 
     static const int nTrk = 4;
     std::vector< vector<Particle> > trkV(nTrk);
     std::string trkTit[nTrk] = {"pi+", "pi-", "K+", "K-"};
     
     std::vector<Particle> gammaV, pi0, phi0, Ksr0, Ksr0bar, Dss_p, Dss_m, 
-            Dss_p_2317, Dss_m_2317, Bs0, Bs0bar; //, BsStar0, BsStar0bar, Upsilon_5S;
+            Dss_p_2317, Dss_m_2317, Bs0, Bs0bar; // BsStar0, BsStar0bar, Upsilon_5S;
 
     class Reco : public Module {
     public:
@@ -145,12 +149,12 @@ namespace Belle {
         return dscr;
     }
 
-    Reco::Reco (void) {
+    Reco::Reco(void) {
         std::cout << "---- Reco constructor -----" << std::endl;
     };
 
 
-    void Reco::begin_run(BelleEvent*, int *) {
+    void Reco::begin_run(BelleEvent*, int*) {
 
         std::cout << std::endl << "---- Reco's begin_run function -----" << std::endl;
         eid::init_data();
