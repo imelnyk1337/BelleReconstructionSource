@@ -194,11 +194,10 @@ namespace Belle {
         std::string s_Dss_2       = " gen_ds2 chg_ds2 msV_ds2 msM_ds2 msC_ds2 chiV_ds2 chiM_ds2 prbV_ds2 prbM_ds2 cl_ds2 clV_ds2"
                                     " clM_ds2 pVx_ds2 pVy_ds2 pVz_ds2 xx_ds2 xy_ds2 xz_ds2 dVx_ds2 dVy_ds2 dVz_ds2 psr_ds2"
                                     " px_ds2 py_ds2 pz_ds2 p_ds2 pt_ds2 ph_ds2 th_ds2 id0_ds2 id1_ds2 ";
-        std::string s_Dss_gen     = " ms_ds_t px_ds_t py_ds_t pz_ds_t e_ds_t ";
-        std::string s_Dss_gen_1   = " ms_ds_t1 px_ds_t1 py_ds_t1 pz_ds_t1 e_ds_t1 ";
-        std::string s_Dss_gen_2   = " ms_ds_t2 px_ds_t2 py_ds_t2 pz_ds_t2 e_ds_t2 ";
-        std::string s_phi0        = " gen_ph0 chg_ph0 ms_ph0 chi_ph0 pt_ph0 hel_ph0 ihp_ph0 ";
-        std::string s_Ksr0        = " gen_ks0 chg_ks0 ms_ks0 chi_ks0 pt_ks0 hel_ks0 ihp_ks0 ";
+        std::string s_Dss_gen     = " ms_ds_t px_ds_t py_ds_t pz_ds_t e_ds_t th_ds_t ct_ds_t ph_ds_t rh_ds_t ";
+        std::string s_Dss_gen_1   = " ms_ds_t1 px_ds_t1 py_ds_t1 pz_ds_t1 e_ds_t1 th_ds_t1 ct_ds_t1 ph_ds_t1 rh_ds_t1 ";
+        std::string s_Dss_gen_2   = " ms_ds_t2 px_ds_t2 py_ds_t2 pz_ds_t2 e_ds_t2 th_ds_t2 ct_ds_t2 ph_ds_t2 rh_ds_t2 ";
+
         std::string s_child       = " gen_ch chg_ch ms_ch chi_ch pt_ch hel_ch ind_ch "; // ind_ch=1 - phipi, 2 - KsrK
         std::string s_child_1     = " gen_ch1 chg_ch1 msV_ch1 msM_ch1 msC_ch1 chiV_ch1 chiM_ch1 prbV_ch1 prbM_ch1 cl_ch1"
                                     " clV_ch1 clM_ch1 pVx_ch1 pVy_ch1 pVz_ch1 xx_ch1 xy_ch1 xz_ch1 dVx_ch1 dVy_ch1 dVz_ch1"

@@ -963,19 +963,20 @@ void withPionId(std::vector<Particle>& p_list, const double prob, int accq0, int
 // **********************************************************
 int getEvtGenType() {
     // 0:"Data", 1:"evtgen-charged", 2:"evtgen-mixed", 3:"evtgen-charm", 4:"evtgen-uds", 5:"evtgen-bsbs", 6:"evtgen-nonbsbs"
-    Gen_hepevt_Manager &genMgr  = Gen_hepevt_Manager::get_manager();
+    Gen_hepevt_Manager& genMgr  = Gen_hepevt_Manager::get_manager();
     for(std::vector<Gen_hepevt>::iterator i = genMgr.begin(); 
                 i != genMgr.end(); ++i) {
+
         int idh = (*i).idhep();
-        if      (abs(idh)==521) {return 1;}  // B+B-
-        else if (abs(idh)==511) {return 2;}  // B0B0bar
-        else if (abs(idh)==  4) {return 3;}  // ccbar
-        else if (abs(idh)<=  3) {return 4;}  // uds
+        if      (abs(idh) == 521) {return 1;}  // B+B-
+        else if (abs(idh) == 511) {return 2;}  // B0B0bar
+        else if (abs(idh) ==   4) {return 3;}  // ccbar
+        else if (abs(idh) <=   3) {return 4;}  // uds
     }
     return 0;
 }
 // ***********************************************************
-void evtInfo_dump(BelleTuple* tt, bool debugDump=false) {
+void evtInfo_dump(BelleTuple* tt, bool debugDump = false) {
     // Event Information
     int expNo, runNo, evtNo;
     getEventInfo(expNo, runNo, evtNo, McFlag); // utility.cc
@@ -997,13 +998,13 @@ void evtInfo_dump(BelleTuple* tt, bool debugDump=false) {
     tt->column("expn",  expNo ); // Exp #
     tt->column("runn",  runNo ); // Run #
     tt->column("evtn",  evtNo );
-    tt->column("ipx",  ip_position.x() );
-    tt->column("ipy",  ip_position.y() );
-    tt->column("ipz",  ip_position.z() );
+    tt->column("ipx",   ip_position.x());
+    tt->column("ipy",   ip_position.y());
+    tt->column("ipz",   ip_position.z());
     //************* Signal shape ********
-    tt->column("r2", r2 );
+    tt->column("r2", r2);
     //*************  MC  ****************
-    tt->column("evtgen", idGenType );
+    tt->column("evtgen", idGenType);
 }
 // ***********************************************************
 VectorL getGenVectorL(int idhPcl) {
@@ -1083,7 +1084,7 @@ void gen_val_dump(BelleTuple* tt, bool gen_pcl, VectorL pclL, const std::string&
             "pz",
             "e",
             "th",
-            "cth",
+            "ct",
             "ph",
             "rh"
     };
@@ -1591,7 +1592,7 @@ void dumpDs2317(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInf
     // std::string s_2317_gen = " ms_d17_t px_d17_t py_d17_t pz_d17_t e_d17_t ";
     VectorL ds17L = getGenVectorL(IDhep(P));
 
-    val_dump( tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
+    val_dump(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
     gen_val_dump(tt, gen_d17, ds17L, genDgrSuff, debugDump);
     dumpPi0(tt, pi0_2317, "_p0_d", debugDump);
     
