@@ -370,7 +370,7 @@ void withdRdZcut(std::vector<Particle>& p_list, const HepPoint3D& ip_position, d
         int mhyp;
         if (id == 11) mhyp = 0;
         else if (id == 13) mhyp = 1;
-        else if (id == 211) mhyp = 2;
+        // else if (id == 211) mhyp = 2; // repeatition
         else if (id == 321) mhyp = 3;
         else if (id == 2212) mhyp = 4;
         else mhyp = 2;
@@ -433,7 +433,7 @@ double getMsGammaInPi0(Particle& gamma) {
     std::vector<Particle> pi0;
     makePi0(pi0);
     withPi0GammPCut(pi0,  0.030);
-//    withPi0pStarCut(pi0,  0.050);
+    // withPi0pStarCut(pi0,  0.050);
 
     double msGG = -1.;
     for (size_t iPi0 = 0; iPi0 < pi0.size(); ++iPi0) {
@@ -599,7 +599,7 @@ void makeRecursiveVertexFit(Particle& Mother, bool debugDump = false, bool useKm
     if (err) {
         setBadVtx(Mother);
 
-        // =============== The printing option for debugging =======================
+        // =============== The printing option for debugging ===================
         // ===== Does not have a physics- or reconstruction-related sence ======
         // May be just skipped, set to True to display and/or print in stdout ==
         if (debugDump) {
@@ -698,7 +698,7 @@ void makeRecursiveVertexFit(vector<Particle>& p_list, bool debugDump = false, bo
     }
 }
 // ***********************************************************
-void printPi0(vector<Particle>& pi0, std::string comment = "") {
+void printPi0(vector<Particle>& pi0, const std::string& comment = "") {
     printf("------  %s Pi0 (%i) -------\n", comment.c_str(), pi0.size());
     
     for (size_t iPi0 = 0; iPi0 < pi0.size(); ++iPi0) {
@@ -712,7 +712,7 @@ void printPi0(vector<Particle>& pi0, std::string comment = "") {
     }
 }
 // ***********************************************************
-void printTrkPID(vector<Particle>& trkList, std::string pType, std::string comment = "") {
+void printTrkPID(vector<Particle>& trkList, const std::string& pType, const std::string& comment = "") {
     int ip, ibg1, ibg2;
     if ((pType == "pi+") || (pType == "pi-")) {
         ip   = 2;
@@ -784,6 +784,10 @@ double getHelicity(VectorL& mother, VectorL& dght, VectorL& grndDght) {
     grndDght_boosted.boost(V1_boost);
     double helic = -mother_boosted.vect().unit().dot(grndDght_boosted.vect().unit());
 
+
+    // =============== Printing option for debugging =================
+    // ===== Does not have a physics- or reconstruction sence ========
+    // May just skip, set to True to display and/or print in stdout ==
     if (debugHel) {
         printf("\n======================== getHelicity ====================\n");
         cout << "  VectorL   mother:" << mother << endl;
@@ -791,6 +795,9 @@ double getHelicity(VectorL& mother, VectorL& dght, VectorL& grndDght) {
         cout << "  VectorL grndDght:" << grndDght << endl;
         printf("         dght helic: %7.5f\n\n",helic);
     }
+    // ================================================================
+    // ================================================================
+    // ================================================================
     
     return helic;
 }
@@ -804,11 +811,17 @@ double getHelicity(Particle& p, int indDough=0) {
     VectorL grndDght = p.child(indDough).child(0).p();
     double helic = getHelicity(mother, dght, grndDght);
 
+    // =============== Printing option for debugging =================
+    // ===== Does not have a physics- or reconstruction sence ========
+    // May just skip, set to True to display and/or print in stdout ==
     if (debugHel) {
         printf("\n======================== getHelicity ====================");
         printPclDebug( p, "(Mother)" );
         printf("         dght helic: %7.5f\n\n",helic);
     }
+    // ================================================================
+    // ================================================================
+    // ================================================================
     
     return helic;
 }
@@ -989,11 +1002,17 @@ void evtInfo_dump(BelleTuple* tt, bool debugDump = false) {
     double  r2 = -1.;
     Evtcls_hadron_info_Manager& clsMgr = Evtcls_hadron_info_Manager::get_manager();
     if(clsMgr.count()) r2 = clsMgr[0].R2();
-    
+
+    // =============== Printing option for debugging =================
+    // ===== Does not have a physics- or reconstruction sence ========
+    // May just skip, set to True to display and/or print in stdout ==
     if (debugDump)
         printf("\n        ---- EvtInfo_DUMP --- EvtGenType[%i],  exp:%2i,  run:%2i, evt:%i, ip_position:[%f, %f, %f] ----\n", 
             idGenType, expNo, runNo, evtNo, 
             ip_position.x(), ip_position.y(), ip_position.z());
+    // ================================================================
+    // ================================================================
+    // ================================================================
 
     tt->column("expn",  expNo ); // Exp #
     tt->column("runn",  runNo ); // Run #
@@ -1024,7 +1043,7 @@ VectorL getGenVectorL(int idhPcl) {
     return pclL;
 }
 // ***********************************************************
-void dumpPi0(BelleTuple* tt, Particle& p0, std::string sfx, bool debugDump) {
+void dumpPi0(BelleTuple* tt, Particle& p0, const std::string& sfx, bool debugDump) {
 
     Particle& g1 = p0.child(0);
     Particle& g2 = p0.child(1);
@@ -1045,30 +1064,43 @@ void dumpPi0(BelleTuple* tt, Particle& p0, std::string sfx, bool debugDump) {
     int valPclI[nValI]    = {gen_pi0};
     std::string pclTitD[nValD] = {"eg1",     "eg2",     "psr",   "mgg",    "gg1",  "gg2"};
     double valPclD[nValD] = {g1.ptot(), g2.ptot(), psrPi0, msPi0_gg, gen_g1, gen_g2};
-    
+
+    // =============== Printing option for debugging =================
+    // ===== Does not have a physics- or reconstruction sence ========
+    // May just skip, set to True to display and/or print in stdout ==
     if (debugDump) {
-        printf("  ==== val_dump ==== pi0 (%s): ", sfx.c_str());
+        printf("  ==== dumpValues ==== pi0 (%s): ", sfx.c_str());
         for (int iVal = 0; iVal < nValI; iVal++) 
             printf("(%s:%6i) ", (pclTitI[iVal] + sfx ).c_str(), valPclI[iVal]);
         for (int iVal = 0; iVal < nValD; iVal++) 
             printf("(%s:%6.3f) ", (pclTitD[iVal] + sfx ).c_str(), valPclD[iVal]);
         printf("\n");
     }
+    // ================================================================
+    // ================================================================
+    // ================================================================
+
     for (int iVal = 0; iVal < nValI; ++iVal) tt->column(pclTitI[iVal] + sfx, valPclI[iVal]);
     for (int iVal = 0; iVal < nValD; ++iVal) tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
 }
 
 // ***********************************************************
-void val_dump(BelleTuple* tt, int nValI, int nValD, int* valPclI, double* valPclD, std::string* pclTitI, std::string* pclTitD,
-                                                                                            std::string sfx, bool debugDump) {
+void dumpValues(BelleTuple* tt, int nValI, int nValD, int* valPclI, double* valPclD, std::string* pclTitI, std::string* pclTitD,
+                                                                                            const std::string& sfx, bool debugDump) {
+    // =============== Printing option for debugging =================
+    // ===== Does not have a physics- or reconstruction sence ========
+    // May just skip, set to True to display and/or print in stdout ==
     if (debugDump) {
-        printf("  ==== val_dump ==== dec:(%s): ", sfx.c_str());
+        printf("  ==== dumpValues ==== dec:(%s): ", sfx.c_str());
         for (int iVal = 0; iVal < nValI; ++iVal)
             printf("(%s:%6i) ", (pclTitI[iVal] + sfx).c_str(), valPclI[iVal]);
         for (int iVal = 0; iVal < nValD; ++iVal)
             printf("(%s:%6.3f) ", (pclTitD[iVal] + sfx).c_str(), valPclD[iVal]);
         printf("\n");
     }
+    // ================================================================
+    // ================================================================
+    // ================================================================
     for (int iVal = 0; iVal < nValI; ++iVal)
         tt->column(pclTitI[iVal] + sfx, valPclI[iVal]);
     for (int iVal = 0; iVal < nValD; ++iVal)
@@ -1103,12 +1135,19 @@ void dumpGenValues(BelleTuple* tt, bool gen_pcl, VectorL pclL, const std::string
         for (int iVal = 0; iVal < nValD; ++iVal)
             valPclD[iVal] = -.99;
     }
+    // =============== Printing option for debugging =================
+    // ===== Does not have a physics- or reconstruction sence ========
+    // May just skip, set to True to display and/or print in stdout ==
     if (debugDump) {
         printf("  ==== dumpGenValues ==== dec:(%s): ", sfx.c_str());
         for (int iVal = 0; iVal < nValD; ++iVal)
             printf("(%s:%6.3f) ", (pclTitD[iVal] + sfx ).c_str(), valPclD[iVal]);
         printf("\n");
     }
+    // ================================================================
+    // ================================================================
+    // ================================================================
+
     for (int iVal = 0; iVal < nValD; ++iVal) {
         // printf("(%s:%6.3f) ", (pclTitD[iVal]+sfx ).c_str(), valPclD[iVal]);
         tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
@@ -1138,6 +1177,10 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
 
     checkAdoptCutMassChisqKvf(P, msLimLeft, msLimRight, info.maxChi2());
     if (!info.isAdoptCut()) {
+
+        // =============== Printing option for debugging =================
+        // ===== Does not have a physics- or reconstruction sence ========
+        // May just skip, set to True to display and/or print in stdout ==
         if (debugDump) {
             printf("\n       *****  DssChild is not adopted ******\n" );
             printPclDebug( P );
@@ -1147,7 +1190,11 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
             printf("msKvf:%f, msLimLeft:%f, msLimRight:%f, maxChi2:%f, vx:%f, vy:%f, vz:%f \n",
                    info.msKvf(), msLimLeft, msLimRight, info.maxChi2(), vx, vy, vz);
         }
-        return;
+        // ================================================================
+        // ================================================================
+        // ================================================================
+
+        return; // the most important line for understanding this function outcome
     }
 
     double chisqKvf      = info.chisqKvf();       // -1.; //
@@ -1274,13 +1321,20 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
             "pz"
     };
 
+    // =============== Printing option for debugging =================
+    // ===== Does not have a physics- or reconstruction sence ========
+    // May just skip, set to True to display and/or print in stdout ==
     if (debugDump) {
         printf("\n======== dumpDsChild  ========= (%s) chg_dss_child:%i, ms_dss_child:%7.3f ) \n",
                ChildPcl.c_str(), (int)P.lund(), msKvf);
         printUserInfo(P);
     }
+    // ================================================================
+    // ================================================================
+    // ================================================================
 
-    val_dump(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
+
+    dumpValues(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
     
     if (stDump) tt->dumpData();
 }
@@ -1307,6 +1361,10 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
     checkAdoptCutMassChisqKvf(P, msLimLeft, msLimRight, info.maxChi2());
 
     if (!info.isAdoptCut()) {
+
+        // =============== Printing option for debugging =================
+        // ===== Does not have a physics- or reconstruction sence ========
+        // May just skip, set to True to display and/or print in stdout ==
         if (debugDump) {
             printf("\n       ***** The Ds candidate is not adopted ******\n" );
             printPclDebug(P);
@@ -1316,7 +1374,12 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
             printf("msKvf:%f, msLimLeft:%f, msLimRight:%f, maxChi2:%f, vx:%f, vy:%f, vz:%f \n",
                    info.msKvf(), msLimLeft, msLimRight, info.maxChi2(), vx, vy, vz);
         }
-        /* !!!! A crucial step: if info.isAdoptCut() equals 0, return statement will be invoked at this point
+        // ================================================================
+        // ================================================================
+        // ================================================================
+
+
+        /* !!!! A crucial step below: if info.isAdoptCut() equals 0, return statement will be invoked at this point
          * and the dumpDs stack frame is popped out from the Reco::event() call stack;
          * the unadopted candidates are not going to be recorded or involved in further steps of reconstruction
          * they are also not included in the following combinations
@@ -1384,8 +1447,6 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
 
     std::string dgrSuff = "_ds" + sfxDs, genDgrSuff = "_ds_t" + sfxDs;
 
-
-    
     const int nValI = 2; 
     const int nValD = 29;
     int valPclI[nValI]    = {signPcl, gen_pcl};
@@ -1453,13 +1514,21 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
 
     VectorL dssL = getGenVectorL(IDhep(P));
 
+
+    // =============== Printing option for debugging =================
+    // ===== Does not have a physics- or reconstruction sence ========
+    // May just skip, set to True to display and/or print in stdout ==
     if (debugDump) {
         printf("\n======== Dss  ========= sfx:%s, chg_ds:%i, gen_ds:%i, ms_ds:%7.3f , child ( ms:%7.3f ) \n", 
                genDgrSuff.c_str(), signPcl, gen_pcl, msKvf, Child0.p().m());
         printUserInfo(P);
     }
+    // ================================================================
+    // ================================================================
+    // ================================================================
+
     tt->column("hel_ch" + sfxDs, helicChild1);
-    val_dump(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
+    dumpValues(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
     dumpGenValues(tt, gen_pcl, dssL, genDgrSuff, debugDump);
     dumpDsChild(tt, Child0, sfxDs, false, false, debugDump);
     if (stDump) tt->dumpData();
@@ -1582,17 +1651,24 @@ void dumpDs2317(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInf
     };
 
     std::string dgrSuff = "_d17", genDgrSuff = "_d17_t";
-    
+
+    // =============== Printing option for debugging =================
+    // ===== Does not have a physics- or reconstruction sence ========
+    // May just skip, set to True to display and/or print in stdout ==
     if (debugDump) {
         printf("\n======== Ds(2317)  ========= chg_2317:%i, gen_2317:%i, ms_2317:%7.3f , child ( ms:%7.3f ) \n", 
                chg_d17, gen_d17, msKvf, msKvfChild);
         printUserInfo(P);
     }
+    // ================================================================
+    // ================================================================
+    // ================================================================
+
 
     // std::string s_2317_gen = " ms_d17_t px_d17_t py_d17_t pz_d17_t e_d17_t ";
     VectorL ds17L = getGenVectorL(IDhep(P));
 
-    val_dump(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
+    dumpValues(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
     dumpGenValues(tt, gen_d17, ds17L, genDgrSuff, debugDump);
     dumpPi0(tt, pi0_2317, "_p0_d", debugDump);
     
@@ -1733,15 +1809,21 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
                              "mbc",
                              "de"
     };
-    
-    
+
+
+    // =============== Printing option for debugging =================
+    // ===== Does not have a physics- or reconstruction sence ========
+    // May just skip, set to True to display and/or print in stdout ==
     if (debugDump) {
         printf("\n\n======== Bs0  ========= chg_bs:%i,  gen_bs:%i, ms_bs:%7.3f , de_bs: %7.3f , de_bs_old: %7.3f, mbc_bs: %7.3f , mbc_bs_old: %7.3f \n", 
                chg_bs, gen_bs, msKvf, de_bs, de_bs_old, mbc_bs, mbc_bs_old);
         printUserInfo(P);
     }
+    // ================================================================
+    // ================================================================
+    // ================================================================
     
-    val_dump(  tt,  nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, "_bs", debugDump );
+    dumpValues(tt,  nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, "_bs", debugDump);
     dumpPi0(   tt, pi0_Bs0,     "_p0_b", debugDump);
     dumpPi0(   tt, pi0_Ds2317,  "_p0_d", debugDump);
     dumpDs(    tt, Dss_Bs0,     "1", false, false, debugDump);
@@ -1752,8 +1834,8 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
 // ***********************************************************
 void printVectPclWithChildren(std::vector<Particle>& pcl, const std::string& tit = "") {
     if (pcl.size() > 0) {
-        printf("    ---- %s [%i] ----- \n", tit.c_str(), pcl.size() );
-        for (int i = 0; i < pcl.size(); i++) {
+        printf("    ---- %s [%i] ----- \n", tit.c_str(), pcl.size());
+        for (int i = 0; i < pcl.size(); ++i) {
             printPclDebug(pcl[i]);
             for (int ich = 0; ich < pcl[i].nChildren(); ich++) 
                 printPclDebug(pcl[i].child(ich));
@@ -1854,7 +1936,7 @@ void Reco::event(BelleEvent* evptr, int* status) {
     createUserInfo(gammaV);
 
 
-    // =================   WORKING WITH PI0 CANDIDATES ================= //
+    // =================   WORKING WITH Pi0 CANDIDATES ================= //
     makePi0(pi0);
     // Checking gammas' energies for all the pi0 daughters
     withPi0GammPCut(pi0, minPi0GammP);
@@ -2007,9 +2089,9 @@ void Reco::event(BelleEvent* evptr, int* status) {
         for (int iEvt = 0; iEvt < Bs0bar.size(); ++iEvt)
             dumpBs0(TP_Bs0, Bs0bar[iEvt], true, stDumpBs0, debugDumpBs0);
     }
-    printf("---------  clearVectors (final)   ---------------\n");
+    printf("---------  clearVectors (final) --------- \n");
     clearVectors();
-    printf("------------------  Reco end --------------------  \n");
+    printf("------------------  Reco end -------------------- \n");
 
 }
 
