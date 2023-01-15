@@ -209,10 +209,10 @@ namespace Belle {
         std::string s_2317        = " gen_d17 chg_d17 msV_d17 msM_d17 msC_d17 chiV_d17 chiM_d17 prbV_d17 prbM_d17"
                                     " cl_d17 clV_d17 clM_d17 pVx_d17 pVy_d17 pVz_d17 xx_d17 xy_d17 xz_d17 dVx_d17 dVy_d17"
                                     " dVz_d17 psr_d17 px_d17 py_d17 pz_d17 p_d17 pt_d17 ph_d17 th_d17 hel_d17 ";
-        std::string s_2317_gen    = " ms_d17_t px_d17_t py_d17_t pz_d17_t e_d17_t ";
+        std::string s_2317_gen    = " ms_d17_t px_d17_t py_d17_t pz_d17_t e_d17_t th_d17_t ct_d17_t ph_d17_t rh_d17_t ";
 
-        std::string s_pi_d17      = " gen_p0_d eg1_p0_d  eg2_p0_d  psr_p0_d  mgg_p0_d gg1_p0_d gg2_p0_d ";
-        std::string s_pi_B0s      = " gen_p0_b eg1_p0_b  eg2_p0_b  psr_p0_b  mgg_p0_b gg1_p0_b gg2_p0_b ";
+        std::string s_pi_d17      = " gen_p0_d eg1_p0_d eg2_p0_d psr_p0_d mgg_p0_d gg1_p0_d gg2_p0_d ";
+        std::string s_pi_B0s      = " gen_p0_b eg1_p0_b eg2_p0_b psr_p0_b mgg_p0_b gg1_p0_b gg2_p0_b ";
 
         std::string s_2317_wPi    = s_2317  + s_2317_gen  + s_pi_d17;
         std::string s_Dss1_wCh    = s_Dss_1 + s_Dss_gen_1 + s_child_1;
