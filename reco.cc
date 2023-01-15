@@ -460,27 +460,39 @@ void createUserInfo(Particle& particle) {
     bool useTube = false;
     double wMass = dM_Dgr;
 
-    if ((abs(lund) > 500) && (abs(lund) < 600)) {                         // B0, Bc
+    // !!! used for this reconstruction
+    if ((abs(lund) > 500) && (abs(lund) < 600)) {                         // B0, Bc, Bs
         useTube = true;
         wMass = wB;
-    } else if ((lund      == 310) || (abs(lund) == 3122) || (lund == 333)) { // K0s, Lam0, Phi0
+    }
+    // !!! used for this reconstruction
+    else if ((lund      == 310) || (abs(lund) == 3122) || (lund == 333)) { // K0s, Lam0, Phi0
         wMass = dM_V0;
-    } else if (abs(lund)  == 313) {                                          // K*0
+    }
+    // !!! used for this reconstruction
+    else if (abs(lund)  == 313) {                                          // K*0
         wMass = dM_Ksr0;
-    } else if ((abs(lund) == 113) || (abs(lund) == 213)) {                // RHO0,+.-
+    }
+    else if ((abs(lund) == 113) || (abs(lund) == 213)) {                // RHO0,+.-
         wMass = dM_Rho;
-    } else if ((abs(lund) == 413) || (abs(lund) == 423)) {                // D*+, D*0feve
+    }
+    // !!! used for this reconstruction
+    else if ((abs(lund) == 413) || (abs(lund) == 423)) {                // D*+, D*0feve
         useTube = true; 
         wMass = wDst;
-    } else if (abs(lund)  == 431) {                                          // DS+
+    }
+    else if (abs(lund)  == 431) {                                          // DS+
         wMass = dM_Dss;
-    } else if (abs(lund)  == 433) {                                          // D*S+
+    }
+    else if (abs(lund)  == 433) {                                          // D*S+
         useTube = true;
         wMass = dM_Dsst;
-    } else if (abs(lund)  == 10431) {                                        // D**S+(D_sJ(2317))
+    }
+    else if (abs(lund)  == 10431) {                                        // D**S+(D_sJ(2317))
         useTube = true;
         wMass = dM_2317;
-    } else if (abs(lund)  == 443) {                                          // J/psi
+    }
+    else if (abs(lund)  == 443) {                                          // J/psi
         useTube = true; 
     }
     
@@ -1859,7 +1871,7 @@ void Reco::event(BelleEvent* evptr, int* status) {
     // Making a simple Kvf fit
     makeRecursiveVertexFit(pi0, false, false);
 
-    // Selecting pi0 candidates considering their reconstructed mass (mass of 2 gammas)
+    // Selecting pi0 candidates considering their reconstructed masses (mass of 2 gammas)
     withPi0MassGamGamCut(pi0, wMassPi0GG);
 
     // Making a mass-constraint fit for pi0 candidate, which passed through all cuts (including gammas)
@@ -1968,8 +1980,9 @@ void Reco::event(BelleEvent* evptr, int* status) {
      * combination(Upsilon_5S, Ptype(9000553),  BsStar0, BsStar0bar, dM_Bs0);
      */
     
-    // ----------------------------  Dump  ---------------------------
-    //   Ds
+    // ----------------------------  Dumping  ---------------------------
+    // Ds
+    /*
     std::string sfxDs = "";
     if (stDumpDss) {
         for (int iEvt = 0; iEvt < Dss_p.size(); ++iEvt)
@@ -1977,14 +1990,16 @@ void Reco::event(BelleEvent* evptr, int* status) {
         for (int iEvt = 0; iEvt < Dss_m.size(); ++iEvt)
             dumpDs(TP_Dss, Dss_m[iEvt], sfxDs, true, stDumpDss, debugDumpDss);
     }    
-    //  Ds(2317)
+    // Ds(2317)
     if (stDump2317) {
         for (int iEvt = 0; iEvt < Dss_p_2317.size(); ++iEvt)
             dumpDs2317(TP_Dss_2317, Dss_p_2317[iEvt], sfxDs, true, stDump2317, debugDump2317);
         for (int iEvt = 0; iEvt < Dss_m_2317.size(); ++iEvt)
             dumpDs2317(TP_Dss_2317, Dss_m_2317[iEvt], sfxDs, true, stDump2317, debugDump2317);
     }
-    //  Bs0
+    */
+
+    // Bs0
     if (stDumpBs0) {
         for (int iEvt = 0; iEvt < Bs0.size(); ++iEvt)
             dumpBs0(TP_Bs0, Bs0[iEvt], true, stDumpBs0, debugDumpBs0);

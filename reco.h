@@ -74,18 +74,18 @@ namespace Belle {
                  dM_Bs0             = 0.080;
     // Photon and pi0 selection
     static const double
-                        eGammaMin   = 0.030,
-                        wMassPi0GG  = 0.020, // 0.020;
+                        eGammaMin   = 0.030, // 0.100;
+                        wMassPi0GG  = 0.030, // 0.020;
                         minPi0GammP = 0.030,
                         minPi0pStar = 0.040;
 
     static const double
-                           dM_Dgr   = 0.100,  // GeV, mass window for D ground tag
-                           dM_V0    = 0.060,  // GeV, peak mass window for V0 tag
-                           dM_Ksr0  = 0.120,  // GeV, peak mass window for K*0 tag
-                           dM_Rho   = 0.175,  // 0.275; // 0.130; // GeV, peak mass window for Rho tag
-                           dM_Dss   = 0.100,  // GeV, mass window for DS+
-                           dM_Dsst  = 0.100,  // GeV, mass window for D*S+
+                           dM_Dgr   = 0.100,  // GeV, mass window for D ground tag;
+                           dM_V0    = 0.060,  // GeV, peak mass window for V0 tag;
+                           dM_Ksr0  = 0.120,  // GeV, peak mass window for K*0 tag;
+                           dM_Rho   = 0.175,  // 0.275; // 0.130; // GeV, peak mass window for Rho tag;
+                           dM_Dss   = 0.100,  // GeV, mass window for DS+;
+                           dM_Dsst  = 0.100,  // GeV, mass window for D*S+;
                            wDst     = 0.020,  // 0.008; // wWideMassDs/2.;
                            wB       = 0.110,  // 0.120; // wWideMassB/2.;
                            maxR2    = 0.5,
@@ -132,8 +132,8 @@ namespace Belle {
         void end_run(BelleEvent*, int*) {};
         void other(int*, BelleEvent*, int*) {};
 
-
-        BelleTuple* TP_Dss, *TP_Dss_2317, *TP_Bs0;
+        BelleTuple* TP_Bs0;
+        // BelleTuple* TP_Dss, *TP_Dss_2317, *TP_Bs0;
         // BelleTuple *TP_phi0, *TP_Ksr0, *TP_Dss, *TP_Dss_2317, *TP_Bs0;
     };
 
@@ -223,9 +223,9 @@ namespace Belle {
         std::string s_2317_sum    = s_Dss_sum       + s_2317_wPi;
         std::string s_B0s_sum     = s_info  + s_B0s + s_Dss1_wCh + s_2317_wPi + s_Dss2_wCh + s_pi_B0s;
 
-        TP_Dss               = BASF_Histogram->ntuple("Dss",    s_Dss_sum);
-        TP_Dss_2317          = BASF_Histogram->ntuple("Ds2317", s_2317_sum);
-        TP_Bs0               = BASF_Histogram->ntuple("Bs0",    s_B0s_sum);
+        // TP_Dss               = BASF_Histogram->ntuple("Dss",    s_Dss_sum);
+        // TP_Dss_2317          = BASF_Histogram->ntuple("Ds2317", s_2317_sum);
+        TP_Bs0               = BASF_Histogram->ntuple("Bs0", s_B0s_sum);
     }
 
 #if defined(BELLE_NAMESPACE)
