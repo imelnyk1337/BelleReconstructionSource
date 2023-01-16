@@ -188,7 +188,7 @@ namespace Belle {
         std::cout << "----- Reco's hist_def function -----" << std::endl;
 
         std::string s_info        = " expn runn evtn r2 ipx ipy ipz evtgen ";
-        std::string s_B0s         = " gen_bs chg_bs mbc_bs de_bs msV_bs msM_bs msC_bs chiV_bs chiM_bs prbV_bs"
+        std::string s_B0s         = " gen_bs chg_bs mbc_bs de_bs de2_bs msV_bs msM_bs msC_bs chiV_bs chiM_bs prbV_bs"
                                     " prbM_bs cl_bs clV_bs clM_bs px_bs py_bs pz_bs p_bs pVx_bs pVy_bs pVz_bs xx_bs xy_bs xz_bs"
                                     " dVx_bs dVy_bs dVz_bs pt_bs ph_bs th_bs eta_bs cth_bs ";
         std::string s_Dss         = " gen_ds chg_ds ms_ds chi_ds pt_ds ph_ds th_ds ";

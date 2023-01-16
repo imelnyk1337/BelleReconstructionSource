@@ -993,7 +993,7 @@ int getEvtGenType() {
     return 0;
 }
 // ***********************************************************
-void evtInfo_dump(BelleTuple* tt, bool debugDump = false) {
+void dumpEventInfo(BelleTuple* tt, bool debugDump = false) {
     // Event Information
     int expNo, runNo, evtNo;
     getEventInfo(expNo, runNo, evtNo, McFlag); // utility.cc
@@ -1164,7 +1164,7 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
 
     // printf("\n======== dumpDsChild  ========= chg_dss_child:%i, ms_dss_child:%7.3f ) \n",
     // (int)P.lund(), P.p().m() );
-    if (evtInfoDump) evtInfo_dump(tt, debugDump);
+    if (evtInfoDump) dumpEventInfo(tt, debugDump);
 
     int lund = (int)P.lund();
     
@@ -1345,7 +1345,7 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
 // ***********************************************************
 void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDump = false, bool stDump = true, bool debugDump = false) {
 
-    if (evtInfoDump) evtInfo_dump(tt, debugDump);
+    if (evtInfoDump) dumpEventInfo(tt, debugDump);
     int lund = (int)P.lund();
 
     // Creating an userInfo object for the Ds meson candidate
@@ -1540,7 +1540,7 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
 // ***********************************************************
 void dumpDs2317(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDump = false, bool stDump = true, bool debugDump = false) {
 
-    if (evtInfoDump) evtInfo_dump(tt,debugDump);
+    if (evtInfoDump) dumpEventInfo(tt, debugDump);
 
     if (!&P.userInfo()) createUserInfo(P);
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
@@ -1675,7 +1675,6 @@ void dumpDs2317(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInf
     dumpValues(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
     dumpGenValues(tt, gen_d17, ds17L, genDgrSuff, debugDump);
     dumpPi0(tt, pi0_2317, "_p0_d", debugDump);
-    
     dumpDs(tt, Child, sfxDs, false, false, debugDump);
 
     if (stDump) tt->dumpData();
@@ -1684,7 +1683,7 @@ void dumpDs2317(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInf
 void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
                  bool stDump = true, bool debugDump = true) {
 
-    if (evtInfoDump) evtInfo_dump(tt, debugDump);
+    if (evtInfoDump) dumpEventInfo(tt, debugDump);
 
     if (!&P.userInfo()) createUserInfo(P);
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
@@ -1695,7 +1694,7 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
      * to find out the particle's vertex fit status.
     */
     if (info.chisqKvf() < 0.) {
-        // particle not vertexed yet
+        // particle has not been vertexed yet
         makeRecursiveVertexFit(P, debugDump);
     }
     // Retrieval of the values after vertex fitting
@@ -1742,8 +1741,10 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     
 
     VectorL pB = pStar(P.p()); // ??? have to ensure that it's chosen properly
+    VectorL pB2 = pStar(P.p(), E_HER, E_LER, CROSS_ANGLE);
     double de_bs_old = pB.e() - Benergy();
     double de_bs = pB.e() - BeamEnergy::E_beam_corr();
+    double de2_bs = pB2.e() - BeamEnergy::E_beam_corr();
     double mbc_bs_old = beamEnergyConstraint(P);
     
     double energyEl  = BeamEnergy::E_HER();
@@ -1752,7 +1753,7 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     double mbc_bs    = beamEnergyConstraint(P, E_HER, E_LER, CROSS_ANGLE);
     
     const int nValI = 2; 
-    const int nValD = 28;
+    const int nValD = 29;
     int valPclI[nValI] = {chg_bs, gen_bs};
     double valPclD[nValD] = {msKvf,
                              msKmvf,
@@ -1781,7 +1782,8 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
                              phi_bs,
                              theta_bs,
                              mbc_bs,
-                             de_bs
+                             de_bs,
+                             de2_bs
     };
     std::string pclTitI[nValI] = {"chg", "gen"};
     std::string pclTitD[nValD] = {"msV",
@@ -1811,7 +1813,8 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
                              "ph",
                              "th",
                              "mbc",
-                             "de"
+                             "de",
+                             "de2"
     };
 
 
@@ -1828,9 +1831,9 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     // ================================================================
     
     dumpValues(tt,  nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, "_bs", debugDump);
-    dumpPi0(   tt, pi0_Bs0,     "_p0_b", debugDump);
-    dumpPi0(   tt, pi0_Ds2317,  "_p0_d", debugDump);
-    dumpDs(    tt, Dss_Bs0,     "1", false, false, debugDump);
+    dumpPi0   (tt, pi0_Bs0,     "_p0_b", debugDump);
+//    dumpPi0   (tt, pi0_Ds2317,  "_p0_d", debugDump);
+    dumpDs    (tt, Dss_Bs0,     "1", false, false, debugDump);
     dumpDs2317(tt, Dss2317_Bs0, "2", false, false, debugDump);
 
     if (stDump) tt->dumpData();
