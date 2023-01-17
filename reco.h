@@ -203,12 +203,13 @@ namespace Belle {
         std::string s_Dss_gen_2   = " ms_ds_t2 px_ds_t2 py_ds_t2 pz_ds_t2 e_ds_t2 th_ds_t2 ct_ds_t2 ph_ds_t2 rh_ds_t2 ";
 
         std::string s_child       = " gen_ch chg_ch ms_ch chi_ch pt_ch hel_ch ind_ch "; // ind_ch=1 - phipi, 2 - KsrK
+        // Add ind_ch
         std::string s_child_1     = " gen_ch1 chg_ch1 msV_ch1 msM_ch1 msC_ch1 chiV_ch1 chiM_ch1 prbV_ch1 prbM_ch1 cl_ch1"
                                     " clV_ch1 clM_ch1 pVx_ch1 pVy_ch1 pVz_ch1 xx_ch1 xy_ch1 xz_ch1 dVx_ch1 dVy_ch1 dVz_ch1"
-                                    " psr_ch1 px_ch1 py_ch1 pz_ch1 p_ch1 pt_ch1 ph_ch1 th_ch1 ";
+                                    " psr_ch1 px_ch1 py_ch1 pz_ch1 p_ch1 pt_ch1 ph_ch1 th_ch1 ind_ch1 hel_ch1 ";
         std::string s_child_2     = " gen_ch2 chg_ch2 msV_ch2 msM_ch2 msC_ch2 chiV_ch2 chiM_ch2 prbV_ch2 prbM_ch2 cl_ch2"
                                     " clV_ch2 clM_ch2 pVx_ch2 pVy_ch2 pVz_ch2 xx_ch2 xy_ch2 xz_ch2 dVx_ch2 dVy_ch2 dVz_ch2"
-                                    " psr_ch2 px_ch2 py_ch2 pz_ch2 p_ch2 pt_ch2 ph_ch2 th_ch2 ";
+                                    " psr_ch2 px_ch2 py_ch2 pz_ch2 p_ch2 pt_ch2 ph_ch2 th_ch2 ind_ch2 hel_ch2 ";
 
         std::string s_2317        = " gen_d17 chg_d17 msV_d17 msM_d17 msC_d17 chiV_d17 chiM_d17 prbV_d17 prbM_d17"
                                     " cl_d17 clV_d17 clM_d17 pVx_d17 pVy_d17 pVz_d17 xx_d17 xy_d17 xz_d17 dVx_d17 dVy_d17"

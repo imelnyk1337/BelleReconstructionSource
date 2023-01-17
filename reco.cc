@@ -978,6 +978,7 @@ void withPionId(std::vector<Particle>& p_list, const double prob, int accq0, int
   }
 }
 // **********************************************************
+// Modify this function
 int getEvtGenType() {
     // 0:"Data", 1:"evtgen-charged", 2:"evtgen-mixed", 3:"evtgen-charm", 4:"evtgen-uds", 5:"evtgen-bsbs", 6:"evtgen-nonbsbs"
     Gen_hepevt_Manager& genMgr  = Gen_hepevt_Manager::get_manager();
