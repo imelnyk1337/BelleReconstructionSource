@@ -982,16 +982,31 @@ void withPionId(std::vector<Particle>& p_list, const double prob, int accq0, int
 int getEvtGenType() {
     // 0:"Data", 1:"evtgen-charged", 2:"evtgen-mixed", 3:"evtgen-charm", 4:"evtgen-uds", 5:"evtgen-bsbs", 6:"evtgen-nonbsbs"
     Gen_hepevt_Manager& genMgr  = Gen_hepevt_Manager::get_manager();
-    for(std::vector<Gen_hepevt>::iterator i = genMgr.begin(); 
-                i != genMgr.end(); ++i) {
+    for(std::vector<Gen_hepevt>::iterator i = genMgr.begin(); i != genMgr.end(); ++i) {
 
-        int idh = (*i).idhep();
-        if      (abs(idh) == 521) {return 1;}  // B+B-
-        else if (abs(idh) == 511) {return 2;}  // B0B0bar
-        else if (abs(idh) ==   4) {return 3;}  // ccbar
-        else if (abs(idh) <=   3) {return 4;}  // uds
+        int status = 0;
+        int idhep = i->idhep();
+        switch (abs(idhep)) {
+            case 533:
+                status = 1; // Bs0* (vector)
+            case 531:
+                status = 2; // Bs0  (scalar)
+            case 431:
+                status = 3; // Ds+-
+            case 10431:
+                status = 4; // Ds1*(2317)
+            case 4:
+                status = 5; // ccbar
+            case 3:
+                status = 6; // uds
+            case 2:
+                status = 6; // uds
+            case 1:
+                status = 6; // uds
+
+        }
     }
-    return 0;
+    return status;
 }
 // ***********************************************************
 void dumpEventInfo(BelleTuple* tt, bool debugDump = false) {
@@ -1907,10 +1922,10 @@ void Reco::event(BelleEvent* evptr, int* status) {
 
     // If each plist element is not within atc_pID.prob < prob,
     // its element is removed from plist.
-    withPionId(trkV[0], maxProbPion, 3, 1, 5, 2, 3);  // pi+ vs bg K
-    withPionId(trkV[1], maxProbPion, 3, 1, 5, 2, 3);  // pi- vs bg K
-    withPionId(trkV[0], maxProbPion, 3, 1, 5, 2, 4);  // pi+ vs bg p
-    withPionId(trkV[1], maxProbPion, 3, 1, 5, 2, 4);  // pi- vs bg p
+    withKaonId(trkV[0], maxProbPion, 3, 1, 5, 2, 3);  // pi+ vs bg K
+    withKaonId(trkV[1], maxProbPion, 3, 1, 5, 2, 3);  // pi- vs bg K
+    withKaonId(trkV[0], maxProbPion, 3, 1, 5, 2, 4);  // pi+ vs bg p
+    withKaonId(trkV[1], maxProbPion, 3, 1, 5, 2, 4);  // pi- vs bg p
 
 
     // If each plist element is not associated with rphi & z-svd hits
