@@ -1921,15 +1921,15 @@ void Reco::event(BelleEvent* evptr, int* status) {
     // its element is removed from plist.
     withKaonId(trkV[2], minProbPID_Kp, 3, 1, 5, 3, 2);      // K+ vs bg pi
     withKaonId(trkV[3], minProbPID_Kn, 3, 1, 5, 3, 2);      // K- vs bg pi
-    withKaonId(trkV[2], minProbPID_Kp, 3, 1, 5, 3, 4);      // K+ vs bg p
-    withKaonId(trkV[3], minProbPID_Kn, 3, 1, 5, 3, 4);      // K- vs bg p
+//    withKaonId(trkV[2], minProbPID_Kp, 3, 1, 5, 3, 4);      // K+ vs bg p
+//    withKaonId(trkV[3], minProbPID_Kn, 3, 1, 5, 3, 4);      // K- vs bg p
 
     // If each plist element is not within atc_pID.prob < prob,
     // its element is removed from plist.
     withPionId(trkV[0], maxProbPion, 3, 1, 5, 3, 2);  // pi+ vs bg K
     withPionId(trkV[1], maxProbPion, 3, 1, 5, 3, 2);  // pi- vs bg K
-    withPionId(trkV[0], maxProbPion, 3, 1, 5, 4, 2);  // pi+ vs bg p
-    withPionId(trkV[1], maxProbPion, 3, 1, 5, 4, 2);  // pi- vs bg p
+//    withPionId(trkV[0], maxProbPion, 3, 1, 5, 4, 2);  // pi+ vs bg p
+//    withPionId(trkV[1], maxProbPion, 3, 1, 5, 4, 2);  // pi- vs bg p
 
 
     // If each plist element is not associated with rphi & z-svd hits
