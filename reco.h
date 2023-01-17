@@ -191,6 +191,7 @@ namespace Belle {
         std::string s_B0s         = " gen_bs chg_bs mbc_bs de_bs de2_bs msV_bs msM_bs msC_bs chiV_bs chiM_bs prbV_bs"
                                     " prbM_bs cl_bs clV_bs clM_bs px_bs py_bs pz_bs p_bs pVx_bs pVy_bs pVz_bs xx_bs xy_bs xz_bs"
                                     " dVx_bs dVy_bs dVz_bs pt_bs ph_bs th_bs eta_bs cth_bs ";
+        std::string s_Bs0_gen     = " ms_bs_t px_bs_t py_bs_t pz_bs_t e_bs_t th_bs_t ct_bs_t ph_bs_t rh_bs_t ";
         std::string s_Dss         = " gen_ds chg_ds ms_ds chi_ds pt_ds ph_ds th_ds ";
         std::string s_Dss_1       = " gen_ds1 chg_ds1 msV_ds1 msM_ds1 msC_ds1 chiV_ds1 chiM_ds1 prbV_ds1 prbM_ds1 cl_ds1"
                                     " clV_ds1 clM_ds1 pVx_ds1 pVy_ds1 pVz_ds1 xx_ds1 xy_ds1 xz_ds1 dVx_ds1 dVy_ds1 dVz_ds1"
@@ -225,7 +226,7 @@ namespace Belle {
 
         std::string s_Dss_sum     = s_info  + s_Dss + s_Dss_gen  + s_child;
         std::string s_2317_sum    = s_Dss_sum       + s_2317_wPi;
-        std::string s_B0s_sum     = s_info  + s_B0s + s_Dss1_wCh + s_2317_wPi + s_Dss2_wCh + s_pi_B0s;
+        std::string s_B0s_sum     = s_info  + s_B0s + s_Bs0_gen  + s_Dss1_wCh + s_2317_wPi + s_Dss2_wCh + s_pi_B0s;
 
         // TP_Dss               = BASF_Histogram->ntuple("Dss",    s_Dss_sum);
         // TP_Dss_2317          = BASF_Histogram->ntuple("Ds2317", s_2317_sum);

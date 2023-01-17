@@ -979,12 +979,12 @@ void withPionId(std::vector<Particle>& p_list, const double prob, int accq0, int
 }
 // **********************************************************
 // Modify this function
+// Make sure that this function returns a correct value
 int getEvtGenType() {
     // 0:"Data", 1:"evtgen-charged", 2:"evtgen-mixed", 3:"evtgen-charm", 4:"evtgen-uds", 5:"evtgen-bsbs", 6:"evtgen-nonbsbs"
     Gen_hepevt_Manager& genMgr  = Gen_hepevt_Manager::get_manager();
-    for(std::vector<Gen_hepevt>::iterator i = genMgr.begin(); i != genMgr.end(); ++i) {
-
-        int status = 0;
+    int status = 0;
+    for (std::vector<Gen_hepevt>::iterator i = genMgr.begin(); i != genMgr.end(); ++i) {
         int idhep = i->idhep();
         switch (abs(idhep)) {
             case 533:
@@ -1021,22 +1021,22 @@ void dumpEventInfo(BelleTuple* tt, bool debugDump = false) {
     // Event Shape 
     double  r2 = -1.;
     Evtcls_hadron_info_Manager& clsMgr = Evtcls_hadron_info_Manager::get_manager();
-    if(clsMgr.count()) r2 = clsMgr[0].R2();
+    if (clsMgr.count()) r2 = clsMgr[0].R2();
 
     // =============== Printing option for debugging =================
     // ===== Does not have a physics- or reconstruction sence ========
     // May just skip, set to True to display and/or print in stdout ==
     if (debugDump)
-        printf("\n        ---- EvtInfo_DUMP --- EvtGenType[%i],  exp:%2i,  run:%2i, evt:%i, ip_position:[%f, %f, %f] ----\n", 
-            idGenType, expNo, runNo, evtNo, 
+        printf("\n        ---- EvtInfo_DUMP --- EvtGenType[%i],  exp:%2i,  run:%2i, evt:%i, ip_position:[%f, %f, %f] ----\n",
+            idGenType, expNo, runNo, evtNo,
             ip_position.x(), ip_position.y(), ip_position.z());
     // ================================================================
     // ================================================================
     // ================================================================
 
-    tt->column("expn",  expNo ); // Exp #
-    tt->column("runn",  runNo ); // Run #
-    tt->column("evtn",  evtNo );
+    tt->column("expn",  expNo); // Exp #
+    tt->column("runn",  runNo); // Run #
+    tt->column("evtn",  evtNo);
     tt->column("ipx",   ip_position.x());
     tt->column("ipy",   ip_position.y());
     tt->column("ipz",   ip_position.z());
@@ -1845,12 +1845,16 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     // ================================================================
     // ================================================================
     // ================================================================
-    
-    dumpValues(tt,  nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, "_bs", debugDump);
-    dumpPi0   (tt, pi0_Bs0,     "_p0_b", debugDump);
-//    dumpPi0   (tt, pi0_Ds2317,  "_p0_d", debugDump);
-    dumpDs    (tt, Dss_Bs0,     "1", false, false, debugDump);
-    dumpDs2317(tt, Dss2317_Bs0, "2", false, false, debugDump);
+
+    VectorL bs0L = getGenVectorL(IDhep(P));
+    std::string genSfx = "_bs_t";
+
+    dumpValues   (tt,  nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, "_bs", debugDump);
+    dumpGenValues(tt, gen_bs, bs0L, genSfx, debugDump);
+    dumpPi0      (tt, pi0_Bs0,     "_p0_b", debugDump);
+    // dumpPi0   (tt, pi0_Ds2317,  "_p0_d", debugDump);
+    dumpDs       (tt, Dss_Bs0,     "1", false, false, debugDump);
+    dumpDs2317   (tt, Dss2317_Bs0, "2", false, false, debugDump);
 
     if (stDump) tt->dumpData();
 }
@@ -1902,7 +1906,7 @@ void Reco::event(BelleEvent* evptr, int* status) {
     Evtcls_hadron_info_Manager& clsMgr = Evtcls_hadron_info_Manager::get_manager();
     if (clsMgr.count()) r2 = clsMgr[0].R2();
 
-    ////////////////////  make charged particles - tracks //////////////////
+    // //////////////////  make charged particles - tracks //////////////////
     // makes Kaon and Pion from MdstCharged w/o cut. 1 : w/ good_charged, 0 : w/o
     makeKPi(trkV[2], trkV[3], trkV[0], trkV[1], 1); //k_p, k_m, pi_p, pi_m
 
@@ -1922,10 +1926,10 @@ void Reco::event(BelleEvent* evptr, int* status) {
 
     // If each plist element is not within atc_pID.prob < prob,
     // its element is removed from plist.
-    withKaonId(trkV[0], maxProbPion, 3, 1, 5, 2, 3);  // pi+ vs bg K
-    withKaonId(trkV[1], maxProbPion, 3, 1, 5, 2, 3);  // pi- vs bg K
-    withKaonId(trkV[0], maxProbPion, 3, 1, 5, 2, 4);  // pi+ vs bg p
-    withKaonId(trkV[1], maxProbPion, 3, 1, 5, 2, 4);  // pi- vs bg p
+    withPionId(trkV[0], maxProbPion, 3, 1, 5, 3, 2);  // pi+ vs bg K
+    withPionId(trkV[1], maxProbPion, 3, 1, 5, 3, 2);  // pi- vs bg K
+    withPionId(trkV[0], maxProbPion, 3, 1, 5, 4, 2);  // pi+ vs bg p
+    withPionId(trkV[1], maxProbPion, 3, 1, 5, 4, 2);  // pi- vs bg p
 
 
     // If each plist element is not associated with rphi & z-svd hits
@@ -1980,13 +1984,13 @@ void Reco::event(BelleEvent* evptr, int* status) {
     // Selecting pi0 candidates considering their reconstructed masses (mass of 2 gammas)
     withPi0MassGamGamCut(pi0, wMassPi0GG);
 
-    // Making a mass-constraint fit for pi0 candidate, which passed through all cuts (including gammas)
+    // Making a mass-constraint fit for a pi0 candidate, which passed through all cuts (including gammas)
     makeRecursiveVertexFit(pi0, false, true);
 
 
 
     /* setPi0Error(pi0); -- it was instead of the entire chuck of code from start poit
-     * only one this line above. Make sure that it's properly for your case of analysis
+     * only one this line above. Make sure that it's proper for your case of analysis
      * !!!! PAY ATTENTION. End point
      */
 
