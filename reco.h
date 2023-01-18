@@ -35,6 +35,11 @@
 
 #include "tagv/TagV.h"
 #include "hamlet/Hamlet.h"
+// necessary for dealing with systematic errors on data,
+// idle and shoud be commented out for MC simulations
+// modity depanding on you analysis requirements
+// look here http://belle.kek.jp/group/pid_joint/
+//# include "kid_eff_o6.h"
 
 
 #if defined(BELLE_NAMESPACE)
@@ -110,38 +115,44 @@ namespace Belle {
     static const int nTrk = 4;
     std::vector< vector<Particle> > trkV(nTrk);
     std::string trkTit[nTrk] = {"pi+", "pi-", "K+", "K-"};
-    
-    std::vector<Particle> gammaV, pi0, phi0, Ksr0, Ksr0bar, Dss_p, Dss_m, 
+
+    std::vector<Particle> gammaV, pi0, phi0, Ksr0, Ksr0bar, Dss_p, Dss_m,
             Dss_p_2317, Dss_m_2317, Bs0, Bs0bar; // BsStar0, BsStar0bar, Upsilon_5S;
 
+
+    // :::::::::::::::::: Main class Reco :::::::::::::::
+    // defines the behavior of the entire Reco module
     class Reco : public Module {
     public:
-        Reco(void);
+        Reco();
 
-        ~Reco(void) {};
+        ~Reco() = default;
 
-        void init(int *) {
-            std::cout << "---- Reco initialization -----" << std::endl;
-            start = std::clock();
-            /* initialization of Ptype is done inside Hamlet */
-            // Hamlet::init();
-            
-        };
-
-        void term(void) {};
-        void disp_stat(const char*) {};
-        void hist_def(void);
+        void init(int*);
+        void term();
+        void disp_stat(const char*);
+        void hist_def();
         void event(BelleEvent*, int*);
         void begin_run(BelleEvent*, int*);
-        void end_run(BelleEvent*, int*) {};
-        void other(int*, BelleEvent*, int*) {};
+        void end_run(BelleEvent*, int*);
+        void other(int*, BelleEvent*, int*);
 
         BelleTuple* TP_Bs0;
         // BelleTuple* TP_Dss, *TP_Dss_2317, *TP_Bs0;
         // BelleTuple *TP_phi0, *TP_Ksr0, *TP_Dss, *TP_Dss_2317, *TP_Bs0;
+
+        /* dealing with systematic errors in the dataset,
+        * not applicable to a MC simulation;
+        * uncomment the chunk of code below and
+        * modify considering your analysis requirements
+        *
+        private:
+            KID_eff_06 kideff_k_1, kideff_k_2, kideff_k_3;
+            KID_eff_06 kideff_pi_1, kideff_pi_2, kideff_pi_3;
+        */
     };
 
-    extern "C" Module_descr* mdcl_Reco() { /* main */
+extern "C" Module_descr* mdcl_Reco() { /* main */
         Reco* module = new Reco;
         Module_descr* dscr = new Module_descr("Reco", module);
         IpProfile::define_global(dscr);
@@ -149,39 +160,55 @@ namespace Belle {
         return dscr;
     }
 
-    Reco::Reco(void) {
+    Reco::Reco() {
         std::cout << "---- Reco constructor -----" << std::endl;
     };
 
+    void Reco::init(int *) {
+        std::cout << "---- Reco initialization -----" << std::endl;
+        start = std::clock();
+        /* initialization of Ptype is done inside Hamlet */
+        // Hamlet::init();
+        /* dealing with systematic errors in the dataset,
+         * not applicable to a MC simulation;
+         * uncomment the chunk of code below and
+         * modify considering your analysis requirements
+         *
+         * kideff_k_1.init (0.9, 1, "kaon_1", "data/kideff-2006-svd1-all.dat");
+         * kideff_k_2.init (0.9, 1, "kaon_2", "data/kideff-2006-svd2-all.dat");
+         * kideff_k_3.init (0.9, 1, "kaon_3", "data/kideff-2009-newtrk-all.dat");
+         * kideff_pi_1.init(0.4, 3, "pion_1", "data/kideff-2006-svd1-all.dat");
+         * kideff_pi_2.init(0.4, 3, "pion_2", "data/kideff-2006-svd2-all.dat");
+         * kideff_pi_3.init(0.4, 3, "pion_3", "data/kideff-2009-newtrk-all.dat");
+         */
+    };
 
-    void Reco::begin_run(BelleEvent*, int*) {
-
-        std::cout << std::endl << "---- Reco's begin_run function -----" << std::endl;
-        eid::init_data();
-        // Get IP profile data from $BELLE_POSTGRES_SERVER
-        duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
-
-        // Hamlet::begin_run();
-        IpProfile::begin_run();
-        // Dump IP profile data to stdout (optional)
-        IpProfile::dump();
-        
-        BeamEnergy::begin_run();
-        
-        std::cout << "duration: "     << duration << " sec"        << std::endl;
-        std::cout << " Benergy(): "   << Benergy()                 << std::endl;
-        std::cout << " E_beam_corr: " << BeamEnergy::E_beam_corr() << std::endl;
-        std::cout << " E_beam_err: "  << BeamEnergy::E_beam_err()  << std::endl;
-        std::cout << " E_LER: "       << BeamEnergy::E_LER()       << std::endl;
-        std::cout << " E_HER: "       << BeamEnergy::E_HER()       << std::endl;
-        std::cout << " E_beam_orig: " << BeamEnergy::E_beam_orig() << std::endl;
-        std::cout << " E_LER_orig: "  << BeamEnergy::E_LER_orig()  << std::endl;
-        std::cout << " E_HER_orig: "  << BeamEnergy::E_HER_orig()  << std::endl;
-        std::cout << " E_beam2: "     << BeamEnergy::E_beam2()     << std::endl;
-        std::cout << " Cross_angle: " << BeamEnergy::Cross_angle() << std::endl;
+    void Reco::term() {
+        /*
+         * dealing with systematic erors,
+         * uncomment the chunk of code
+         * below and modify considering
+         * your analysis requirements
+         *
+         * kideff_k_1.calculate();
+         * kideff_k_2.calculate();
+         * kideff_k_3.calculate();
+         * kideff_pi_1.calculate();
+         * kideff_pi_2.calculate();
+         * kideff_pi_3.calculate();
+         * kideff_k_1.dump();
+         * kideff_k_2.dump();
+         * kideff_k_3.dump();
+         * kideff_pi_1.dump();
+         * kideff_pi_2.dump();
+         * kideff_pi_3.dump();
+         *
+        */
     }
 
-    void Reco::hist_def(void) {
+    void Reco::disp_stat(const char*) {};
+
+    void Reco::hist_def() {
 
         extern BelleTupleManager* BASF_Histogram;
 
@@ -232,6 +259,40 @@ namespace Belle {
         // TP_Dss_2317          = BASF_Histogram->ntuple("Ds2317", s_2317_sum);
         TP_Bs0               = BASF_Histogram->ntuple("Bs0", s_B0s_sum);
     }
+
+    void Reco::begin_run(BelleEvent*, int*) {
+
+        std::cout << std::endl << "---- Reco's begin_run function -----" << std::endl;
+        eid::init_data();
+        // Get IP profile data from $BELLE_POSTGRES_SERVER
+        duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+
+        // Hamlet::begin_run();
+        IpProfile::begin_run();
+        // Dump IP profile data to stdout (optional)
+        IpProfile::dump();
+        
+        BeamEnergy::begin_run();
+        
+        std::cout << "duration: "     << duration << " sec"        << std::endl;
+        std::cout << " Benergy(): "   << Benergy()                 << std::endl;
+        std::cout << " E_beam_corr: " << BeamEnergy::E_beam_corr() << std::endl;
+        std::cout << " E_beam_err: "  << BeamEnergy::E_beam_err()  << std::endl;
+        std::cout << " E_LER: "       << BeamEnergy::E_LER()       << std::endl;
+        std::cout << " E_HER: "       << BeamEnergy::E_HER()       << std::endl;
+        std::cout << " E_beam_orig: " << BeamEnergy::E_beam_orig() << std::endl;
+        std::cout << " E_LER_orig: "  << BeamEnergy::E_LER_orig()  << std::endl;
+        std::cout << " E_HER_orig: "  << BeamEnergy::E_HER_orig()  << std::endl;
+        std::cout << " E_beam2: "     << BeamEnergy::E_beam2()     << std::endl;
+        std::cout << " Cross_angle: " << BeamEnergy::Cross_angle() << std::endl;
+    }
+
+    void Reco::end_run(BelleEvent*, int*) {};
+    void Reco::other(int*, BelleEvent*, int*) {}
+
+
+
+
 
 #if defined(BELLE_NAMESPACE)
 }//namespace Belle
