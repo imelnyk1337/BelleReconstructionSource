@@ -982,6 +982,28 @@ void withKaonId(std::vector<Particle>& p_list, const double prob, int accq0, int
 void withPionId(std::vector<Particle>& p_list,
                 const double prob, int accq0, int tofq0, int cdcq0,
                 int ids0, int idb0) {
+    /* ************* THE FUNCTION'S ANNOTATION **************
+     * Combine informations from ACC, TOF and CDC (dE/dx)
+     * in order to separate e+-, mu+-, K+-, pi+-, p+-
+     * atc_pid returns a likelihood ratio which is called
+     * probParticle that compares two particles i and j:
+     * Prob(i : j) = L(i) / (L(i) + L(j))
+     * For example, Prob(K : pi) tends to be 1 if the
+     * charged paritcle is K-like,
+     * and tends to be 0 if it is pi-like.
+     * Apparently, Prob(K : pi) = 1 - Prob(pi : K).
+     * Prob(K : pi) is NOT a probability to be a kaon.
+     * accq0, tofq0, cdcq0: flags for each detector
+     * accq0 = 3, tofq0 = 1, cdcq0 = 5 are the
+     * default and recommended values;
+     * ids0, idb0 -- signal and background species.
+     * 0 for e,
+     * 1 for mu,
+     * 2 for pi,
+     * 3 for K and
+     * 4 for p.
+     * By default, ids0 = 3 and idb0 = 2 (K agaist pi).
+     * */
 
     atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
 
@@ -1464,7 +1486,14 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
     double decay_vz_ds      = P.momentum().decayVertex().z();
     double helicChild1 = getHelicity(P);
 
+
+    // Working with Ds+(-) children (K+(-), K-(+) and pi+(-))
     Particle& Child0 = P.child(0);   // phi0 (--> K+ K-) or K* (--> K+ pi-), or K*bar (--> K- pi+)
+    Particle& Child0Child0 = Child0.child(0); // K+ or K-
+    Particle& Child0Child1 = Child0.child(1); // K- or pi- or pi+
+    Particle& Child1 = P.child(1);   // pi+ or K
+
+
     if (!&Child0.userInfo()) createUserInfo(Child0);
     UserInfo& infoChild0 = dynamic_cast<UserInfo&>(Child0.userInfo());
 
@@ -1472,21 +1501,21 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
     double px_ds_Ch0     = Child0.px();
     double py_ds_Ch0     = Child0.py();
     double pz_ds_Ch0     = Child0.pz();
-    // Probability of particle identification for the first Ds'd child
+
+    // Probability of particle identification for the first Ds'd child children
+
     double probPidChild0 = infoChild0.probpid();
 
     Hep3Vector Child03D(px_ds_Ch0, py_ds_Ch0, pz_ds_Ch0);
-
-    Particle& Child1 = P.child(1);   // pi or K
-    if (!&Child1.userInfo()) createUserInfo(Child1);
-    UserInfo& infoChild1 = dynamic_cast<UserInfo&>(Child1.userInfo());
 
     double psr_ds_Ch1    = pStar(Child1.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
     double px_ds_Ch1     = Child1.px();
     double py_ds_Ch1     = Child1.py();
     double pz_ds_Ch1     = Child1.pz();
 
-    // Probability of particle identification for the second Ds'd child
+    // Probability of particle identification for the second Ds'd child (pi or K)
+    if (!&Child1.userInfo()) createUserInfo(Child1);
+    UserInfo& infoChild1 = dynamic_cast<UserInfo&>(Child1.userInfo());
     double probPidChild1 = infoChild1.probpid();
     Hep3Vector Child13D  (px_ds_Ch1, py_ds_Ch1, pz_ds_Ch1);
 
@@ -1949,8 +1978,10 @@ void Reco::event(BelleEvent* evptr, int* status) {
 
     // If each plist element is not within atc_pID.prob >= prob,
     // its element is removed from plist.
-    withKaonId(trkV[2], minProbPID_Kp, 3, 1, 5, 3, 2);      // K+ vs bg pi
-    withKaonId(trkV[3], minProbPID_Kn, 3, 1, 5, 3, 2);      // K- vs bg pi
+    // ----------------- pos kaons ---- defalut values - kaons - pions
+    withKaonId(trkV[2], minProbPID_Kp,  3,    1,     5,  3,      2);      // K+ vs bg pi
+    // ----------------- neg kaons ---- defalut values - kaons - pions
+    withKaonId(trkV[3], minProbPID_Kn,  3,    1,     5,  3,      2);      // K- vs bg pi
 
     // Comparison with protons is not needed to be implemented in the
     // kind of processes that are taken place in this
@@ -1960,8 +1991,10 @@ void Reco::event(BelleEvent* evptr, int* status) {
 
     // If each plist element is not within atc_pID.prob < prob,
     // its element is removed from plist.
-    withPionId(trkV[0], maxProbPion, 3, 1, 5, 3, 2);        // pi+ vs bg K
-    withPionId(trkV[1], maxProbPion, 3, 1, 5, 3, 2);        // pi- vs bg K
+    // ----------------- pos pions ---- defalut values - kaons - pions
+    withPionId(trkV[0], maxProbPion,    3,    1,     5,  3,      2);        // pi+ vs bg K
+    // ----------------- neg pions ---- defalut values - kaons - pions
+    withPionId(trkV[1], maxProbPion,    3,    1,     5,  3,      2);        // pi- vs bg K
 
     // The same story as above: protonts are not considered
     // withPionId(trkV[0], maxProbPion, 3, 1, 5, 4, 2);     // pi+ vs bg p
