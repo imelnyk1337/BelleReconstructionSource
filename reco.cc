@@ -960,8 +960,31 @@ void withKaonId(std::vector<Particle>& p_list, const double prob, int accq0, int
   }
 }
 
-void withPionId(std::vector<Particle>& p_list, const double prob, int accq0, int tofq0, int cdcq0, int ids0, int idb0) {
+// #=========== utility.cc ===========#
+//void withPionId(std::vector<Particle> &list,
+//                const double prob, int accq0, int tofq0, int cdcq0,
+//                int ids0, int idb0) {
+//
+//    atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
+//
+//    for (int i = 0; i < (int)list.size(); ++i) {
+//        if (list[i].mdstCharged() && kid.prob(&(list[i].mdstCharged())) < prob) {;}
+//        else {
+//            list.erase(list.begin() + i);
+//            --i;
+//        }
+//    }
+//}
+// #==========#===========#===========#
+
+// #=========== custom with creating UserInfo ===========#
+
+void withPionId(std::vector<Particle>& p_list,
+                const double prob, int accq0, int tofq0, int cdcq0,
+                int ids0, int idb0) {
+
     atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
+
     for (size_t i = 0; i < p_list.size(); ++i) {
         Particle& P = p_list[i];
         double probParticle = kid.prob(&(P.mdstCharged()));
@@ -977,6 +1000,8 @@ void withPionId(std::vector<Particle>& p_list, const double prob, int accq0, int
     }
   }
 }
+// #=============== ================ ================#
+
 // **********************************************************
 // Modify this function
 // Make sure that this function returns a correct value
@@ -1907,8 +1932,13 @@ void Reco::event(BelleEvent* evptr, int* status) {
     if (clsMgr.count()) r2 = clsMgr[0].R2();
 
     // //////////////////  make charged particles - tracks //////////////////
-    // makes Kaon and Pion from MdstCharged w/o cut. 1 : w/ good_charged, 0 : w/o
-    makeKPi(trkV[2], trkV[3], trkV[0], trkV[1], 1); //k_p, k_m, pi_p, pi_m
+    // makes Kaon and Pion from MdstCharged w/o cut. 1 : w/ good_charged, 0 : w/ol
+    // ////////////////// ORDER: k_p, k_m, pi_p, pi_m ///////////////////////
+    makeKPi(trkV[2], // k_p
+            trkV[3], // k_m
+            trkV[0], // pi_p
+            trkV[1], // pi_m
+            1);
 
     if (debugTrkPID) {
         printf("\n");
@@ -1921,15 +1951,21 @@ void Reco::event(BelleEvent* evptr, int* status) {
     // its element is removed from plist.
     withKaonId(trkV[2], minProbPID_Kp, 3, 1, 5, 3, 2);      // K+ vs bg pi
     withKaonId(trkV[3], minProbPID_Kn, 3, 1, 5, 3, 2);      // K- vs bg pi
-//    withKaonId(trkV[2], minProbPID_Kp, 3, 1, 5, 3, 4);      // K+ vs bg p
-//    withKaonId(trkV[3], minProbPID_Kn, 3, 1, 5, 3, 4);      // K- vs bg p
+
+    // Comparison with protons is not needed to be implemented in the
+    // kind of processes that are taken place in this
+    // analysis (Bs --> Ds+ Ds0*(2317)- pi0)
+    // withKaonId(trkV[2], minProbPID_Kp, 3, 1, 5, 3, 4);   // K+ vs bg p
+    // withKaonId(trkV[3], minProbPID_Kn, 3, 1, 5, 3, 4);   // K- vs bg p
 
     // If each plist element is not within atc_pID.prob < prob,
     // its element is removed from plist.
-    withPionId(trkV[0], maxProbPion, 3, 1, 5, 3, 2);  // pi+ vs bg K
-    withPionId(trkV[1], maxProbPion, 3, 1, 5, 3, 2);  // pi- vs bg K
-//    withPionId(trkV[0], maxProbPion, 3, 1, 5, 4, 2);  // pi+ vs bg p
-//    withPionId(trkV[1], maxProbPion, 3, 1, 5, 4, 2);  // pi- vs bg p
+    withPionId(trkV[0], maxProbPion, 3, 1, 5, 3, 2);        // pi+ vs bg K
+    withPionId(trkV[1], maxProbPion, 3, 1, 5, 3, 2);        // pi- vs bg K
+
+    // The same story as above: protonts are not considered
+    // withPionId(trkV[0], maxProbPion, 3, 1, 5, 4, 2);     // pi+ vs bg p
+    // withPionId(trkV[1], maxProbPion, 3, 1, 5, 4, 2);     // pi- vs bg p
 
 
     // If each plist element is not associated with rphi & z-svd hits
