@@ -1409,9 +1409,9 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
 void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDump = false, bool stDump = true, bool debugDump = false) {
 
     if (evtInfoDump) dumpEventInfo(tt, debugDump);
-    int lund = (int)P.lund();
+    int lundDs = (int)P.lund();
 
-    // Creating an userInfo object for the Ds meson candidate
+    // Creating a userInfo object for the Ds meson candidate
     if (!&P.userInfo()) createUserInfo(P);
     UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
     // Making vertex fit
@@ -1420,7 +1420,7 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
         makeRecursiveVertexFit(P, debugDump, true);
     }
     
-    double massPDG    = Ptype(lund).mass();
+    double massPDG    = Ptype(lundDs).mass();
     double msLimLeft  = massPDG - info.wMass();
     double msLimRight = massPDG + info.wMass();
 
@@ -1473,7 +1473,7 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
     double perp_ds          = P3D.perp();
     double phi_ds           = P3D.phi();
     double theta_ds         = P3D.theta();
-    int    signPcl          = (int)P.lund() > 0 ? 1 : -1;
+    int    signPcl          = lundDs > 0 ? 1 : -1;
     bool   gen_pcl          = IDhep(P) == 0 ? false : true;
     double production_vx_ds = P.momentum().vertex().x();
     double production_vy_ds = P.momentum().vertex().y();
@@ -1484,23 +1484,29 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
     double decay_vx_ds      = P.momentum().decayVertex().x();
     double decay_vy_ds      = P.momentum().decayVertex().y();
     double decay_vz_ds      = P.momentum().decayVertex().z();
-    double helicChild1 = getHelicity(P);
+    double helicChild1      = getHelicity(P);
 
 
     // Working with Ds+(-) children (K+(-), K-(+) and pi+(-))
-    Particle& Child0 = P.child(0);   // phi0 (--> K+ K-) or K* (--> K+ pi-), or K*bar (--> K- pi+)
-    Particle& Child0Child0 = Child0.child(0); // K+ or K-
-    Particle& Child0Child1 = Child0.child(1); // K- or pi- or pi+
-    Particle& Child1 = P.child(1);   // pi+ or K
+    Particle& Child0        = P.child(0);             // phi0 (--> K+ K-) or K* (--> K+ pi-), or K*bar (--> K- pi+)
+    Particle& Child0Child0  = Child0.child(0);  // K+ or K-
+    Particle& Child0Child1  = Child0.child(1);  // K- or pi- or pi+
+    Particle& Child1        = P.child(1);             // pi+ or K
+
+    int lundChild0          = (int)Child0.lund();
+    int lundChild0Child0    = (int)Child0Child0.lund();
+    int lundChild0Child1    = (int)Child0Child1.lund();
+    int lundChild1          = (int)Child1.lund();
+
 
 
     if (!&Child0.userInfo()) createUserInfo(Child0);
-    UserInfo& infoChild0 = dynamic_cast<UserInfo&>(Child0.userInfo());
+    UserInfo& infoChild0    = dynamic_cast<UserInfo&>(Child0.userInfo());
 
-    double psr_ds_Ch0    = pStar(Child0.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
-    double px_ds_Ch0     = Child0.px();
-    double py_ds_Ch0     = Child0.py();
-    double pz_ds_Ch0     = Child0.pz();
+    double psr_ds_Ch0       = pStar(Child0.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    double px_ds_Ch0        = Child0.px();
+    double py_ds_Ch0        = Child0.py();
+    double pz_ds_Ch0        = Child0.pz();
 
     // Probability of particle identification for the first Ds'd child children
 
