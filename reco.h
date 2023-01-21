@@ -3,7 +3,8 @@
 #include <ctime>
 #include <vector>
 #include <string>
-#include <list>
+//#include <list>
+//#include <map>
 
 #include "belle.h"
 
@@ -222,10 +223,10 @@ extern "C" Module_descr* mdcl_Reco() { /* main */
         std::string s_Dss         = " gen_ds chg_ds ms_ds chi_ds pt_ds ph_ds th_ds ";
         std::string s_Dss_1       = " gen_ds1 chg_ds1 msV_ds1 msM_ds1 msC_ds1 chiV_ds1 chiM_ds1 prbV_ds1 prbM_ds1 cl_ds1"
                                     " clV_ds1 clM_ds1 pVx_ds1 pVy_ds1 pVz_ds1 xx_ds1 xy_ds1 xz_ds1 dVx_ds1 dVy_ds1 dVz_ds1"
-                                    " psr_ds1 px_ds1 py_ds1 pz_ds1 p_ds1 pt_ds1 ph_ds1 th_ds1 id0_ds1 id1_ds1 ";
+                                    " psr_ds1 px_ds1 py_ds1 pz_ds1 p_ds1 pt_ds1 ph_ds1 th_ds1 id0_ds1 id1_ds1 kpp_ds1 kmp_ds1 ppp_ds1 pmp_ds1 ";
         std::string s_Dss_2       = " gen_ds2 chg_ds2 msV_ds2 msM_ds2 msC_ds2 chiV_ds2 chiM_ds2 prbV_ds2 prbM_ds2 cl_ds2 clV_ds2"
                                     " clM_ds2 pVx_ds2 pVy_ds2 pVz_ds2 xx_ds2 xy_ds2 xz_ds2 dVx_ds2 dVy_ds2 dVz_ds2 psr_ds2"
-                                    " px_ds2 py_ds2 pz_ds2 p_ds2 pt_ds2 ph_ds2 th_ds2 id0_ds2 id1_ds2 ";
+                                    " px_ds2 py_ds2 pz_ds2 p_ds2 pt_ds2 ph_ds2 th_ds2 id0_ds2 id1_ds2 kpp_ds1 kmp_ds1 ppp_ds1 pmp_ds1 ";
         std::string s_Dss_gen     = " ms_ds_t px_ds_t py_ds_t pz_ds_t e_ds_t th_ds_t ct_ds_t ph_ds_t rh_ds_t ";
         std::string s_Dss_gen_1   = " ms_ds_t1 px_ds_t1 py_ds_t1 pz_ds_t1 e_ds_t1 th_ds_t1 ct_ds_t1 ph_ds_t1 rh_ds_t1 ";
         std::string s_Dss_gen_2   = " ms_ds_t2 px_ds_t2 py_ds_t2 pz_ds_t2 e_ds_t2 th_ds_t2 ct_ds_t2 ph_ds_t2 rh_ds_t2 ";
