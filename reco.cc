@@ -1489,19 +1489,64 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
 
     // Working with Ds+(-) children (K+(-), K-(+) and pi+(-))
     Particle& Child0        = P.child(0);             // phi0 (--> K+ K-) or K* (--> K+ pi-), or K*bar (--> K- pi+)
-    Particle& Child0Child0  = Child0.child(0);  // K+ or K-
-    Particle& Child0Child1  = Child0.child(1);  // K- or pi- or pi+
+    Particle& Child0Child0  = Child0.child(0);        // K+ or K-
+    Particle& Child0Child1  = Child0.child(1);        // K- or pi- or pi+
     Particle& Child1        = P.child(1);             // pi+ or K
+
+    if (!&Child0.userInfo()) createUserInfo(Child0);
+    UserInfo& infoChild0    = dynamic_cast<UserInfo&>(Child0.userInfo());
+
+    if (!&Child0Child0.userInfo()) createUserInfo(Child0Child0);
+    UserInfo& infoChild0Child0 = dynamic_cast<UserInfo&>(Child0Child0.userInfo());
+
+    if (!&Child0Child1.userInfo()) createUserInfo(Child0Child1);
+    UserInfo& infoChild0Child1 = dynamic_cast<UserInfo&>(Child0Child1.userInfo());
+
+    if (!&Child1.userInfo()) createUserInfo(Child1);
+    UserInfo& infoChild1 = dynamic_cast<UserInfo&>(Child1.userInfo());
+
 
     int lundChild0          = (int)Child0.lund();
     int lundChild0Child0    = (int)Child0Child0.lund();
     int lundChild0Child1    = (int)Child0Child1.lund();
     int lundChild1          = (int)Child1.lund();
 
+    double piPlusPID  = -1.,
+           piMinusPID = -1.,
+           kPlusPID   = -1.,
+           kMinusPID  = -1.;
+
+    if (lundDs < 0) {                 // Ds-
+        piPlusPID = -1.;
+        if (lundChild0 == 333) {      // phi0
+            kMinusPID  = infoChild0Child0.probpid();
+            kPlusPID   = infoChild0Child1.probpid();
+            piMinusPID = infoChild1.probpid();
+        }
+        else
+            if (lundChild0 == 313) { // K*0
+            kPlusPID   = infoChild0Child0.probpid();
+            piMinusPID = infoChild0Child1.probpid();
+            kMinusPID  = infoChild1.probpid();
+        }
+    } else
+        if (lundDs > 0) {                 // Ds+
+            piMinusPID = -1.;
+            if (lundChild0 == 333) {      // phi0
+                kMinusPID = infoChild0Child0.probpid();
+                kPlusPID  = infoChild0Child1.probpid();
+                piPlusPID = infoChild1.probpid();
+            } else
+            if (lundChild0 == -313) {     // anti-K*0
+                kMinusPID = infoChild0Child0.probpid();
+                piPlusPID = infoChild0Child1.probpid();
+                kPlusPID  = infoChild1.probpid();
+            }
+    }
 
 
-    if (!&Child0.userInfo()) createUserInfo(Child0);
-    UserInfo& infoChild0    = dynamic_cast<UserInfo&>(Child0.userInfo());
+
+
 
     double psr_ds_Ch0       = pStar(Child0.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
     double px_ds_Ch0        = Child0.px();
@@ -1509,7 +1554,6 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
     double pz_ds_Ch0        = Child0.pz();
 
     // Probability of particle identification for the first Ds'd child children
-
     double probPidChild0 = infoChild0.probpid();
 
     Hep3Vector Child03D(px_ds_Ch0, py_ds_Ch0, pz_ds_Ch0);
@@ -1520,15 +1564,13 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
     double pz_ds_Ch1     = Child1.pz();
 
     // Probability of particle identification for the second Ds'd child (pi or K)
-    if (!&Child1.userInfo()) createUserInfo(Child1);
-    UserInfo& infoChild1 = dynamic_cast<UserInfo&>(Child1.userInfo());
     double probPidChild1 = infoChild1.probpid();
     Hep3Vector Child13D  (px_ds_Ch1, py_ds_Ch1, pz_ds_Ch1);
 
     std::string dgrSuff = "_ds" + sfxDs, genDgrSuff = "_ds_t" + sfxDs;
 
     const int nValI = 2; 
-    const int nValD = 29;
+    const int nValD = 33;
     int valPclI[nValI]    = {signPcl, gen_pcl};
     double valPclD[nValD] = {msKvf,
                              msKmvf,
@@ -1558,11 +1600,16 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
                              phi_ds,
                              theta_ds,
                              probPidChild0,
-                             probPidChild1
+                             probPidChild1,
+                             kPlusPID,
+                             kMinusPID,
+                             piPlusPID,
+                             piMinusPID
     };
     std::string pclTitI[nValI] = {"chg", "gen"};
-    std::string pclTitD[nValD] = {"msV",
-                             "msM",
+    std::string pclTitD[nValD] = {
+                                  "msV",
+                                  "msM",
                              "msC",
                              "chiV",
                              "chiM",
@@ -1589,7 +1636,11 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
                              "ph",
                              "th",
                              "id0",
-                             "id1"
+                             "id1",
+                             "kpp",
+                             "kmp",
+                             "ppp",
+                             "pmp"
     };
 
     VectorL dssL = getGenVectorL(IDhep(P));
