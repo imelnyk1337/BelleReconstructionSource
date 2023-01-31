@@ -1877,7 +1877,7 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     double energyEl  = BeamEnergy::E_HER();
     double energyPos = BeamEnergy::E_LER();
     double angle     = BeamEnergy::Cross_angle();
-    double mbc_bs    = beamEnergyConstraint(P, E_HER, E_LER, CROSS_ANGLE);
+    double mbc_bs    = beamEnergyConstraint(P, E_HER, E_LER);
     
     const int nValI = 2; 
     const int nValD = 29;
