@@ -3,8 +3,7 @@
 #include <ctime>
 #include <vector>
 #include <string>
-//#include <list>
-//#include <map>
+
 
 #include "belle.h"
 
@@ -51,10 +50,6 @@ namespace Belle {
 
     std::clock_t start;
     double duration;
-    // Beam parameters
-    static const double E_HER               = BeamEnergy::E_HER();
-    static const double E_LER               = BeamEnergy::E_LER();
-    static const double CROSS_ANGLE         = BeamEnergy::Cross_angle();
 
     // Parameters for track selection
     static const double
@@ -153,7 +148,7 @@ namespace Belle {
         */
     };
 
-extern "C" Module_descr* mdcl_Reco() { /* main */
+extern "C" Module_descr* mdcl_Reco() {  /* main */
         Reco* module = new Reco;
         Module_descr* dscr = new Module_descr("Reco", module);
         IpProfile::define_global(dscr);
@@ -275,18 +270,26 @@ extern "C" Module_descr* mdcl_Reco() { /* main */
         
         BeamEnergy::begin_run();
         
-        std::cout << "duration: "     << duration << " sec"        << std::endl;
-        std::cout << " Benergy(): "   << Benergy()                 << std::endl;
-        std::cout << " E_beam_corr: " << BeamEnergy::E_beam_corr() << std::endl;
-        std::cout << " E_beam_err: "  << BeamEnergy::E_beam_err()  << std::endl;
-        std::cout << " E_LER: "       << BeamEnergy::E_LER()       << std::endl;
-        std::cout << " E_HER: "       << BeamEnergy::E_HER()       << std::endl;
-        std::cout << " E_beam_orig: " << BeamEnergy::E_beam_orig() << std::endl;
-        std::cout << " E_LER_orig: "  << BeamEnergy::E_LER_orig()  << std::endl;
-        std::cout << " E_HER_orig: "  << BeamEnergy::E_HER_orig()  << std::endl;
-        std::cout << " E_beam2: "     << BeamEnergy::E_beam2()     << std::endl;
-        std::cout << " Cross_angle: " << BeamEnergy::Cross_angle() << std::endl;
+        std::cout << "duration: "        << duration << " sec"        << std::endl;
+        std::cout << " Run_flag(): "     << BeamEnergy::Run_flag()    << std::endl;
+        std::cout << " Benergy(): "      << Benergy()                 << std::endl;
+        std::cout << " E_beam_corr: "    << BeamEnergy::E_beam_corr() << std::endl;
+        std::cout << " E_beam_err: "     << BeamEnergy::E_beam_err()  << std::endl;
+        std::cout << " E_LER: "          << BeamEnergy::E_LER()       << std::endl;
+        std::cout << " E_HER: "          << BeamEnergy::E_HER()       << std::endl;
+        std::cout << " E_beam_orig: "    << BeamEnergy::E_beam_orig() << std::endl;
+        std::cout << " E_LER_orig: "     << BeamEnergy::E_LER_orig()  << std::endl;
+        std::cout << " E_HER_orig: "     << BeamEnergy::E_HER_orig()  << std::endl;
+        std::cout << " E_beam2: "        << BeamEnergy::E_beam2()     << std::endl;
+        std::cout << " Cross_angle: "    << BeamEnergy::Cross_angle() << std::endl;
+        std::cout << " Ecm(), sqrt(s): " << BeamEnergy::Ecm()         << std::endl;
+
+        std::cout << "BeamEnergy::dump(): " << std::endl;
+        BeamEnergy::dump();
     }
+
+
+
 
     void Reco::end_run(BelleEvent*, int*) {};
     void Reco::other(int*, BelleEvent*, int*) {}

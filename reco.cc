@@ -707,7 +707,7 @@ void printPi0(vector<Particle>& pi0, const std::string& comment = "") {
         Particle& g1 = pi0[iPi0].child(0);
         Particle& g2 = pi0[iPi0].child(1);
         double msPi0_gg = (g1.p() + g2.p()).m();
-        double psrPi0 = pStar(p0.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+        double psrPi0 = pStar(p0.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
         printf(" Pi0 (%i)  mass:%7.5f, [px,py,pz]:[%7.4f, %7.4f, %7.4f], p:%6.4f,  p_cm:%6.4f,  Eg(1,2): [%6.4f, %6.4f], ms_gg:%7.5f\n",
         iPi0, p0.mass(), p0.px(), p0.py(), p0.pz(), p0.ptot(), psrPi0, g1.ptot(), g2.ptot(), msPi0_gg);
     }
@@ -918,7 +918,7 @@ void checkAdoptCutChisqKmvf(std::vector<Particle>& p_list, double maxChisq = 2.e
 void checkAdoptCutPStar(std::vector<Particle>& p_list, double minPStarValue) {
     for (size_t i = 0; i < p_list.size(); ++i) {
         Particle& particle = p_list[i];
-        double psr = pStar(particle.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+        double psr = pStar(particle.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
         if (psr > minPStarValue) {
             continue;
         }
@@ -931,7 +931,7 @@ void checkAdoptCutPStar(std::vector<Particle>& p_list, double minPStarValue) {
 void checkAdoptCutPStar(std::vector<Particle>& p_list, double minPStarValue, double maxPStarValue) {
     for (size_t i = 0; i < p_list.size(); ++i) {
         Particle& particle = p_list[i];
-        double psr = pStar(particle.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+        double psr = pStar(particle.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
         if (psr > minPStarValue && psr < maxPStarValue) {
             continue;
         }
@@ -1116,7 +1116,7 @@ void dumpPi0(BelleTuple* tt, Particle& p0, const std::string& sfx, bool debugDum
     Particle& g2 = p0.child(1);
 
     double msPi0_gg = (g1.p() + g2.p()).m();
-    double psrPi0   = pStar(p0.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    double psrPi0   = pStar(p0.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
     double pPi0     = p0.momentum().p().mag();
     // double pPi0 = .... // there should be pi0 momentum magnitude
 
@@ -1124,13 +1124,13 @@ void dumpPi0(BelleTuple* tt, Particle& p0, const std::string& sfx, bool debugDum
     bool gen_g1  = IDhep(g1) == 0 ? false : true;
     bool gen_g2  = IDhep(g2) == 0 ? false : true;
 
-    const int nValI = 1;
-    const int nValD = 6;
+    const int nValI = 3;
+    const int nValD = 4;
 
-    std::string pclTitI[nValI] = {"gen"};
-    int valPclI[nValI]    = {gen_pi0};
-    std::string pclTitD[nValD] = {"eg1",     "eg2",     "psr",   "mgg",    "gg1",  "gg2"};
-    double valPclD[nValD] = {g1.ptot(), g2.ptot(), psrPi0, msPi0_gg, gen_g1, gen_g2};
+    std::string pclTitI[nValI] = {"gen","gg1","gg2"};
+    int valPclI[nValI]    = {gen_pi0, gen_g1, gen_g2};
+    std::string pclTitD[nValD] = {"eg1","eg2","psr","mgg"};
+    double valPclD[nValD] = {g1.ptot(), g2.ptot(), psrPi0, msPi0_gg};
 
     // =============== Printing option for debugging =================
     // ===== Does not have a physics- or reconstruction sence ========
@@ -1288,7 +1288,7 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
         ind_ch1  = 2;
     }
 
-    double psr_ds_child           = pStar(P.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    double psr_ds_child           = pStar(P.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
     double px_ds_child            = P.px();
     double py_ds_child            = P.py();
     double pz_ds_child            = P.pz();
@@ -1465,7 +1465,7 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
     double clKmvf        = info.clKmvf();
 
 
-    double psr_ds           = pStar(P.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    double psr_ds           = pStar(P.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
     double px_ds            = P.px();
     double py_ds            = P.py();
     double pz_ds            = P.pz();
@@ -1548,7 +1548,7 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
 
 
 
-    double psr_ds_Ch0       = pStar(Child0.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    double psr_ds_Ch0       = pStar(Child0.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
     double px_ds_Ch0        = Child0.px();
     double py_ds_Ch0        = Child0.py();
     double pz_ds_Ch0        = Child0.pz();
@@ -1558,7 +1558,7 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
 
     Hep3Vector Child03D(px_ds_Ch0, py_ds_Ch0, pz_ds_Ch0);
 
-    double psr_ds_Ch1    = pStar(Child1.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    double psr_ds_Ch1    = pStar(Child1.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
     double px_ds_Ch1     = Child1.px();
     double py_ds_Ch1     = Child1.py();
     double pz_ds_Ch1     = Child1.pz();
@@ -1695,7 +1695,7 @@ void dumpDs2317(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInf
     UserInfo& infoPi0_2317    = dynamic_cast<UserInfo&>(pi0_2317.userInfo());
 
     double msKvfChild         = infoChild.msKvf();
-    double psr_d17            = pStar(P.p(), E_HER, E_LER, CROSS_ANGLE).vect().mag();
+    double psr_d17            = pStar(P.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
     double px_d17             = P.px();
     double py_d17             = P.py();
     double pz_d17             = P.pz();
@@ -1868,16 +1868,12 @@ void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
     
 
     VectorL pB = pStar(P.p()); // ??? have to ensure that it's chosen properly
-    VectorL pB2 = pStar(P.p(), E_HER, E_LER, CROSS_ANGLE);
+    VectorL pB2 = pStar(P.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle());
     double de_bs_old = pB.e() - Benergy();
     double de_bs = pB.e() - BeamEnergy::E_beam_corr();
     double de2_bs = pB2.e() - BeamEnergy::E_beam_corr();
     double mbc_bs_old = beamEnergyConstraint(P);
-    
-    double energyEl  = BeamEnergy::E_HER();
-    double energyPos = BeamEnergy::E_LER();
-    double angle     = BeamEnergy::Cross_angle();
-    double mbc_bs    = beamEnergyConstraint(P, E_HER, E_LER);
+    double mbc_bs    = beamEnergyConstraint(P, BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle() * 1.e3);
     
     const int nValI = 2; 
     const int nValD = 29;
@@ -1983,6 +1979,8 @@ void printVectPclWithChildren(std::vector<Particle>& pcl, const std::string& tit
 }
 // ***********************************************************
 
+
+
 /*
  * The main function. Events processing takes place here
 */
@@ -1999,9 +1997,9 @@ void Reco::event(BelleEvent* evptr, int* status) {
          debugDump2317 = false,
          debugDumpBs0  = false;
 
-
-    const HepPoint3D& ip_position = IpProfile::position(1);
-    const HepSymMatrix& ip_error  = IpProfile::position_err(1);
+    // IP information
+    const HepPoint3D& ip_position = IpProfile::position();
+    const HepSymMatrix& ip_error  = IpProfile::position_err();
     // Gen_hepevt_Manager& hepevt = Gen_hepevt_Manager::get_manager();
 
     // Event Information
@@ -2009,7 +2007,8 @@ void Reco::event(BelleEvent* evptr, int* status) {
     getEventInfo(expNo, runNo, evtNo, McFlag); // utility.cc
     // printf("\n---- exp:%2i,  run:%2i, evt:%i, ip_position:[%f, %f, %f] ----\n",
     // expNo,runNo,evtNo, ip_position.x(), ip_position.y(), ip_position.z() );
-    printf("\n\n***************** exp:%2i,  run:%2i, evt:%i *********************\n", expNo, runNo, evtNo);
+    // printf("\n\n***************** exp:%2i,  run:%2i, evt:%i *********************\n", expNo, runNo, evtNo);
+    std::cout << "\tExpNo: " << expNo << "\tRunNo: " << runNo << "\tEventNo: " << "\tMcFlag: " << McFlag << std::endl;
   
     // Event Shape
     double r2 = -1.;
@@ -2245,6 +2244,7 @@ void Reco::event(BelleEvent* evptr, int* status) {
     printf("---------  clearVectors (final) --------- \n");
     clearVectors();
     printf("------------------  Reco end -------------------- \n");
+    *status = 1;
 
 }
 
