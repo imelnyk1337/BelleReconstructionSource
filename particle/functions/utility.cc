@@ -1001,9 +1001,8 @@ setGenHepInfoR_sub5(Particle &p){
   return 0;
 }
 
-double
-beamEnergyConstraint(const Particle &b, const double e, const double p,
-		     const double angle){
+double beamEnergyConstraint(const Particle &b, const double e, const double p,
+		     const double angle) {
   //b -- generally B0 or B0B
   //e -- electron beam energy
   //p -- positron beam enegry
@@ -1021,10 +1020,9 @@ beamEnergyConstraint(const Particle &b, const double e, const double p,
   return mass;
 }
 
-double 
-beamEnergyConstraint(const Particle &b,
+double beamEnergyConstraint(const Particle &b,
 		     const HepLorentzVector &el, 
-		     const HepLorentzVector &po){
+		     const HepLorentzVector &po) {
   //b -- generally B0 or B0B
   //e -- electron beam vector
   //p -- positron beam vector
@@ -1778,22 +1776,21 @@ void setGammasError(Particle& p, const HepPoint3D& gVertex, const HepSymMatrix& 
   }
 }
 
-void 
-getEventInfo(int &expNo,
-	     int &runNo,
-	     int &evtNo,
-	     bool &McFlag)
-{
-  expNo = runNo = evtNo = 0;
-  McFlag = false;
-  Belle_event_Manager &evtMgr = Belle_event_Manager::get_manager();
-  if(evtMgr.count() != 0){
-    if(evtMgr[0].ExpMC() == 2)McFlag = true;
-    const int MASK28BIT = 0x0FFFFFFF;
-    expNo = evtMgr[0].ExpNo();
-    runNo = evtMgr[0].RunNo();
-    evtNo = (int)(evtMgr[0].EvtNo() & MASK28BIT);
-  }
+void getEventInfo(int& expNo,
+                  int& runNo,
+	              int& evtNo,
+                  bool& McFlag) {
+
+    expNo = runNo = evtNo = 0;
+    McFlag = false;
+    Belle_event_Manager &evtMgr = Belle_event_Manager::get_manager();
+    if (evtMgr.count() != 0) {
+        if(evtMgr[0].ExpMC() == 2) McFlag = true;
+        const int MASK28BIT = 0x0FFFFFFF;
+        expNo = evtMgr[0].ExpNo();
+        runNo = evtMgr[0].RunNo();
+        evtNo = (int)(evtMgr[0].EvtNo() & MASK28BIT);
+    }
 }
 
 unsigned 
