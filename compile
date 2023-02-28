@@ -1,0 +1,12 @@
+#!/usr/bin/bash
+scp -p reco.cc reco.h userinfo.cc userinfo.h kekcc:/home/belle/imelnyk/DSDS2317/reco/src/
+echo "Compiling ..."
+ssh kekcc 'source /sw/belle/local/etc/bashrc_general;
+	   export BELLE_LEVEL=b20090127_0910;
+           export BELLE_DEBUG=opt;
+           export USE_GRAND_REPROCESS_DATA=1;
+           export BELLE_MESSAGE_LEVEL=ERROR;
+	   cd ~/DSDS2317/reco/src/;
+	   rm -f ../src/reco.o;
+           make';
+echo "DONE!"
