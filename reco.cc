@@ -1039,6 +1039,39 @@ void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
     if (stDump) tt->dumpData();
 }
 // ***********************************************************
+std::pair<int, double> getDsChildID(Particle& DsChild,
+                                    const int accq0 = 3,
+                                    const int tofq0 = 1,
+                                    const int cdcq0 = 5) {
+
+    double ids0 = 3,
+            idb0 = 2;
+    int lund_dschild = DsChild.lund();
+    switch (std::abs(lund_dschild)) {
+        case 321:         // K
+            break;
+        case 211:         // pi
+            ids0 = 2,
+                    idb0 = 3;
+            break;
+    }
+    atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
+    return std::make_pair(DsChild.lund(), kid.prob(&(DsChild.mdstCharged())));
+}
+// ***********************************************************
+std::vector<std::pair<int, double> > getDsChildrenIdentification(Particle& DsMeson) {
+    std::vector<std::pair<int, double> > values;
+    std::vector<Particle> ds_children = {
+            DsMeson.child(0).child(0),
+            DsMeson.child(0).child(1),
+            DsMeson.child(1)
+    };
+    for (std::size_t i = 0; i < ds_children.size(); ++i)
+        values.push_back(getDsChildID(ds_children[i]));
+
+    return values;
+}
+// ***********************************************************
 void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDump = false, bool stDump = true, bool debugDump = false) {
 
     if (evtInfoDump) dumpEventInfo(tt, debugDump);
@@ -1081,6 +1114,13 @@ void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDum
     double decay_vz_ds      = P.momentum().decayVertex().z();
     double helicChild1      = getHelicity(P);
 
+    std::vector<std::pair<int, double> > ds_child_ids = getDsChildrenIdentification(P);
+    c00              = ds_child_ids[0].first;
+    c01              = ds_child_ids[1].first;
+    c10              = ds_child_ids[2].first;
+    pid00            = ds_child_ids[0].second;
+    pid01            = ds_child_ids[1].second;
+    pid10            = ds_child_ids[2].second;
 
     Particle& Child0        = P.child(0); // phi0 (--> K+ K-) or K* (--> K+ pi-), or K*bar (--> K- pi+)
 
