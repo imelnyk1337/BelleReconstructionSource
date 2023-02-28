@@ -1,8 +1,0 @@
-ifeq "$(HAVE_CLHEP_PDT)" "false"
-#	EXCLUDE_SUBDIRS = src particle
-endif
-#
-# We cannot have qqlib as qe also use qqlib98
-#
-LIB_DEPENDS_ON = -lmdst -lkid -leid -lkfitter -lhelix -lqqutil -lbelleutil -ltables $(CLHEP_LIBS)
-

@@ -35,7 +35,7 @@ DEPCPPFLAGS = -MM
 
 FFLAGS = -DBELLE_TARGET_H=\"belle-default.h\"  -fno-second-underscore -fno-automatic -finit-local-zero -fno-emulate-complex
 CFLAGS = -O3 -DBELLE_TARGET_H=\"belle-default.h\"
-CXXFLAGS = -O3 -DHEP_SHORT_NAMES -DBELLE_SHORT_NAMES -DDSTXX_NOINLINE -DBELLE_TARGET_H=\"belle-default.h\" -fPIC
+CXXFLAGS = -O3 -std=c++11 -DHEP_SHORT_NAMES -DBELLE_SHORT_NAMES -DDSTXX_NOINLINE -DBELLE_TARGET_H=\"belle-default.h\" -fPIC
 
 SOFLAGS = -shared -Wl,-export-dynamic
 LDFLAGS = 

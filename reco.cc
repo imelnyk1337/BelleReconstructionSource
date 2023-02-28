@@ -1,3 +1,7 @@
+#include <unordered_map>
+#include <utility>
+#include <map>
+#include <cmath>
 #include "particle/Particle.h"
 #include "particle/PID.h"
 #include "event/BelleEvent.h"
@@ -17,7 +21,7 @@
 #include "particle/utility.h"
 #include "tables/belletdf.h"
 #include "tables/brecon.h"
-#include "tables/fullrecon.h"
+#include "tables/fullrecon.h"re
 #include "tables/evtcls.h"
 #include "mdst/mdst.h"
 #include "tables/evtvtx.h"
@@ -31,2224 +35,1193 @@
 #include "userinfo.h"
 #include "ip/IpProfile.h"
 
-//#if defined(BELLE_NAMESPACE)
 namespace Belle {
-//#endif
 
     //***********************************************************
-std::string pclType(int id) {
-    std::string sid;
-    if      (id ==   0) sid = "--";
-    else if (id ==   1) sid = "d";
-    else if (id ==  -1) sid = "anti-d";
-    else if (id ==   2) sid = "u";
-    else if (id ==  -2) sid = "anti-u";
-    else if (id ==   3) sid = "s";
-    else if (id ==  -3) sid = "anti-s";
-    else if (id ==   4) sid = "c";
-    else if (id ==  -4) sid = "anti-c";
-    else if (id ==  11) sid = "el+";
-    else if (id == -11) sid = "el-";
-    else if (id ==  12) sid = "nu_e";
-    else if (id == -12) sid = "anti-nu_e";
-    else if (id ==  13) sid = "mu+";
-    else if (id == -13) sid = "mu-";
-    else if (id ==  14) sid = "nu_mu";
-    else if (id == -14) sid = "anti-nu_mu";
-    else if (id ==  15) sid = "tau+";
-    else if (id == -15) sid = "tau-";
-    else if (id ==  21) sid = "g";
-    else if (id ==  22) sid = "gamma";
-    else if (id ==  23) sid = "Z0";
-    else if (id ==  24) sid = "W+";
-    else if (id == -24) sid = "W-";
-    else if (id ==  25) sid = "Higgs0";
-    else if (id ==  32) sid = "Z'0";
-    else if (id ==  33) sid = "Z''0";
-    else if (id ==  34) sid = "W'+";
-    else if (id == -34) sid = "W'-";
-    else if (id ==  35) sid = "Higgs'0";
-    else if (id ==  36) sid = "A0";
-    else if (id ==  37) sid = "Higgs+";
-    else if (id == -37) sid = "Higgs-";
-    else if (id == 111) sid = "pi0";
-    else if (id == 113) sid = "RHO0";
-    else if (id == 130) sid = "K_L0";
-    else if (id == 211) sid = "pi+";
-    else if (id ==-211) sid = "pi-";
-    else if (id == 213) sid = "RHO+";
-    else if (id ==-213) sid = "RHO-";
-    else if (id == 221) sid = "eta";
-    else if (id == 223) sid = "omega";
-    else if (id == 310) sid = "K_S0";
-    else if (id ==-311) sid = "anti-K0";
-    else if (id == 311) sid = "K0";
-    else if (id == 313) sid = "K*0";
-    else if (id ==-313) sid = "anti-K*0";
-    else if (id == 321) sid = "K+";
-    else if (id ==-321) sid = "K-";
-    else if (id == 331) sid = "eta'";
-    else if (id == 323) sid = "K*+";
-    else if (id ==-323) sid = "K*-";
-    else if (id == 333) sid = "phi";
-    else if (id ==-411) sid = "D-";
-    else if (id == 411) sid = "D+";
-    else if (id ==-413) sid = "D*-";
-    else if (id == 413) sid = "D*+";
-    else if (id ==-415) sid = "D_2*-";
-    else if (id == 415) sid = "D_2*+";
-    else if (id ==-421) sid = "anti-D0";
-    else if (id == 421) sid = "D0";
-    else if (id ==-431) sid = "DS-";
-    else if (id == 431) sid = "DS+";
-    else if (id ==-423) sid = "anti-D*0";
-    else if (id == 423) sid = "D*0";
-    else if (id ==-425) sid = "anti-D_2*0";
-    else if (id == 425) sid = "D_2*0";
-    else if (id ==-433) sid = "D*S-";
-    else if (id == 433) sid = "D*S+";
-    else if (id == 441) sid = "eta_c";
-    else if (id == 443) sid = "J/psi";
-    else if (id ==-511) sid = "anti-B0";
-    else if (id == 511) sid = "B0";
-    else if (id ==-521) sid = "B-";
-    else if (id == 521) sid = "B+";
-    else if (id == 553) sid = "Upsilon";
-    else if (id == 2112) sid = "n0";
-    else if (id ==-2112) sid = "anti-n0";
-    else if (id == 2212) sid = "p+";
-    else if (id ==-2212) sid = "anti-p-";
-    else if (id == 2224) sid = "Delta++";
-    else if (id ==-2224) sid = "anti-Delta--";
-    else if (id == 3122) sid = "Lam0";
-    else if (id ==-3122) sid = "Lam0bar";
-    else if (id ==-4122) sid = "LamC-";
-    else if (id == 4122) sid = "LamC+";
-    else if (id ==-4214) sid = "anti-Sigma_c*-";
-    else if (id == 4214) sid = "Sigma_c*+";
-    else if (id == 10022) sid = "vpho";
-    else if (id == 10221) sid = "f_0";
-    else if (id ==-10413) sid = "D_1-";
-    else if (id == 10413) sid = "D_1+";
-    else if (id ==-10423) sid = "anti-D_10";
-    else if (id == 10423) sid = "D_10";
-    else if (id ==-10431) sid = "D_s0*-";
-    else if (id == 10431) sid = "D_s0*+";
-    else if (id ==-10433) sid = "D_s1-";
-    else if (id == 10433) sid = "D_s1+";
-    else if (id ==-20213) sid = "a_1-";
-    else if (id == 20213) sid = "a_1+";
-    else if (id ==-20413) sid = "D'_1-";
-    else if (id == 20413) sid = "D'_1+";
-    else if (id ==-20423) sid = "anti-D'_10";
-    else if (id == 20423) sid = "D'_10";
-    else if (id ==-20433) sid = "D'_s1-";
-    else if (id == 20433) sid = "D'_s1+";
-    else if (id ==  300553) sid = "Upsilon(4S)";
-    else if (id == 9000553) sid = "Upsilon(5S)";
-    else sid = "pcl";
-    return sid;
-}
+    std::string getParticleType(int id) {
+        const std::unordered_map<int, std::string> particle_ids {
+            {   0, "--"           }, {   1, "d"             }, {  -1, "anti-d"         },
+            {   2, "u"            }, {  -2, "anti-u"        }, {   3, "s"              },
+            {  -3, "anti-s"       }, {   4, "c"             }, {  -4, "anti-c"         },
+            {  11, "el+"          }, { -11, "el-"           }, {  12, "nu_e"           },
+            { -12, "anti-nu_e"    }, {  13, "mu+"           }, { -13, "mu-"            },
+            {  14, "nu_mu"        }, { -14, "anti-nu_mu"    }, { 15, "tau+"            },
+            { -15, "tau-"         }, {  21, "g"             }, {  22, "gamma"          },
+            {  23, "Z0"           }, {  24, "W+"            }, { -24, "W-"             },
+            {  25, "Higgs0"       }, {  32, "Z'0"           }, {  33, "Z''0"           },
+            {  34, "W'+",         }, { -34, "W'-"           }, {  35, "Higgs'0"        },
+            {  36, "A0"           }, {  37, "Higgs+"        }, { -37, "Higgs-"         },
+            { 111, "pi0"          }, { 113, "RHO0"          }, { 130, "K_L0"           },
+            { 211, "pi+"          }, { -211, "pi-"          }, { 213, "RHO+"           },
+            { -213, "RHO-"        }, { 221, "eta"           }, { 223, "omega"          },
+            { 310, "K_S0"         }, { -311, "anti-K0"      }, { 311, "K0"             },
+            { 313, "K*0"          }, { -313, "anti-K*0"     }, { 321, "K+"             },
+            { -321, "K-"          }, { 331, "eta'"          }, { 323, "K*+"            },
+            { -323, "K*-"         }, { 333, "phi"           }, { -411, "D-"            },
+            { 411, "D+"           }, { -413, "D*-"          }, { 413, "D*+"            },
+            { -415, "D_2*-"       }, { 415, "D_2*+"         }, { -421, "anti-D0"       },
+            { 421, "D0"           }, { -431, "DS-"          }, { 431, "DS+"            },
+            { -423, "anti-D*0"    }, { 423, "D*0"           }, { -425, "anti-D_2*0"    },
+            { 425, "D_2*0"        }, { -433, "D*S-"         }, { 433, "D*S+"           },
+            { 441, "eta_c"        }, { 443, "J/psi"         }, {-511, "anti-B0"        },
+            { 511, "B0"           }, {-521, "B-"            }, { 521, "B+"             },
+            { 553, "Upsilon"      }, {2112, "n0"            }, {-2112, "anti-n0"       },
+            {2212, "p+"           }, {-2212, "anti-p-"      }, {2224, "Delta++"        },
+            {-2224, "anti-Delta--"}, {3122, "Lam0"          }, {-3122, "Lam0bar"       },
+            {-4122, "LamC-"       }, { 4122, "LamC+"        }, {-4214, "anti-Sigma_c*-"},
+            { 4214, "Sigma_c*+"   }, {10022, "vpho"         }, {10221, "f_0"           },
+            {-10413, "D_1-"       }, { 10413, "D_1+"        }, {-10423, "anti-D_10"    },
+            { 10423, "D_10"       }, {-10431, "D_s0*-"      }, { 10431, "D_s0*+"       },
+            {-10433, "D_s1-"      }, { 10433, "D_s1+"       }, {-20213, "a_1-"         },
+            { 20213, "a_1+"       }, {-20413, "D'_1-"       }, { 20413, "D'_1+"        },
+            {-20423, "anti-D'_10" }, { 20423, "D'_10"       }, {-20433, "D'_s1-"       },
+            { 20433, "D'_s1+"     }, { 300553, "Upsilon(4S)"}, { 9000553, "Upsilon(5S)"}};
 
-//======
-// Set proper error matrix for gamma. Note errCart length is 4.
-// Copied from FindGamma in icpv_skim package.
-// From Tagir Aushev for pi0 make
-//======
-void setGammaError(Particle& gamma) {
-
-  HepSymMatrix errEcl(3, 0); // 3x3 initialize to zero
-  errEcl[0][0] = gamma.mdstGamma().ecl().error(0); // Energy
-  errEcl[1][0] = gamma.mdstGamma().ecl().error(1);
-  errEcl[1][1] = gamma.mdstGamma().ecl().error(2); // Phi
-  errEcl[2][0] = gamma.mdstGamma().ecl().error(3);
-  errEcl[2][1] = gamma.mdstGamma().ecl().error(4);
-  errEcl[2][2] = gamma.mdstGamma().ecl().error(5); // Theta
-
-  double  cp = cos(gamma.mdstGamma().ecl().phi());
-  double  sp = sin(gamma.mdstGamma().ecl().phi());
-  double  ct = cos(gamma.mdstGamma().ecl().theta());
-  double  st = sin(gamma.mdstGamma().ecl().theta());
-  double  E  =     gamma.mdstGamma().ecl().energy();
-
-  HepMatrix jacobian(4, 3, 0);
-  jacobian[0][0] =       cp * st;
-  jacobian[0][1] =  -E * sp * st;
-  jacobian[0][2] =   E * cp * ct;
-  jacobian[1][0] =       sp * st;
-  jacobian[1][1] =   E * cp * st;
-  jacobian[1][2] =   E * sp * ct;
-  jacobian[2][0] =            ct;
-  jacobian[2][1] =           0.0;
-  jacobian[2][2] =  -E      * st;
-  jacobian[3][0] =           1.0;
-  jacobian[3][1] =           0.0;
-  jacobian[3][2] =           0.0;
-
-  HepSymMatrix errCart = errEcl.similarity(jacobian);
-
-  const HepPoint3D origin; // Default constructor sets (0,0,0).
-  static double largeError = 1.0; // 1.0*1.0cm^2.
-  HepSymMatrix dx(3, 0);
-  dx[0][0] = largeError;
-  dx[1][1] = largeError;
-  dx[2][2] = largeError;
-  // Convert Mdst_gamma into Particle object.
-
-  gamma.momentum().momentum(gamma.p(), errCart);
-  gamma.momentum().position(origin, dx);
-  return;
-}
-
-void setGammaError(std::vector<Particle>& p) {
-  for(std::vector<Particle>::iterator i = p.begin(); i != p.end(); ++i)
-    setGammaError(*i);
-}
-
-// ************ Set error matrix (dpx) for pi0 ******************/
-void setPi0Error(Particle& particle) {
-    if (particle.nChildren() != 2) return;
-    HepSymMatrix tmpErr(3, 0);
-    HepPoint3D org(0., 0., 0.);
-    if (!particle.child(0).mdstGamma() || !particle.child(1).mdstGamma()) return;
-    for (unsigned i = 0; i < 2; ++i)
-        setGammaError(particle.child(i));
-    // setGammaError( p.child(i), org, tmpErr);
-
-    // kmassfitter kmv;
-    kmassvertexfitter kmv;
-    if (useBF) kmv.magneticField(BF);
-    kmv.invariantMass(particle.pType().mass());
-    for (unsigned i = 0; i < 2; ++i)
-        addTrack2fit(kmv, particle.child(i));
-    // kmv.vertex(org);
-    // kmv.atDecayPoint();
-    int err = kmv.fit();
-    if (!err) {
-        kmakemother kmm2;
-        if (useBF) kmm2.magneticField(BF);
-        makeMother(kmm2, kmv, particle, 0);
-        // makeMother(kmv, particle);
-        particle.momentum().vertex(kmv.vertex(), kmv.errVertex());
+        auto it = particle_ids.find(id);
+        return (it != particle_ids.end() ? it->second : "pcl");
     }
-}
+    // ***********************************************************
+    void setGammaError(Particle& gamma) {
 
-void setPi0Error(std::vector<Particle>& p_list) {
-  for (std::vector<Particle>::iterator itr = p_list.begin(); itr != p_list.end(); ++itr)
-      setPi0Error(*itr);
-}
-// ***********************************************************
-void withGammaInPi0(std::vector<Particle>& Gamma, std::vector<Particle>& pi0, 
-            double minMsPi0 = 0.118, double maxMsPi0 = 0.150) {
+      HepSymMatrix errEcl(3, 0); // 3x3 initialize to zero
+      errEcl[0][0] = gamma.mdstGamma().ecl().error(0); // Energy
+      errEcl[1][0] = gamma.mdstGamma().ecl().error(1);
+      errEcl[1][1] = gamma.mdstGamma().ecl().error(2); // Phi
+      errEcl[2][0] = gamma.mdstGamma().ecl().error(3);
+      errEcl[2][1] = gamma.mdstGamma().ecl().error(4);
+      errEcl[2][2] = gamma.mdstGamma().ecl().error(5); // Theta
 
-    for (size_t i = 0; i < Gamma.size(); ++i) {
-        bool isErase = false;
-        for (int iPi0 = 0; iPi0 < pi0.size(); ++iPi0) {
-            Particle& g1 = pi0[iPi0].child(0);
-            Particle& g2 = pi0[iPi0].child(1);
-            double ms_gg = (g1.p() + g2.p()).m();
-            if (ms_gg > minMsPi0 && ms_gg < maxMsPi0) {
-                if (abs(g1.ptot() - Gamma[i].ptot()) < 1.e-3) isErase = true;
-                if (abs(g2.ptot() - Gamma[i].ptot()) < 1.e-3) isErase = true;
+      double  cp = cos(gamma.mdstGamma().ecl().phi());
+      double  sp = sin(gamma.mdstGamma().ecl().phi());
+      double  ct = cos(gamma.mdstGamma().ecl().theta());
+      double  st = sin(gamma.mdstGamma().ecl().theta());
+      double  E  =     gamma.mdstGamma().ecl().energy();
+
+      HepMatrix jacobian(4, 3, 0);
+      jacobian[0][0] =       cp * st;
+      jacobian[0][1] =  -E * sp * st;
+      jacobian[0][2] =   E * cp * ct;
+      jacobian[1][0] =       sp * st;
+      jacobian[1][1] =   E * cp * st;
+      jacobian[1][2] =   E * sp * ct;
+      jacobian[2][0] =            ct;
+      jacobian[2][1] =           0.0;
+      jacobian[2][2] =  -E      * st;
+      jacobian[3][0] =           1.0;
+      jacobian[3][1] =           0.0;
+      jacobian[3][2] =           0.0;
+
+      HepSymMatrix errCart = errEcl.similarity(jacobian);
+
+      const HepPoint3D origin; // Default constructor sets (0,0,0).
+      static double largeError = 1.0; // 1.0*1.0cm^2.
+      HepSymMatrix dx(3, 0);
+      dx[0][0] = largeError;
+      dx[1][1] = largeError;
+      dx[2][2] = largeError;
+      // Convert Mdst_gamma into Particle object.
+
+      gamma.momentum().momentum(gamma.p(), errCart);
+      gamma.momentum().position(origin, dx);
+    }
+
+    void setGammaError(std::vector<Particle>& p) {
+      for(std::vector<Particle>::iterator i = p.begin(); i != p.end(); ++i)
+        setGammaError(*i);
+    }
+    // ***********************************************************
+    int getIdHep(Particle& particle) {
+        if (!particle.genHepevt()) return 0;
+        return particle.genHepevt().idhep();
+    }
+    // ***********************************************************
+    bool isLikeTrk(int lund, const std::string& chrgType = "Charged_pi0") {
+        const int absLund = std::abs(lund);
+        const bool isCharged = (absLund == 11) || (absLund == 13) || (absLund == 211) || (absLund == 321) || (absLund == 2212);
+        const bool isNeutral = !isCharged && (absLund == 111 || absLund == 22);  // pi0 & gamma
+        const bool isOnlyCharged = chrgType == "onlyCharged";
+
+        return (isOnlyCharged && isCharged) || (!isOnlyCharged && (isCharged || isNeutral));
+    }
+    // ***********************************************************
+
+    void dRdZ(const Mdst_charged& charged, int massHyp, const HepPoint3D& ip_position,
+                                                                double dR, double dZ) {
+
+        if (charged.trk()) {
+            Mdst_trk& trk = charged.trk();
+            if (trk.mhyp(massHyp)) {
+                Mdst_trk_fit& trkFit = trk.mhyp(massHyp);
+
+                HepPoint3D pivot;
+                pivot.setX((double) trkFit.pivot(0));
+                pivot.setY((double) trkFit.pivot(1));
+                pivot.setZ((double) trkFit.pivot(2));
+
+                HepVector a(5);
+                a[0] = (double) trkFit.helix(0);
+                a[1] = (double) trkFit.helix(1);
+                a[2] = (double) trkFit.helix(2);
+                a[3] = (double) trkFit.helix(3);
+                a[4] = (double) trkFit.helix(4);
+
+                Helix h(pivot, a);
+                h.pivot(ip_position);
+                dR = std::fabs(h.dr());
+                dZ = std::fabs(h.dz());
+
+                return;
             }
         }
 
-        if(isErase) {
-            Gamma.erase(Gamma.begin() + i);
-            --i;
-        }
+        dR = 100.;
+        dZ = 100.;
     }
-}
-// ***********************************************************
-int IDhep(Particle& particle) {
-    if(!particle.genHepevt()) return 0;
-    return particle.genHepevt().idhep();
-}
-// ***********************************************************
-bool isLikeTrk(int lund, const std::string& chrgType = "Charged_pi0") {
-    int ln = abs(lund);
-    bool isTrk = (ln == 11) || (ln == 13) || (ln == 211) ||(ln == 321) || (ln == 11) || (ln == 2212); // el, mu, pi, K, p
-    if ( chrgType != "onlyCharged" )
-        isTrk = isTrk || (ln == 111) || (ln == 22) ;  // pi0 & gamma
-    return isTrk;
-}
-// ***********************************************************
-void printPclDebug(Particle& p, const std::string& comment = "", const std::string& comment2 = "") {
-    int expNo, runNo, evtNo;
-    bool McFlag;
-    getEventInfo( expNo, runNo, evtNo, McFlag); // utility.cc
+    // ***********************************************************
+    void withdRdZcut(std::vector<Particle>& p_list, const HepPoint3D& ip_position, double dRcut, double dZcut) {
+        for (size_t i = 0; i < p_list.size(); ++i) {
+            int id = abs(p_list[i].pType().lund());
 
-    int lund = (int)p.lund();
-    std::string trkType = pclType(lund);
-    int ln = abs(lund);
-    bool isTrk = isLikeTrk( lund );
-    Hep3Vector pcl3D( p.px(), p.py(), p.pz() );
-    printf("\n----- Particle [%s]  %9s %s ---\n", trkType.c_str(), comment.c_str(), comment2.c_str() );
-    printf(" massRECO:%8.5f,   ", p.p().m());
-    // if (!isTrk)
-    // if ( p.userInfo() ) printUserInfo( p );
-    printf("px,py,pz: (%8.5f,%8.5f,%8.5f)  ", p.px(), p.py(), p.pz());
-    printf("  pT,phi,theta: [%6.4f,%6.4f,%6.4f] \n", pcl3D.perp(), pcl3D.phi(), pcl3D.theta());
-    printf("-- Ptype info.  lund:%i,  name:%s,  massPDG:%8.5f,  cTau:%9.6f, charge:%3.1f, spin:%3.1f,  nDecay:%i, stable:%i \n", 
-           (int)Ptype(lund).lund(), Ptype(lund).name().c_str(), Ptype(lund).mass(), Ptype(lund).cTau(), 
-           Ptype(lund).charge(), Ptype(lund).spin(), Ptype(lund).nDecay(), (int)Ptype(lund).stable() );
-    if (!isTrk) {
-        double vx = p.momentum().decayVertex().x();
-        double vy = p.momentum().decayVertex().y();
-        double vz = p.momentum().decayVertex().z();
-        printf("              vtx:[%8.5f,%8.5f,%8.5f] ", vx, vy, vz );
-        // printf( "      distanceToIP:%8.5f \n", distanceToIP(p) );
-        printf("Children ID: ");
-        for (int jM =0 ; jM < p.nChildren(); ++jM) {
-            Particle& Child = p.child(jM);
-            int lundChild = (int)Child.lund() ;
-            std::string childType = pclType(lundChild);
-            bool isTrkChild = isLikeTrk( lundChild, "onlyCharged" );
-            if (isTrkChild) printf("( %s : %i )  ", childType.c_str(), (int)Child.mdstCharged().get_ID() );
-            else printf("( %s : -- )  ", childType.c_str() );
-        }
-        printf("\n");
-    }
-    if (McFlag) {
-        int ID = p.genHepevt() ? p.genHepevt().get_ID() : -999;
-        printf("-- MC info. ID:%3i  IDhep:%i,  type:%s \n\n", 
-               ID, IDhep(p), pclType( IDhep(p) ).c_str() );
-    }
-}
-// ***********************************************************
-void printPclDebug(vector<Particle>& p_list, const std::string& comment = "", const std::string& comment2 = "") {
-    size_t np = p_list.size();
-    printf("\n----- List of Particles (%i) %9s %s ---\n", np, comment.c_str(), comment2.c_str());
-    for (size_t i = 0; i < np; ++i) {
-        printPclDebug( p_list[i], comment, comment);
-    }
-}
-// ***********************************************************
-void printUserInfo(Particle& p) {
-    UserInfo& info = dynamic_cast<UserInfo&>(p.userInfo());
-    printf("----- printUserInfo -----  msComb:%8.5f, msKvf:%8.5f, chisq:%8.3f, chisqKvf:%8.3f, cl:%8.6f, clKvf:%8.6f, \n              dist2IP:%8.5f, dist2IPmvf:%8.5f, useTube:%i, useKmvf:%i,  isAdoptCut:%i, wMass:%8.5f, maxChi2:%8.3f,  helicity:%6.4f \n", 
-           info.msComb(), info.msKvf(), info.chisq(), info.chisqKvf(), info.cl(), info.clKvf(), info.dist2IP(), info.dist2IPKmvf(),
-           (int)info.useTube(), (int)info.useKmvf(), (int)info.isAdoptCut(), info.wMass(), info.maxChi2(), info.helicity() );
-}
-// ***********************************************************
-void dRdZ(const Mdst_charged& charged, int massHyp, const HepPoint3D& ip_position,
-                                                            double dR, double dZ) {
+            int mhyp;
+            if (id == 11) mhyp = 0;
+            else if (id == 13) mhyp = 1;
+            else if (id == 321) mhyp = 3;
+            else if (id == 2212) mhyp = 4;
+            else mhyp = 2;
 
-    if (charged.trk()) {
-        Mdst_trk& trk = charged.trk();
-        if (trk.mhyp(massHyp)) {
-            Mdst_trk_fit& trkFit = trk.mhyp(massHyp);
+            double dr, dz;
+            dRdZ(p_list[i].mdstCharged(), mhyp, ip_position, dr, dz);
 
-            HepPoint3D pivot;
-            pivot.setX((double) trkFit.pivot(0));
-            pivot.setY((double) trkFit.pivot(1));
-            pivot.setZ((double) trkFit.pivot(2));
-
-            HepVector a(5);
-            a[0] = (double) trkFit.helix(0);
-            a[1] = (double) trkFit.helix(1);
-            a[2] = (double) trkFit.helix(2);
-            a[3] = (double) trkFit.helix(3);
-            a[4] = (double) trkFit.helix(4);
-
-            Helix h(pivot, a);
-            h.pivot(ip_position);
-            dR = fabs(h.dr());
-            dZ = fabs(h.dz());
-
-            return;
-        }
-    }
-
-    dR = 100.;
-    dZ = 100.;
-}
-// ***********************************************************
-void withdRdZcut(std::vector<Particle>& p_list, const HepPoint3D& ip_position, double dRcut, double dZcut) {
-    for (size_t i = 0; i < p_list.size(); ++i) {
-        int id = abs(p_list[i].pType().lund());
-
-        int mhyp;
-        if (id == 11) mhyp = 0;
-        else if (id == 13) mhyp = 1;
-        // else if (id == 211) mhyp = 2; // repeatition
-        else if (id == 321) mhyp = 3;
-        else if (id == 2212) mhyp = 4;
-        else mhyp = 2;
-
-        double dr, dz;
-        dRdZ(p_list[i].mdstCharged(), mhyp, ip_position, dr, dz);
-
-        if (dr > dRcut || dz > dZcut) {
-            p_list.erase(p_list.begin() + i);
-            --i;
-        }
-    }
-}
-// **********************************************************
-bool withPi0MassGamGamCut(Particle& pi0, double M_min, double M_max) {
-    Particle& g1 = pi0.child(0);
-    Particle& g2 = pi0.child(1);
-    double msPi0_gg = (g1.p() + g2.p()).m();
-    if (msPi0_gg < M_min) return false;
-    if (msPi0_gg > M_max) return false;
-    return true;
-}
-// **********************************************************
-bool withPi0GammPCut(Particle& p, double p_min) {
-    Particle& g1 = p.child(0);
-    Particle& g2 = p.child(1);
-    if(p.child(0).ptot() < p_min) return false;
-    if(p.child(1).ptot() < p_min) return false;
-    return true;
-}
-// **********************************************************
-void withPi0MassGamGamCut(std::vector<Particle>& pi0, double dM_max) {
-    double massPi0_PDG = Ptype(111).mass();
-    for (std::vector<Particle>::iterator i = pi0.begin(); i != pi0.end();) {
-        Particle& g1 = i->child(0);
-        Particle& g2 = i->child(1);
-        double msPi0_gg = (g1.p() + g2.p()).m();
-            
-        if (abs(msPi0_gg - massPi0_PDG) > dM_max) pi0.erase(i);
-        else
-            ++i;
-    }
-}
-/* **********************************************************
- * performs a neutral pion's (pi0) gammas' energies in order
- * to select better candidates. Operates with gammas that
- * belong to a pi0
-*/
-// ***********************************************************
-void withPi0GammPCut(std::vector<Particle>& pi0, double p_min) {
-    for (std::vector<Particle>::iterator i = pi0.begin(); i != pi0.end();)
-        if (i->child(0).ptot() < p_min || i->child(1).ptot() < p_min)
-            pi0.erase(i);
-        else
-            ++i;
-}
-// ***********************************************************
-double getMsGammaInPi0(Particle& gamma) {
-
-    std::vector<Particle> pi0;
-    makePi0(pi0);
-    withPi0GammPCut(pi0,  0.030);
-    // withPi0pStarCut(pi0,  0.050);
-
-    double msGG = -1.;
-    for (size_t iPi0 = 0; iPi0 < pi0.size(); ++iPi0) {
-        Particle& g1 = pi0[iPi0].child(0);
-        Particle& g2 = pi0[iPi0].child(1);
-        bool idGamPi0 = false;
-        if (abs(g1.ptot() - gamma.ptot()) < 1.e-3) idGamPi0 = true;
-        if (abs(g2.ptot() - gamma.ptot()) < 1.e-3) idGamPi0 = true;
-        if (idGamPi0) {
-            double ms_gg = (g1.p() + g2.p()).m();
-            if (abs(ms_gg - Ptype("PI0").mass()) < msGG)
-                msGG = ms_gg;
-        }
-    }
-    pi0.clear();
-    return msGG;
-}
-// ***********************************************************
-void createUserInfo(Particle& particle) {
-    particle.userInfo(*(new UserInfo(particle)));
-    UserInfo& info = dynamic_cast<UserInfo&>(particle.userInfo());
-    int lund = (int)particle.lund();
-    double cTau = Ptype(lund).cTau();
-    bool useTube = false;
-    double wMass = dM_Dgr;
-
-    // !!! used for this reconstruction
-    if ((abs(lund) > 500) && (abs(lund) < 600)) {                         // B0, Bc, Bs
-        useTube = true;
-        wMass = wB;
-    }
-    // !!! used for this reconstruction (only Phi0)
-    else if ((lund == 310) || (abs(lund) == 3122) || (lund == 333)) { // K0s, Lam0, Phi0
-        wMass = dM_V0;
-    }
-    // !!! used for this reconstruction
-    else if (abs(lund)  == 313) {                                          // K*0
-        wMass = dM_Ksr0;
-    }
-    else if ((abs(lund) == 113) || (abs(lund) == 213)) {                // RHO0,+.-
-        wMass = dM_Rho;
-    }
-    // !!! used for this reconstruction
-    else if ((abs(lund) == 413) || (abs(lund) == 423)) {                // D*+, D*0feve
-        useTube = true; 
-        wMass = wDst;
-    }
-    else if (abs(lund)  == 431) {                                          // DS+
-        wMass = dM_Dss;
-    }
-    else if (abs(lund)  == 433) {                                          // D*S+
-        useTube = true;
-        wMass = dM_Dsst;
-    }
-    else if (abs(lund)  == 10431) {                                        // D**S+(D_sJ(2317))
-        useTube = true;
-        wMass = dM_2317;
-    }
-    else if (abs(lund)  == 443) {                                          // J/psi
-        useTube = true; 
-    }
-    
-    info.msComb(particle.p().m());
-    info.maxChi2(-1.);
-    info.wMass(wMass);
-    info.useTube(useTube);
-    info.useKmvf(cTau > 1.e-5);
-    info.isAdoptCut(true);
-    info.chisqKvf(-1.);
-    info.chisqKmvf(-1.);
-    info.probChi2Kvf(-1.);
-    info.probChi2Kmvf(-1.);
-    info.helicity(-1.);
-}
-// ***********************************************************
-void createUserInfo(std::vector<Particle>& p_list) {
-    std::vector<Particle>::iterator particle;
-    for (particle = p_list.begin(); particle != p_list.end(); ++particle) {
-        if (!&(*particle).userInfo()) createUserInfo(*particle);
-    }
-}
-// ***********************************************************
-void setBadVtx(Particle& particle) {
-    HepPoint3D vtx(999., 999., 999.);
-    HepSymMatrix errVtx(3, 0);
-    particle.momentum().decayVertex(vtx, errVtx);
-    UserInfo& info = dynamic_cast<UserInfo&>(particle.userInfo());
-    info.isAdoptCut(false);
-}
-// ***********************************************************
-double distanceToIP(Particle& particle) {
-    const HepPoint3D& ip_position = IpProfile::position();
-    Hep3Vector vtxIP(IpProfile::position().x(), IpProfile::position().y(), 0.0);
-    Hep3Vector vtxD(particle.momentum().decayVertex().x(), particle.momentum().decayVertex().y(), 0.0);
-    Hep3Vector vtx_D_IP = vtxD - vtxIP;
-    return vtx_D_IP.mag();
-}
-// ***********************************************************
-void makeRecursiveVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = false,
-                   bool addBeam = false) {
-    /*
-     * Fitting DecayMother -> DecayChild1 + DecayChild2 + ... + trk1 + trk2 + ...
-     * another string
-     * here should be documentation for this function --
-     * makeRecursiveVertexFit(Particle&, bool, bool, bool)
-     */
-
-
-    // Looking for userInfo object connected to the Mother particle ====
-    // If it does not exist, creating it and casting to UserInfo type ==
-    if (!&Mother.userInfo()) createUserInfo(Mother);
-    UserInfo& infoMother = dynamic_cast<UserInfo&>(Mother.userInfo());
-    // =================================================================
-    // =================================================================
-
-    int lundMother = (int)Mother.lund();
-    std::string motherType = pclType(lundMother);
-
-
-    // =============== Printing option for debugging =================
-    // ===== Does not have a physics- or reconstruction sence ========
-    // May just skip, set to True to display and/or print in stdout ==
-    if (debugDump) {
-        printf("\n ========  makeRecursiveVertexFit ==========   %s [%i] --> ",
-            motherType.c_str(), Mother.nChildren());
-        for (int jChild = 0; jChild < Mother.nChildren(); ++jChild) {
-            std::string dghtType = pclType((int)Mother.child(jChild).lund());
-            printf("%s ", dghtType.c_str());
-        }
-        printf("\n");
-    }
-    // ================================================================
-    // ================================================================
-    // ================================================================
-
-
-    kvertexfitter kvfMother;
-    if (useBF) kvfMother.magneticField(BF);
-    int err = -2;
-    for (int jChild = 0; jChild < Mother.nChildren(); ++jChild) {
-        Particle& Child = Mother.child(jChild);
-        int lundChild   = (int)Child.lund();
-        bool isTrkChild = isLikeTrk(lundChild);
-        if (!isTrkChild) {
-            if (!&Child.userInfo()) createUserInfo(Child);
-            UserInfo& infoChild = dynamic_cast<UserInfo&>(Child.userInfo());
-            double chisqChild = infoChild.chisqKvf(); // -1.; //
-            if (chisqChild < 0.) {
-                // The particle has not been vertexed yet
-                bool idUseTube = false;
-                bool idAddMF   = true;   /*false*/  // magneticField (is it necessary??)
-                makeRecursiveVertexFit(Child, debugDump);
+            if (dr > dRcut || dz > dZcut) {
+                p_list.erase(p_list.begin() + i);
+                --i;
             }
         }
-        addTrack2fit(kvfMother, Child);
-        if (addBeam && IpProfile::usable()) addBeam2fit(kvfMother);
     }
-
-    if (infoMother.useTube()) addTube2fit(kvfMother);
-    err = kvfMother.fit();
-
-    // If OK, 0 is returned
-    if (err) {
-        setBadVtx(Mother);
-
-        // =============== The printing option for debugging ===================
-        // ===== Does not have a physics- or reconstruction-related sence ======
-        // May be just skipped, set to True to display and/or print in stdout ==
-        if (debugDump) {
-            printf( "-----  bad vertexing!!! ---- \n\n" );
-        }
-        // =====================================================================
-        // =====================================================================
-        // =====================================================================
-        return;
-    }
-
-    makeMother(kvfMother, Mother);
-    infoMother.msKvf(Mother.p().m());
-    infoMother.chisq(kvfMother.chisq());
-    infoMother.chisqKvf(kvfMother.chisq());
-    infoMother.probChi2Kvf(kvfMother.dgf());
-    infoMother.cl(kvfMother.cl());
-    infoMother.clKvf(kvfMother.cl());
-    infoMother.dist2IP(distanceToIP(Mother));
-
-    for (int jChild = 0; jChild < Mother.nChildren(); ++jChild) {
-        Particle& Child = Mother.child(jChild);
-        int lundChild = (int)Child.lund();
-        bool isTrkChild = isLikeTrk(lundChild);
-        if (!isTrkChild) {
-            if (!&Child.userInfo()) createUserInfo(Child);
-            UserInfo& infoChild = dynamic_cast<UserInfo&>(Child.userInfo());
-            double dx = Mother.momentum().decayVertex().x() - Child.momentum().decayVertex().x();
-            double dy = Mother.momentum().decayVertex().y() - Child.momentum().decayVertex().y();
-            double dz = Mother.momentum().decayVertex().z() - Child.momentum().decayVertex().z();
-            double dist2Mother = sqrt(dx * dx + dy * dy + dz * dz);
-            infoChild.dist2Mother(dist2Mother);
-        }
-    }
-                
-    // Checking for long-living particles as a criteria of mass-constraint fit
-    double cTauMother = Ptype(lundMother).cTau();
-    if (cTauMother > 1.e-5) useKmvf =  true;
-    // making it unenabled for Ds2317. PDG id: 10431 of abs. units
-    if (abs(lundMother) == 10431) useKmvf = false;
-
-    infoMother.useKmvf(useKmvf);
-        
-    if (infoMother.useKmvf()) {
-        // use additional mass-vertex fitter to correct position (?) and LV
-        kmassvertexfitter kmvMother;
-        if (useBF) kmvMother.magneticField(BF);
-        kmvMother.invariantMass(Mother.pType().mass());
-        for (int jChild = 0; jChild < Mother.nChildren(); ++jChild) addTrack2fit(kmvMother, Mother.child(jChild));
-        err = kmvMother.fit();
-        if (err) {
-            setBadVtx(Mother);
-            return;
-        }
-        makeMother(kmvMother, Mother);
-        Mother.momentum().decayVertex(kmvMother.vertex(), kmvMother.errVertex());
-        // useless chunk of code: don't use .chisq() field as a valid chi2 vertexing value
-        if (infoMother.chisq() <= kmvMother.chisq()) {
-            infoMother.chisq(kmvMother.chisq());
-        }
-        infoMother.clKmvf(kmvMother.cl());
-        infoMother.dist2IPKmvf(distanceToIP(Mother));
-        infoMother.msKmvf(Mother.p().m());
-        infoMother.probChi2Kmvf(kmvMother.dgf());
-        infoMother.chisqKmvf(kmvMother.chisq());
-    }
-
-    // =============== Printing option for debugging =================
-    // ===== Does not have a physics- or reconstruction sence ========
-    // May just skip, set to True to display and/or print in stdout ==
-    if (debugDump) {
-        printPclDebug( Mother, "(Mother)" );
-        printf("Mother  --- vtx:[%8.5f,%8.5f,%8.5f], err[00,11,22]:[%8.5f,%8.5f,%8.5f]\n",
-            Mother.momentum().decayVertex().x(),
-            Mother.momentum().decayVertex().y(),
-            Mother.momentum().decayVertex().z(),
-            sqrt(kvfMother.errVertex()[0][0]),
-            sqrt(kvfMother.errVertex()[1][1]),
-            sqrt(kvfMother.errVertex()[2][2])
-        );
-        std::string sind[5] = { "(pcl_1)", "(pcl_2)", "(pcl_3)", "(pcl_4)" , "(pcl_5)" };
-        for (int jChild = 0; jChild<Mother.nChildren(); ++jChild) {
-            printPclDebug( Mother.child(jChild), sind[jChild] );
-        }
-        printf("\n");
-    }
-    // ================================================================
-    // ================================================================
-    // ================================================================
-}
-// ***********************************************************
-void makeRecursiveVertexFit(vector<Particle>& p_list, bool debugDump = false, bool useKmvf = false) {
-    // fit DecayMother -> DecayChild1 + DecayChild2 + ... + trk1 + trk2 + ...
-    for (size_t i = 0; i < p_list.size(); ++i) {
-        makeRecursiveVertexFit(p_list[i], debugDump, useKmvf);
-    }
-}
-// ***********************************************************
-void printPi0(vector<Particle>& pi0, const std::string& comment = "") {
-    printf("------  %s Pi0 (%i) -------\n", comment.c_str(), pi0.size());
-    
-    for (size_t iPi0 = 0; iPi0 < pi0.size(); ++iPi0) {
-        Particle& p0 = pi0[iPi0];
-        Particle& g1 = pi0[iPi0].child(0);
-        Particle& g2 = pi0[iPi0].child(1);
+    // **********************************************************
+    bool withPi0MassGamGamCut(Particle& pi0, double M_min, double M_max) {
+        Particle& g1 = pi0.child(0);
+        Particle& g2 = pi0.child(1);
         double msPi0_gg = (g1.p() + g2.p()).m();
-        double psrPi0 = pStar(p0.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
-        printf(" Pi0 (%i)  mass:%7.5f, [px,py,pz]:[%7.4f, %7.4f, %7.4f], p:%6.4f,  p_cm:%6.4f,  Eg(1,2): [%6.4f, %6.4f], ms_gg:%7.5f\n",
-        iPi0, p0.mass(), p0.px(), p0.py(), p0.pz(), p0.ptot(), psrPi0, g1.ptot(), g2.ptot(), msPi0_gg);
+        if (msPi0_gg < M_min) return false;
+        if (msPi0_gg > M_max) return false;
+        return true;
     }
-}
-// ***********************************************************
-void printTrkPID(vector<Particle>& trkList, const std::string& pType, const std::string& comment = "") {
-    int ip, ibg1, ibg2;
-    if ((pType == "pi+") || (pType == "pi-")) {
-        ip   = 2;
-        ibg1 = 3;
-        ibg2 = 4;
+    // **********************************************************
+    bool withPi0GammPCut(Particle& p, double p_min) {
+        Particle& g1 = p.child(0);
+        Particle& g2 = p.child(1);
+        if(p.child(0).ptot() < p_min) return false;
+        if(p.child(1).ptot() < p_min) return false;
+        return true;
     }
-    else if ((pType == "K+") || (pType == "K-")) {
-        ip   = 3;
-        ibg1 = 2;
-        ibg2 = 4;
-    }
-    else if ((pType == "p+") || (pType == "p-")) {
-        ip   = 4;
-        ibg1 = 2;
-        ibg2 = 3;
-    }
-    else return;
-    printf("--- %3s (%i) ---%6s  trkID(eid,bg1,bg2): ", pType.c_str(), trkList.size(), comment.c_str());
-    for (int i = 0; i < trkList.size(); i++)
-        printf("(%2i | %5.3f,%5.3f,%5.3f) ", (int) trkList[i].mdstCharged().get_ID(),
-                (double) eid(trkList[i].mdstCharged()).prob(3, -1, 5),
-                (double) atc_pid(3, 1, 5, ip, ibg1).prob(trkList[i].mdstCharged()),
-                (double) atc_pid(3, 1, 5, ip, ibg2).prob(trkList[i].mdstCharged()));
-    printf("\n");
-}
-// ***********************************************************
-void printVtxDebug( std::vector<Particle>& plist, std::string comment = "", std::string comment2 = "") {
-    size_t np = plist.size();
-    printf("\n----- Vtx (%i) %9s %s ---\n", np, comment.c_str(), comment2.c_str() );
-    for (size_t i = 0; i < np; ++i) {
-        UserInfo& info = dynamic_cast<UserInfo&>(plist[i].userInfo());
-        double vx = plist[i].momentum().decayVertex().x();
-        double vy = plist[i].momentum().decayVertex().y();
-        double vz = plist[i].momentum().decayVertex().z();
-        printf("[ %i ]  mass,chisq,chisqKvf: (%8.5f,%7.3f,%7.3f)  ", 
-            i, plist[i].p().m(), info.chisq(), info.chisqKvf());
-        printf("vx,vy,vz: (%8.5f,%8.5f,%8.5f)  ", vx, vy, vz);
-        printf("px,py,pz: (%8.5f,%8.5f,%8.5f)\n", 
-            plist[i].px(), plist[i].py(), plist[i].pz());
-    }
-    printf("\n");
-}
+    // **********************************************************
+    void withPi0MassGamGamCut(std::vector<Particle>& pi0, double dM_max) {
+        double massPi0_PDG = Ptype(111).mass();
+        for (std::vector<Particle>::iterator i = pi0.begin(); i != pi0.end();) {
+            Particle& g1 = i->child(0);
+            Particle& g2 = i->child(1);
+            double msPi0_gg = (g1.p() + g2.p()).m();
 
-// ***********************************************************
-void clearVectors() {
-    // clear all vectors
-    for (int i = 0; i < nTrk; ++i) trkV[i].clear();
-    gammaV.clear();
-    pi0.clear();
-    phi0.clear();
-    Ksr0.clear();
-    Ksr0bar.clear();
-    Dss_p.clear();
-    Dss_m.clear();
-    Dss_m_2317.clear();
-    Dss_p_2317.clear();
-    Bs0.clear();
-    Bs0bar.clear();
-    // BsStar0.clear();
-    // BsStar0bar.clear();
-    // Upsilon_5S.clear();
-}
-// ***********************************************************
-double getHelicity(VectorL& mother, VectorL& dght, VectorL& grndDght) {
-    Hep3Vector V1_boost = -dght.boostVector();
-    VectorL mother_boosted = mother;
-    VectorL grndDght_boosted = grndDght;
-    mother_boosted.boost(V1_boost);
-    grndDght_boosted.boost(V1_boost);
-    double helic = -mother_boosted.vect().unit().dot(grndDght_boosted.vect().unit());
-
-
-    // =============== Printing option for debugging =================
-    // ===== Does not have a physics- or reconstruction sence ========
-    // May just skip, set to True to display and/or print in stdout ==
-    if (debugHel) {
-        printf("\n======================== getHelicity ====================\n");
-        cout << "  VectorL   mother:" << mother << endl;
-        cout << "  VectorL     dght:" << dght << endl;
-        cout << "  VectorL grndDght:" << grndDght << endl;
-        printf("         dght helic: %7.5f\n\n",helic);
-    }
-    // ================================================================
-    // ================================================================
-    // ================================================================
-    
-    return helic;
-}
-// ***********************************************************
-
-double getHelicity(Particle& p, int indDough=0) {
-    if (p.nChildren() == 0) return -1;
-    
-    VectorL mother   = p.p(); 
-    VectorL dght     = p.child(indDough).p();
-    VectorL grndDght = p.child(indDough).child(0).p();
-    double helic = getHelicity(mother, dght, grndDght);
-
-    // =============== Printing option for debugging =================
-    // ===== Does not have a physics- or reconstruction sence ========
-    // May just skip, set to True to display and/or print in stdout ==
-    if (debugHel) {
-        printf("\n======================== getHelicity ====================");
-        printPclDebug( p, "(Mother)" );
-        printf("         dght helic: %7.5f\n\n",helic);
-    }
-    // ================================================================
-    // ================================================================
-    // ================================================================
-    
-    return helic;
-}
-// ***********************************************************
-enum VertexMode {
-    vertexFit,
-    MassConstraintFit,
-    noFit
-};
-
-VertexMode vertexModeHash(const std::string& vMode) {
-    if (vMode == "mass-constraint-fit") return MassConstraintFit;
-    else if (vMode == "no-fit") return noFit;
-    else return vertexFit;
-}
-
-void checkAdoptCutMassChisqKvf(Particle& particle, const double& pL, const double& pR,
-                               const double& maxChisq = 2.e2, const std::string& vertexMode = "vertex-fit",
-                               const std::string& status = "", int iChild = 0) {
-
-    // If maxChisq < 0 vtx cuts are not used
-    // status: "", "massdif"
-    UserInfo& info = dynamic_cast<UserInfo&>(particle.userInfo());
-    double ms      = info.msKvf();
-    // double ms = particle.p().m();
-    if (status == "massdif") {
-        Particle& pChild    = particle.child(iChild);
-        UserInfo& infoChild = dynamic_cast<UserInfo&>(pChild.userInfo());
-        ms                  = info.msComb() - infoChild.msComb();
-    }
-
-    bool isErase     = false;
-    double chisqKvf  = info.chisqKvf();
-    double chisqKmvf = info.chisqKmvf();
-    double* chisq    = &chisqKvf;
-    switch (vertexModeHash(vertexMode)) {
-
-        case vertexFit: {
-            chisq = &chisqKvf;
+            if (abs(msPi0_gg - massPi0_PDG) > dM_max) pi0.erase(i);
+            else
+                ++i;
         }
-        case MassConstraintFit: {
-            chisq = &chisqKmvf;
-        }
-        default: {
-            chisq = &chisqKvf;
+    }
+    /* **********************************************************
+     * performs a neutral pion's (pi0) gammas' energies in order
+     * to select better candidates. Operates with gammas that
+     * belong to a pi0
+    */
+    // ***********************************************************
+    void withPi0GammPCut(std::vector<Particle>& pi0, double p_min) {
+        for (std::vector<Particle>::iterator i = pi0.begin(); i != pi0.end();)
+            if (i->child(0).ptot() < p_min || i->child(1).ptot() < p_min)
+                pi0.erase(i);
+            else
+                ++i;
+    }
+    // ***********************************************************
+    void createUserInfo(Particle& particle) {
+        particle.userInfo(*(new UserInfo(particle)));
+        UserInfo& info = dynamic_cast<UserInfo&>(particle.userInfo());
+
+        int id_lund = std::abs(particle.lund());
+        bool use_tube = false;
+        double w_mass = dM_Bs0;
+        bool use_kmvf = false;
+        std::string vertex_mode = "vertex-fit";
+
+        switch (id_lund) {
+            case 531:  // Bs
+                use_tube = true;
+                w_mass = dM_Bs0;
+                break;
+
+            case 333:  // Phi0
+                w_mass = dM_V0;
+                break;
+
+            case 313:  // K*0
+                w_mass = dM_Ksr0;
+                break;
+
+            case 431:  // Ds
+                use_kmvf = true;
+                w_mass = dM_Dss;
+                vertex_mode = "mass-constraint-fit";
+                break;
+
+            case 10431:  // D_sJ(2317)
+                w_mass = dM_2317;
+                break;
+
+            case 111:  // pi0
+                use_kmvf = true;
+                w_mass = wMassPi0GG;
+                vertex_mode = "mass-constraint-fit";
+                break;
+
+            default:
+                break;
+
         }
 
-    }
-    double _chisq = *chisq;
-    delete chisq;
+        info.msComb(particle.p().m());
+        info.wMass(w_mass);
+        info.useTube(use_tube);
+        info.useKmvf(use_kmvf);
+        info.isAdoptCut(true);
+        info.chisqKvf(-1.);
+        info.chisqKmvf(-1.);
+        info.chisqKvfNdf(-1.);
+        info.chisqKmvfNdf(-1.);
+        info.helicity(-1.);
+        info.vertexMode(vertex_mode);
 
-    double vx       = particle.momentum().decayVertex().x();
-    double vy       = particle.momentum().decayVertex().y();
-    double vz       = particle.momentum().decayVertex().z();
-
-    if (maxChisq > 0.) {
-        isErase = (_chisq > maxChisq || _chisq < 0. || abs(vz) > 50. || sqrt(vx * vx + vy * vy) > 30. || ms < pL || ms > pR);
-    } else {
-        isErase = ms < pL || ms > pR;
+        particle.userInfo(info);
     }
-    if (isErase) {
+
+
+
+
+    // ***********************************************************
+    void createUserInfo(std::vector<Particle>& p_list) {
+        std::vector<Particle>::iterator particle;
+        for (particle = p_list.begin(); particle != p_list.end(); ++particle) {
+            if (!&(*particle).userInfo()) createUserInfo(*particle);
+        }
+    }
+    // ***********************************************************
+    void setIncorrectVertexFitResult(Particle& Particle) {
+        HepPoint3D vtx(999., 999., 999.);
+        HepSymMatrix errVtx(3, 0);
+        Particle.momentum().decayVertex(vtx, errVtx);
+        UserInfo& info = dynamic_cast<UserInfo&>(Particle.userInfo());
         info.isAdoptCut(false);
+        Particle.userInfo(info);
     }
-    // printf("----checkAdoptCutMassChisqKvf [%s] --- ms:%f, pL:%f, pR:%f, maxChi2:%f, chisqKvf:%f, vx:%f, vy:%f, vz:%f, --- isErase:%i \n",
-    // pclType((int)p.lund()).c_str(), ms, pL, pR, maxChisq, chisqKvf, vx,vy,vz, (int)isErase);
-}
-// **********************************************************
-void checkAdoptCutMassChisqKvf(std::vector<Particle>& p_list, double pL, double pR,
-                               double maxChisq = 2.e2, const std::string& vertexMode = "vertex-fit",
-                               std::string status = "", int iChild = 0) {
-
-    for (size_t i = 0; i < p_list.size(); ++i) {
-        checkAdoptCutMassChisqKvf(p_list[i], pL, pR, maxChisq, vertexMode, status, iChild);
+    // ***********************************************************
+    double distanceToIP(Particle& Particle) {
+        const HepPoint3D& ip_position = IpProfile::position(1);
+        Hep3Vector vtxIP(IpProfile::position(1).x(), IpProfile::position(1).y(), 0.0);
+        Hep3Vector vtxD(Particle.momentum().decayVertex().x(), Particle.momentum().decayVertex().y(), 0.0);
+        Hep3Vector vtx_D_IP = vtxD - vtxIP;
+        return vtx_D_IP.mag();
     }
-}
-// **********************************************************
-void checkAdoptCutChisqKmvf(Particle& particle, double maxChisq = 2.e2) {
-
-    // If maxChisq < 0 wtx cuts are not used
-    UserInfo& info   = dynamic_cast<UserInfo&>(particle.userInfo());
-    bool isErase     = false;
-    double chisqKmvf = info.chisqKmvf();
-    if (maxChisq > 0.) isErase = (chisqKmvf > maxChisq);
-    if (isErase) info.isAdoptCut(false);
-}
-// **********************************************************
-void checkAdoptCutChisqKmvf(std::vector<Particle>& p_list, double maxChisq = 2.e2) {
-    for (size_t i = 0; i < p_list.size(); ++i) {
-        checkAdoptCutChisqKmvf(p_list[i], maxChisq);
-    }
-}
-// **********************************************************
-void checkAdoptCutPStar(std::vector<Particle>& p_list, double minPStarValue) {
-    for (size_t i = 0; i < p_list.size(); ++i) {
-        Particle& particle = p_list[i];
-        double psr = pStar(particle.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
-        if (psr > minPStarValue) {
-            continue;
+    // ***********************************************************
+    void makeRecursiveVertexFit(Particle& Mother, bool debugDump = false, bool useKmvf = false,
+                       bool addBeam = true) {
+        /*
+         * Fitting DecayMother -> DecayChild1 + DecayChild2 + ... + trk1 + trk2 + ...
+         */
+        int expNo, runNo, evtNo;
+        getEventInfo(expNo, runNo, evtNo, McFlag); // utility.cc
+        int lund_mother = int(Mother.lund());
+        if (evtNo == 470) {
+            std::cout << "**1, " << lund_mother  << std::endl;
         }
-        else {
-            p_list.erase(p_list.begin() + i);
+        if (!&Mother.userInfo()) createUserInfo(Mother);
+        UserInfo& info_mother = dynamic_cast<UserInfo&>(Mother.userInfo());
+        if (evtNo == 470) {
+            std::cout << "**2, " << lund_mother << std::endl;
         }
-    }
-}
-// **********************************************************
-void checkAdoptCutPStar(std::vector<Particle>& p_list, double minPStarValue, double maxPStarValue) {
-    for (size_t i = 0; i < p_list.size(); ++i) {
-        Particle& particle = p_list[i];
-        double psr = pStar(particle.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
-        if (psr > minPStarValue && psr < maxPStarValue) {
-            continue;
-        }
-        else {
-            p_list.erase(p_list.begin() + i);
-        }
-    }
-}
-// **********************************************************
-void withKaonId(std::vector<Particle>& p_list, const double prob, int accq0, int tofq0, int cdcq0, int ids0, int idb0) {
-    atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
-    for (size_t i = 0; i < p_list.size(); ++i) {
-        Particle& P = p_list[i];
-        double probParticle = kid.prob(&(P.mdstCharged()));
+        kvertexfitter kvf_mother;
+        if (useBF) kvf_mother.magneticField(BF);
+        std::size_t kvf_error = 0;
+        std::size_t kmm_error = 1;
 
-        if (P.mdstCharged() && probParticle >= prob) {
-
-            if (!&P.userInfo()) createUserInfo(P);
-            UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
-            info.probpid(probParticle);
-        }
-        else {
-            p_list.erase(p_list.begin() + i);
-            --i;
-        }
-  }
-}
-
-// #=========== utility.cc ===========#
-//void withPionId(std::vector<Particle> &list,
-//                const double prob, int accq0, int tofq0, int cdcq0,
-//                int ids0, int idb0) {
-//
-//    atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
-//
-//    for (int i = 0; i < (int)list.size(); ++i) {
-//        if (list[i].mdstCharged() && kid.prob(&(list[i].mdstCharged())) < prob) {;}
-//        else {
-//            list.erase(list.begin() + i);
-//            --i;
-//        }
-//    }
-//}
-// #==========#===========#===========#
-
-// #=========== custom with creating UserInfo ===========#
-
-void withPionId(std::vector<Particle>& p_list,
-                const double prob, int accq0, int tofq0, int cdcq0,
-                int ids0, int idb0) {
-    /* ************* THE FUNCTION'S ANNOTATION **************
-     * Combine informations from ACC, TOF and CDC (dE/dx)
-     * in order to separate e+-, mu+-, K+-, pi+-, p+-
-     * atc_pid returns a likelihood ratio which is called
-     * probParticle that compares two particles i and j:
-     * Prob(i : j) = L(i) / (L(i) + L(j))
-     * For example, Prob(K : pi) tends to be 1 if the
-     * charged paritcle is K-like,
-     * and tends to be 0 if it is pi-like.
-     * Apparently, Prob(K : pi) = 1 - Prob(pi : K).
-     * Prob(K : pi) is NOT a probability to be a kaon.
-     * accq0, tofq0, cdcq0: flags for each detector
-     * accq0 = 3, tofq0 = 1, cdcq0 = 5 are the
-     * default and recommended values;
-     * ids0, idb0 -- signal and background species.
-     * 0 for e,
-     * 1 for mu,
-     * 2 for pi,
-     * 3 for K and
-     * 4 for p.
-     * By default, ids0 = 3 and idb0 = 2 (K agaist pi).
-     * */
-
-    atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
-
-    for (size_t i = 0; i < p_list.size(); ++i) {
-        Particle& P = p_list[i];
-        double probParticle = kid.prob(&(P.mdstCharged()));
-        if (P.mdstCharged() && probParticle < prob) { // a big difference compated to withKaonId
-
-            if (!&P.userInfo()) createUserInfo(P);
-            UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
-            info.probpid(probParticle);
-        }
-        else {
-            p_list.erase(p_list.begin() + i);
-            --i;
-    }
-  }
-}
-// #=============== ================ ================#
-
-// **********************************************************
-// Modify this function
-// Make sure that this function returns a correct value
-int getEvtGenType() {
-    // 0:"Data", 1:"evtgen-charged", 2:"evtgen-mixed", 3:"evtgen-charm", 4:"evtgen-uds", 5:"evtgen-bsbs", 6:"evtgen-nonbsbs"
-    Gen_hepevt_Manager& genMgr  = Gen_hepevt_Manager::get_manager();
-    int status = 0;
-    for (std::vector<Gen_hepevt>::iterator i = genMgr.begin(); i != genMgr.end(); ++i) {
-        int idhep = i->idhep();
-        switch (abs(idhep)) {
-            case 533:
-                status = 1; // Bs0* (vector)
-            case 531:
-                status = 2; // Bs0  (scalar)
-            case 431:
-                status = 3; // Ds+-
-            case 10431:
-                status = 4; // Ds1*(2317)
-            case 4:
-                status = 5; // ccbar
-            case 3:
-                status = 6; // uds
-            case 2:
-                status = 6; // uds
-            case 1:
-                status = 6; // uds
-
-        }
-    }
-    return status;
-}
-// ***********************************************************
-void dumpEventInfo(BelleTuple* tt, bool debugDump = false) {
-    // Event Information
-    int expNo, runNo, evtNo;
-    getEventInfo(expNo, runNo, evtNo, McFlag); // utility.cc
-    const HepPoint3D& ip_position = IpProfile::position(1);
-    const HepSymMatrix& ip_error = IpProfile::position_err(1);
-    
-    int idGenType = getEvtGenType();
-
-    // Event Shape 
-    double  r2 = -1.;
-    Evtcls_hadron_info_Manager& clsMgr = Evtcls_hadron_info_Manager::get_manager();
-    if (clsMgr.count()) r2 = clsMgr[0].R2();
-
-    // =============== Printing option for debugging =================
-    // ===== Does not have a physics- or reconstruction sence ========
-    // May just skip, set to True to display and/or print in stdout ==
-    if (debugDump)
-        printf("\n        ---- EvtInfo_DUMP --- EvtGenType[%i],  exp:%2i,  run:%2i, evt:%i, ip_position:[%f, %f, %f] ----\n",
-            idGenType, expNo, runNo, evtNo,
-            ip_position.x(), ip_position.y(), ip_position.z());
-    // ================================================================
-    // ================================================================
-    // ================================================================
-
-    tt->column("expn",  expNo); // Exp #
-    tt->column("runn",  runNo); // Run #
-    tt->column("evtn",  evtNo);
-    tt->column("ipx",   ip_position.x());
-    tt->column("ipy",   ip_position.y());
-    tt->column("ipz",   ip_position.z());
-    //************* Signal shape ********
-    tt->column("r2", r2);
-    //*************  MC  ****************
-    tt->column("evtgen", idGenType);
-}
-// ***********************************************************
-VectorL getGenVectorL(int idhPcl) {
-    VectorL pclL;
-    int ID_Pcl = -1; 
-    Gen_hepevt_Manager& genMgr = Gen_hepevt_Manager::get_manager();
-    for (std::vector<Gen_hepevt>::iterator itr = genMgr.begin(); itr != genMgr.end(); ++itr) {
-        int idh = (*itr).idhep();
-        if (idh == idhPcl) { // Ds+/-
-            ID_Pcl = (*itr).get_ID();
-            pclL.setPx(genMgr[ID_Pcl - 1].PX());
-            pclL.setPy(genMgr[ID_Pcl - 1].PY());
-            pclL.setPz(genMgr[ID_Pcl - 1].PZ());
-            pclL.setE (genMgr[ID_Pcl - 1].E());
-        }
-    }
-    return pclL;
-}
-// ***********************************************************
-void dumpPi0(BelleTuple* tt, Particle& p0, const std::string& sfx, bool debugDump) {
-
-    Particle& g1 = p0.child(0);
-    Particle& g2 = p0.child(1);
-
-    double msPi0_gg = (g1.p() + g2.p()).m();
-    double psrPi0   = pStar(p0.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
-    double pPi0     = p0.momentum().p().mag();
-    // double pPi0 = .... // there should be pi0 momentum magnitude
-
-    bool gen_pi0 = IDhep(p0) == 0 ? false : true;
-    bool gen_g1  = IDhep(g1) == 0 ? false : true;
-    bool gen_g2  = IDhep(g2) == 0 ? false : true;
-
-    const int nValI = 3;
-    const int nValD = 4;
-
-    std::string pclTitI[nValI] = {"gen","gg1","gg2"};
-    int valPclI[nValI]    = {gen_pi0, gen_g1, gen_g2};
-    std::string pclTitD[nValD] = {"eg1","eg2","psr","mgg"};
-    double valPclD[nValD] = {g1.ptot(), g2.ptot(), psrPi0, msPi0_gg};
-
-    // =============== Printing option for debugging =================
-    // ===== Does not have a physics- or reconstruction sence ========
-    // May just skip, set to True to display and/or print in stdout ==
-    if (debugDump) {
-        printf("  ==== dumpValues ==== pi0 (%s): ", sfx.c_str());
-        for (int iVal = 0; iVal < nValI; iVal++) 
-            printf("(%s:%6i) ", (pclTitI[iVal] + sfx ).c_str(), valPclI[iVal]);
-        for (int iVal = 0; iVal < nValD; iVal++) 
-            printf("(%s:%6.3f) ", (pclTitD[iVal] + sfx ).c_str(), valPclD[iVal]);
-        printf("\n");
-    }
-    // ================================================================
-    // ================================================================
-    // ================================================================
-
-    for (int iVal = 0; iVal < nValI; ++iVal) tt->column(pclTitI[iVal] + sfx, valPclI[iVal]);
-    for (int iVal = 0; iVal < nValD; ++iVal) tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
-}
-
-// ***********************************************************
-void dumpValues(BelleTuple* tt, int nValI, int nValD, int* valPclI, double* valPclD, std::string* pclTitI, std::string* pclTitD,
-                                                                                            const std::string& sfx, bool debugDump) {
-    // =============== Printing option for debugging =================
-    // ===== Does not have a physics- or reconstruction sence ========
-    // May just skip, set to True to display and/or print in stdout ==
-    if (debugDump) {
-        printf("  ==== dumpValues ==== dec:(%s): ", sfx.c_str());
-        for (int iVal = 0; iVal < nValI; ++iVal)
-            printf("(%s:%6i) ", (pclTitI[iVal] + sfx).c_str(), valPclI[iVal]);
-        for (int iVal = 0; iVal < nValD; ++iVal)
-            printf("(%s:%6.3f) ", (pclTitD[iVal] + sfx).c_str(), valPclD[iVal]);
-        printf("\n");
-    }
-    // ================================================================
-    // ================================================================
-    // ================================================================
-    for (int iVal = 0; iVal < nValI; ++iVal)
-        tt->column(pclTitI[iVal] + sfx, valPclI[iVal]);
-    for (int iVal = 0; iVal < nValD; ++iVal)
-        tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
-}
-// ***********************************************************
-void dumpGenValues(BelleTuple* tt, bool gen_pcl, VectorL pclL, const std::string& sfx, bool debugDump) {
-    const int nValD = 9;
-    std::string pclTitD[nValD] = {
-            "ms",
-            "px",
-            "py",
-            "pz",
-            "e",
-            "th",
-            "ct",
-            "ph",
-            "rh"
-    };
-    double valPclD[nValD] = {
-            pclL.m(),
-            pclL.px(),
-            pclL.py(),
-            pclL.pz(),
-            pclL.e(),
-            pclL.theta(),
-            pclL.cosTheta(),
-            pclL.phi(),
-            pclL.rho()
-    };
-    if (!gen_pcl) {
-        for (int iVal = 0; iVal < nValD; ++iVal)
-            valPclD[iVal] = -.99;
-    }
-    // =============== Printing option for debugging =================
-    // ===== Does not have a physics- or reconstruction sence ========
-    // May just skip, set to True to display and/or print in stdout ==
-    if (debugDump) {
-        printf("  ==== dumpGenValues ==== dec:(%s): ", sfx.c_str());
-        for (int iVal = 0; iVal < nValD; ++iVal)
-            printf("(%s:%6.3f) ", (pclTitD[iVal] + sfx ).c_str(), valPclD[iVal]);
-        printf("\n");
-    }
-    // ================================================================
-    // ================================================================
-    // ================================================================
-
-    for (int iVal = 0; iVal < nValD; ++iVal) {
-        // printf("(%s:%6.3f) ", (pclTitD[iVal]+sfx ).c_str(), valPclD[iVal]);
-        tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
-    }
-}
-// ***********************************************************
-void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
-                 bool evtInfoDump = false,
-                 bool stDump = true, bool debugDump = false) {
-
-    // printf("\n======== dumpDsChild  ========= chg_dss_child:%i, ms_dss_child:%7.3f ) \n",
-    // (int)P.lund(), P.p().m() );
-    if (evtInfoDump) dumpEventInfo(tt, debugDump);
-
-    int lund = (int)P.lund();
-    
-    if (!&P.userInfo()) createUserInfo(P);
-    UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
-    if (info.chisqKvf() < 0.) {
-        // the particle has not been vertexed yet
-        makeRecursiveVertexFit(P, debugDump);
-    }
-
-    double massPDG = Ptype(lund).mass();
-    double msLimLeft  = massPDG - info.wMass();
-    double msLimRight = massPDG + info.wMass();
-
-    checkAdoptCutMassChisqKvf(P, msLimLeft, msLimRight, 2.e2, "vertex-fit");
-    if (!info.isAdoptCut()) {
-
-        // =============== Printing option for debugging =================
-        // ===== Does not have a physics- or reconstruction sence ========
-        // May just skip, set to True to display and/or print in stdout ==
-        if (debugDump) {
-            printf("\n       *****  DsChild is not adopted ******\n" );
-            printPclDebug( P );
-            double vx = P.momentum().decayVertex().x();
-            double vy = P.momentum().decayVertex().y();
-            double vz = P.momentum().decayVertex().z();
-            printf("msKvf:%f, msLimLeft:%f, msLimRight:%f, maxChi2:%f, vx:%f, vy:%f, vz:%f \n",
-                   info.msKvf(), msLimLeft, msLimRight, info.maxChi2(), vx, vy, vz);
-        }
-        // ================================================================
-        // ================================================================
-        // ================================================================
-
-        return; // the most important line for understanding this function outcome
-    }
-
-    double chisqKvf      = info.chisqKvf();       // -1.; //
-    double chisqKmvf     = info.chisqKmvf();
-    double probChisqKvf  = info.probChi2Kvf();
-    double probChisqKmvf = info.probChi2Kmvf();
-    double msComb        = info.msComb();
-    double msKvf         = info.msKvf();         // dgr.p().m(); //
-    double msKmvf        = info.msKmvf();        // -1.; //
-    double cl            = info.cl();
-    double clKvf         = info.clKvf();
-    double clKmvf        = info.clKmvf();
-    double helic         = info.helicity();
-    
-    int ind_ch1 = 0;
-    int lundChild = (int)P.lund();
-    std::string ChildPcl;
-    if (abs(lundChild) == 333) {
-        ChildPcl ="phipi";
-        ind_ch1  = 1;
-    }
-    if (abs(lundChild) == 313) {
-        ChildPcl = "KsrK";
-        ind_ch1  = 2;
-    }
-
-    double psr_ds_child           = pStar(P.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
-    double px_ds_child            = P.px();
-    double py_ds_child            = P.py();
-    double pz_ds_child            = P.pz();
-    double p_ds_child             = P.momentum().p().mag();
-    double production_vx_ds_child = P.momentum().vertex().x();
-    double production_vy_ds_child = P.momentum().vertex().y();
-    double production_vz_ds_child = P.momentum().vertex().z();
-    double xx_ds_child            = P.momentum().x().x();
-    double xy_ds_child            = P.momentum().x().y();
-    double xz_ds_child            = P.momentum().x().z();
-    double decay_vx_ds_child      = P.momentum().decayVertex().x();
-    double decay_vy_ds_child      = P.momentum().decayVertex().y();
-    double decay_vz_ds_child      = P.momentum().decayVertex().z();
-
-    Hep3Vector P3D                (px_ds_child, py_ds_child, pz_ds_child);
-    double perp_ds_child          = P3D.perp();
-    double phi_ds_child           = P3D.phi();
-    double theta_ds_child         = P3D.theta();
-
-
-    std::string dgrSuff = "_ch" + sfxDs;
-    int signPcl = (int)P.lund() > 0 ? 1 : -1;
-    bool gen_pcl = IDhep(P) == 0 ? false : true;
-    double vx = P.momentum().decayVertex().x();
-    double vy = P.momentum().decayVertex().y();
-    double vz = P.momentum().decayVertex().z();
-
-    
-    // double helicChild1 = getHelicity( P );
-
-    const int nValI = 3; 
-    const int nValD = 29;
-    int valPclI[nValI] = {
-            signPcl,
-            gen_pcl,
-            ind_ch1
-    };
-    double valPclD[nValD] = {
-            msKvf,
-            msKmvf,
-            msComb,
-            chisqKvf,
-            chisqKmvf,
-            probChisqKvf,
-            probChisqKmvf,
-            cl,
-            clKvf,
-            clKmvf,
-            production_vx_ds_child,
-            production_vy_ds_child,
-            production_vz_ds_child,
-            xx_ds_child,
-            xy_ds_child,
-            xz_ds_child,
-            decay_vx_ds_child,
-            decay_vy_ds_child,
-            decay_vz_ds_child,
-            perp_ds_child,
-            phi_ds_child,
-            theta_ds_child,
-            psr_ds_child,
-            px_ds_child,
-            py_ds_child,
-            pz_ds_child
-    };
-    std::string pclTitI[nValI] = {
-            "chg",
-            "gen",
-            "ind"
-    };
-    std::string pclTitD[nValD] = {
-            "msV",
-            "msM",
-            "msC",
-            "chiV",
-            "chiM",
-            "prbV",
-            "prbM",
-            "cl",
-            "clV",
-            "clM",
-            "pVx",
-            "pVy",
-            "pVz",
-            "xx",
-            "xy",
-            "xz",
-            "dVx",
-            "dVy",
-            "dVz",
-            "pt",
-            "ph",
-            "th",
-            "psr",
-            "px",
-            "py",
-            "pz"
-    };
-
-    // =============== Printing option for debugging =================
-    // ===== Does not have a physics- or reconstruction sence ========
-    // May just skip, set to True to display and/or print in stdout ==
-    if (debugDump) {
-        printf("\n======== dumpDsChild  ========= (%s) chg_dss_child:%i, ms_dss_child:%7.3f ) \n",
-               ChildPcl.c_str(), (int)P.lund(), msKvf);
-        printUserInfo(P);
-    }
-    // ================================================================
-    // ================================================================
-    // ================================================================
-
-
-    dumpValues(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
-    
-    if (stDump) tt->dumpData();
-}
-// ***********************************************************
-void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDump = false, bool stDump = true, bool debugDump = false) {
-
-    if (evtInfoDump) dumpEventInfo(tt, debugDump);
-    int lundDs = (int)P.lund();
-
-    // Creating a userInfo object for the Ds meson candidate
-    if (!&P.userInfo()) createUserInfo(P);
-    UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
-    // Making vertex fit
-    if (info.chisqKvf() < 0.) {
-        // particle has not been vertexed yet
-        makeRecursiveVertexFit(P, debugDump, true);
-    }
-    
-    double massPDG    = Ptype(lundDs).mass();
-    double msLimLeft  = massPDG - info.wMass();
-    double msLimRight = massPDG + info.wMass();
-
-    // Validation of chi2 values
-    checkAdoptCutMassChisqKvf(P, msLimLeft, msLimRight, 2.e2, "mass-constraint-fit");
-
-    if (!info.isAdoptCut()) {
-
-        // =============== Printing option for debugging =================
-        // ===== Does not have a physics- or reconstruction sence ========
-        // May just skip, set to True to display and/or print in stdout ==
-        if (debugDump) {
-            printf("\n       ***** The Ds candidate is not adopted ******\n" );
-            printPclDebug(P);
-            double vx = P.momentum().decayVertex().x();
-            double vy = P.momentum().decayVertex().y();
-            double vz = P.momentum().decayVertex().z();
-            printf("msKvf:%f, msLimLeft:%f, msLimRight:%f, maxChi2:%f, vx:%f, vy:%f, vz:%f \n",
-                   info.msKvf(), msLimLeft, msLimRight, info.maxChi2(), vx, vy, vz);
-        }
-        // ================================================================
-        // ================================================================
-        // ================================================================
-
-
-        /* !!!! A crucial step below: if info.isAdoptCut() equals 0, return statement will be invoked at this point
-         * and the dumpDs stack frame is popped out from the Reco::event() call stack;
-         * the unadopted candidates are not going to be recorded or involved in further steps of reconstruction
-         * they are also not included in the following combinations
-        */
-        return;
-    }
-    double chisqKvf      = info.chisqKvf();       // -1.; //
-    double chisqKmvf     = info.chisqKmvf();
-    double probChisqKvf  = info.probChi2Kvf();
-    double probChisqKmvf = info.probChi2Kmvf();
-    double msComb        = info.msComb();
-    double msKvf         = info.msKvf();         // dgr.p().m(); //
-    double msKmvf        = info.msKmvf();        // -1.; //
-    double cl            = info.cl();
-    double clKvf         = info.clKvf();
-    double clKmvf        = info.clKmvf();
-
-
-    double psr_ds           = pStar(P.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
-    double px_ds            = P.px();
-    double py_ds            = P.py();
-    double pz_ds            = P.pz();
-    Hep3Vector P3D          (px_ds, py_ds, pz_ds);
-    double perp_ds          = P3D.perp();
-    double phi_ds           = P3D.phi();
-    double theta_ds         = P3D.theta();
-    int    signPcl          = lundDs > 0 ? 1 : -1;
-    bool   gen_pcl          = IDhep(P) == 0 ? false : true;
-    double production_vx_ds = P.momentum().vertex().x();
-    double production_vy_ds = P.momentum().vertex().y();
-    double production_vz_ds = P.momentum().vertex().z();
-    double xx_ds            = P.momentum().x().x();
-    double xy_ds            = P.momentum().x().y();
-    double xz_ds            = P.momentum().x().z();
-    double decay_vx_ds      = P.momentum().decayVertex().x();
-    double decay_vy_ds      = P.momentum().decayVertex().y();
-    double decay_vz_ds      = P.momentum().decayVertex().z();
-    double helicChild1      = getHelicity(P);
-
-
-    // Working with Ds+(-) children (K+(-), K-(+) and pi+(-))
-    Particle& Child0        = P.child(0);             // phi0 (--> K+ K-) or K* (--> K+ pi-), or K*bar (--> K- pi+)
-    Particle& Child0Child0  = Child0.child(0);        // K+ or K-
-    Particle& Child0Child1  = Child0.child(1);        // K- or pi- or pi+
-    Particle& Child1        = P.child(1);             // pi+ or K
-
-    if (!&Child0.userInfo()) createUserInfo(Child0);
-    UserInfo& infoChild0    = dynamic_cast<UserInfo&>(Child0.userInfo());
-
-    if (!&Child0Child0.userInfo()) createUserInfo(Child0Child0);
-    UserInfo& infoChild0Child0 = dynamic_cast<UserInfo&>(Child0Child0.userInfo());
-
-    if (!&Child0Child1.userInfo()) createUserInfo(Child0Child1);
-    UserInfo& infoChild0Child1 = dynamic_cast<UserInfo&>(Child0Child1.userInfo());
-
-    if (!&Child1.userInfo()) createUserInfo(Child1);
-    UserInfo& infoChild1 = dynamic_cast<UserInfo&>(Child1.userInfo());
-
-
-    int lundChild0          = (int)Child0.lund();
-    int lundChild0Child0    = (int)Child0Child0.lund();
-    int lundChild0Child1    = (int)Child0Child1.lund();
-    int lundChild1          = (int)Child1.lund();
-
-    double piPlusPID  = -1.,
-           piMinusPID = -1.,
-           kPlusPID   = -1.,
-           kMinusPID  = -1.;
-
-    if (lundDs < 0) {                 // Ds-
-        piPlusPID = -1.;
-        if (lundChild0 == 333) {      // phi0
-            kMinusPID  = infoChild0Child0.probpid();
-            kPlusPID   = infoChild0Child1.probpid();
-            piMinusPID = infoChild1.probpid();
-        }
-        else
-            if (lundChild0 == 313) { // K*0
-            kPlusPID   = infoChild0Child0.probpid();
-            piMinusPID = infoChild0Child1.probpid();
-            kMinusPID  = infoChild1.probpid();
-        }
-    } else
-        if (lundDs > 0) {                 // Ds+
-            piMinusPID = -1.;
-            if (lundChild0 == 333) {      // phi0
-                kMinusPID = infoChild0Child0.probpid();
-                kPlusPID  = infoChild0Child1.probpid();
-                piPlusPID = infoChild1.probpid();
-            } else
-            if (lundChild0 == -313) {     // anti-K*0
-                kMinusPID = infoChild0Child0.probpid();
-                piPlusPID = infoChild0Child1.probpid();
-                kPlusPID  = infoChild1.probpid();
+        for (int j_child = 0; j_child < Mother.nChildren(); ++j_child) {
+            Particle& child = Mother.child(j_child);
+            int lund_child   = int(child.lund());
+            bool is_child_trk = isLikeTrk(lund_child);
+            if (!is_child_trk) {
+                if (!&child.userInfo()) createUserInfo(child);
+                UserInfo& info_child = dynamic_cast<UserInfo&>(child.userInfo());
+                double chi2_child = info_child.chisqKvf();
+                if (chi2_child < 0.) {
+                    makeRecursiveVertexFit(child, debugDump);
+                    }
+                }
+            addTrack2fit(kvf_mother, child);
             }
+        if (addBeam && Belle::IpProfile::usable()) addBeam2fit(kvf_mother);
+    //    if (info_mother.useTube()) addTube2fit(kvf_mother);
+        kvf_error = kvf_mother.fit();
+
+        // If OK, 0 is returned
+        if (kvf_error) {
+            setIncorrectVertexFitResult(Mother);
+//            return;
+        }
+
+        kmm_error = makeMother(kvf_mother, Mother);
+        // if OK, 1 is returned
+        if (!kmm_error) {
+            setIncorrectVertexFitResult(Mother);
+//            return;
+        }
+        Mother.momentum().decayVertex(kvf_mother.vertex(), kvf_mother.errVertex());
+        info_mother.msKvf(Mother.p().m());
+        info_mother.chisqKvf(kvf_mother.chisq());
+        info_mother.chisqKvfNdf(kvf_mother.chisq() / kvf_mother.dgf());
+        info_mother.clKvf(kvf_mother.cl());
+        info_mother.dist2IP(distanceToIP(Mother));
+
+        for (int j_child = 0; j_child < Mother.nChildren(); ++j_child) {
+            Particle& child = Mother.child(j_child);
+            int lund_child = int(child.lund());
+            bool is_child_trk = isLikeTrk(lund_child);
+            if (!is_child_trk) {
+                UserInfo& infoChild = dynamic_cast<UserInfo&>(child.userInfo());
+                double dx = Mother.momentum().decayVertex().x() - child.momentum().decayVertex().x();
+                double dy = Mother.momentum().decayVertex().y() - child.momentum().decayVertex().y();
+                double dz = Mother.momentum().decayVertex().z() - child.momentum().decayVertex().z();
+                double dist2Mother = std::sqrt(dx * dx + dy * dy + dz * dz);
+                infoChild.dist2Mother(dist2Mother);
+                }
+            }
+
+        if (evtNo == 470) {
+            std::cout << "**3, "  << lund_mother << std::endl;
+            }
+        // Checking for long-living particles as a criteria of mass-constraint fit
+        if ((info_mother.useKmvf() || useKmvf) && info_mother.chisqKmvf() < 0.) {
+            // use additional mass-vertex fitter to correct the position (?) and LV
+            kmassvertexfitter kmvf_mother;
+            if (useBF) kmvf_mother.magneticField(BF);
+            int kmvf_error = 0;
+            if (useBF) kmvf_mother.magneticField(BF);
+            kmvf_mother.invariantMass(Mother.pType().mass());
+            for (int j_child = 0; j_child < Mother.nChildren(); ++j_child)
+                addTrack2fit(kmvf_mother, Mother.child(j_child));
+
+            kmvf_error = kmvf_mother.fit();
+            if (kmvf_error) {
+                setIncorrectVertexFitResult(Mother);
+            }
+            kmm_error = makeMother(kmvf_mother, Mother);
+            if (!kmm_error) {
+                setIncorrectVertexFitResult(Mother);
+            }
+            if (evtNo == 470) {
+                std::cout << "**4, "  << lund_mother << std::endl;
+            }
+            Mother.momentum().decayVertex(kmvf_mother.vertex(), kmvf_mother.errVertex());
+            info_mother.clKmvf(kmvf_mother.cl());
+            info_mother.dist2IPKmvf(distanceToIP(Mother));
+            info_mother.msKmvf(Mother.p().m());
+            info_mother.chisqKmvf(kmvf_mother.chisq());
+            info_mother.chisqKmvfNdf(kmvf_mother.chisq() / kmvf_mother.dgf());
+
+        }
+        if (evtNo == 470) {
+            std::cout << "**5, "  << lund_mother << std::endl;
+        }
+        Mother.userInfo(info_mother);
     }
-
-
-
-
-
-    double psr_ds_Ch0       = pStar(Child0.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
-    double px_ds_Ch0        = Child0.px();
-    double py_ds_Ch0        = Child0.py();
-    double pz_ds_Ch0        = Child0.pz();
-
-    // Probability of particle identification for the first Ds'd child children
-    double probPidChild0 = infoChild0.probpid();
-
-    Hep3Vector Child03D(px_ds_Ch0, py_ds_Ch0, pz_ds_Ch0);
-
-    double psr_ds_Ch1    = pStar(Child1.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
-    double px_ds_Ch1     = Child1.px();
-    double py_ds_Ch1     = Child1.py();
-    double pz_ds_Ch1     = Child1.pz();
-
-    // Probability of particle identification for the second Ds'd child (pi or K)
-    double probPidChild1 = infoChild1.probpid();
-    Hep3Vector Child13D  (px_ds_Ch1, py_ds_Ch1, pz_ds_Ch1);
-
-    std::string dgrSuff = "_ds" + sfxDs, genDgrSuff = "_ds_t" + sfxDs;
-
-    const int nValI = 2; 
-    const int nValD = 33;
-    int valPclI[nValI]    = {signPcl, gen_pcl};
-    double valPclD[nValD] = {msKvf,
-                             msKmvf,
-                             msComb,
-                             chisqKvf,
-                             chisqKmvf,
-                             probChisqKvf,
-                             probChisqKmvf,
-                             cl,
-                             clKvf,
-                             clKmvf,
-                             production_vx_ds,
-                             production_vy_ds,
-                             production_vz_ds,
-                             xx_ds,
-                             xy_ds,
-                             xz_ds,
-                             decay_vx_ds,
-                             decay_vy_ds,
-                             decay_vz_ds,
-                             psr_ds,
-                             px_ds,
-                             py_ds,
-                             pz_ds,
-                             py_ds,
-                             perp_ds,
-                             phi_ds,
-                             theta_ds,
-                             probPidChild0,
-                             probPidChild1,
-                             kPlusPID,
-                             kMinusPID,
-                             piPlusPID,
-                             piMinusPID
-    };
-    std::string pclTitI[nValI] = {"chg", "gen"};
-    std::string pclTitD[nValD] = {
-                                  "msV",
-                                  "msM",
-                             "msC",
-                             "chiV",
-                             "chiM",
-                             "prbV",
-                             "prbM",
-                             "cl",
-                             "clV",
-                             "clM",
-                             "pVx",
-                             "pVy",
-                             "pVz",
-                             "xx",
-                             "xy",
-                             "xz",
-                             "dVx",
-                             "dVy",
-                             "dVz",
-                             "psr",
-                             "px",
-                             "py",
-                             "pz",
-                             "p",
-                             "pt",
-                             "ph",
-                             "th",
-                             "id0",
-                             "id1",
-                             "kpp",
-                             "kmp",
-                             "ppp",
-                             "pmp"
-    };
-
-    VectorL dssL = getGenVectorL(IDhep(P));
-
-
-    // =============== Printing option for debugging =================
-    // ===== Does not have a physics- or reconstruction sence ========
-    // May just skip, set to True to display and/or print in stdout ==
-    if (debugDump) {
-        printf("\n======== Dss  ========= sfx:%s, chg_ds:%i, gen_ds:%i, ms_ds:%7.3f , child ( ms:%7.3f ) \n", 
-               genDgrSuff.c_str(), signPcl, gen_pcl, msKvf, Child0.p().m());
-        printUserInfo(P);
-    }
-    // ================================================================
-    // ================================================================
-    // ================================================================
-
-    tt->column("hel_ch" + sfxDs, helicChild1);
-    dumpValues(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
-    dumpGenValues(tt, gen_pcl, dssL, genDgrSuff, debugDump);
-    dumpDsChild(tt, Child0, sfxDs, false, false, debugDump);
-    if (stDump) tt->dumpData();
-}
-// ***********************************************************
-void dumpDs2317(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDump = false, bool stDump = true, bool debugDump = false) {
-
-    if (evtInfoDump) dumpEventInfo(tt, debugDump);
-
-    if (!&P.userInfo()) createUserInfo(P);
-    UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
-    if (info.chisqKvf() < 0.) {
-        // particle has not been vertexed yet
-        makeRecursiveVertexFit(P, debugDump);
-    }
-    
-    double chisqKvf      = info.chisqKvf();       // -1.; //
-    double chisqKmvf     = info.chisqKmvf();
-    double probChisqKvf  = info.probChi2Kvf();
-    double probChisqKmvf = info.probChi2Kmvf();
-    double msComb        = info.msComb();
-    double msKvf         = info.msKvf();         // dgr.p().m(); //
-    double msKmvf        = info.msKmvf();        // -1.; //
-    double cl            = info.cl();
-    double clKvf         = info.clKvf();
-    double clKmvf        = info.clKmvf();
-    double helic_2317    = -1.;
-    
-
-    Particle& Child           = P.child(0);
-    Particle& pi0_2317        = P.child(1);
-    UserInfo& infoChild       = dynamic_cast<UserInfo&>(Child.userInfo());
-    UserInfo& infoPi0_2317    = dynamic_cast<UserInfo&>(pi0_2317.userInfo());
-
-    double msKvfChild         = infoChild.msKvf();
-    double psr_d17            = pStar(P.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
-    double px_d17             = P.px();
-    double py_d17             = P.py();
-    double pz_d17             = P.pz();
-    double p_d17              = P.momentum().p().mag();
-    double production_vx_d17  = P.momentum().vertex().x();
-    double production_vy_d17  = P.momentum().vertex().y();
-    double production_vz_d17  = P.momentum().vertex().z();
-    double xx_d17             = P.momentum().x().x();
-    double xy_d17             = P.momentum().x().y();
-    double xz_d17             = P.momentum().x().z();
-    double decay_vx_d17       = P.momentum().decayVertex().x();
-    double decay_vy_d17       = P.momentum().decayVertex().y();
-    double decay_vz_d17       = P.momentum().decayVertex().z();
-
-
-    Hep3Vector P3D            (px_d17, py_d17, pz_d17);
-    double perp_d17           = P3D.perp();
-    double phi_d17            = P3D.phi();
-    double theta_d17          = P3D.theta();
-    int chg_d17               = (int)P.lund() >  0 ? 1 : -1;
-    int gen_d17               = (int)IDhep(P) == 0 ? 0 :  1;
-    
-    const int nValI = 2;
-    const int nValD = 28;
-    int valPclI[nValI] = {chg_d17, gen_d17};
-    double valPclD[nValD] = {msKvf,
-                             msKmvf,
-                             msComb,
-                             chisqKvf,
-                             chisqKmvf,
-                             probChisqKvf,
-                             probChisqKmvf,
-                             cl,
-                             clKvf,
-                             clKmvf,
-                             production_vx_d17,
-                             production_vy_d17,
-                             production_vz_d17,
-                             xx_d17,
-                             xy_d17,
-                             xz_d17,
-                             decay_vx_d17,
-                             decay_vy_d17,
-                             decay_vz_d17,
-                             psr_d17,
-                             px_d17,
-                             py_d17,
-                             pz_d17,
-                             p_d17,
-                             perp_d17,
-                             phi_d17,
-                             theta_d17,
-                             helic_2317
-    };
-    std::string pclTitI[nValI] = {"chg", "gen"};
-    std::string pclTitD[nValD] = {"msV",
-                             "msM",
-                             "msC",
-                             "chiV",
-                             "chiM",
-                             "prbV",
-                             "prbM",
-                             "cl",
-                             "clV",
-                             "clM",
-                             "pVx",
-                             "pVy",
-                             "pVz",
-                             "xx",
-                             "xy",
-                             "xz",
-                             "dVx",
-                             "dVy",
-                             "dVz",
-                             "psr",
-                             "px",
-                             "py",
-                             "pz",
-                             "p",
-                             "pt",
-                             "ph",
-                             "th",
-                             "hel"
-    };
-
-    std::string dgrSuff = "_d17", genDgrSuff = "_d17_t";
-
-    // =============== Printing option for debugging =================
-    // ===== Does not have a physics- or reconstruction sence ========
-    // May just skip, set to True to display and/or print in stdout ==
-    if (debugDump) {
-        printf("\n======== Ds(2317)  ========= chg_2317:%i, gen_2317:%i, ms_2317:%7.3f , child ( ms:%7.3f ) \n", 
-               chg_d17, gen_d17, msKvf, msKvfChild);
-        printUserInfo(P);
-    }
-    // ================================================================
-    // ================================================================
-    // ================================================================
-
-
-    // std::string s_2317_gen = " ms_d17_t px_d17_t py_d17_t pz_d17_t e_d17_t ";
-    VectorL ds17L = getGenVectorL(IDhep(P));
-
-    dumpValues(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
-    dumpGenValues(tt, gen_d17, ds17L, genDgrSuff, debugDump);
-    dumpPi0(tt, pi0_2317, "_p0_d", debugDump);
-    dumpDs(tt, Child, sfxDs, false, false, debugDump);
-
-    if (stDump) tt->dumpData();
-}   
-// ***********************************************************
-void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
-                 bool stDump = true, bool debugDump = true) {
-
-    if (evtInfoDump) dumpEventInfo(tt, debugDump);
-
-    if (!&P.userInfo()) createUserInfo(P);
-    UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
-
-    /* Checking whether the particle candidate has been vertexed
-     * Mass-constraint fitting (Kmvf) is impossible to perform without using
-     * a simple vertex fit (Kvf). So, the chisqKvf != -1., is a valid criteria
-     * to find out the particle's vertex fit status.
-    */
-    if (info.chisqKvf() < 0.) {
-        // particle has not been vertexed yet
-        makeRecursiveVertexFit(P, debugDump);
-    }
-    // Retrieval of the values after vertex fitting
-    double chisqKvf      = info.chisqKvf();      // -1.; //
-    double chisqKmvf     = info.chisqKmvf();
-    double probChisqKvf  = info.probChi2Kvf();
-    double probChisqKmvf = info.probChi2Kmvf();
-    double msComb        = info.msComb();
-    double msKvf         = info.msKvf();         // dgr.p().m(); //
-    double msKmvf        = info.msKmvf();        // -1.; //
-    double cl            = info.cl();
-    double clKvf         = info.clKvf();
-    double clKmvf        = info.clKmvf();
-
-    Particle& Dss_Bs0 = P.child(0);
-    Particle& Dss2317_Bs0 = P.child(1);
-    Particle& pi0_Bs0 = P.child(2);
-    Particle& pi0_Ds2317 = Dss2317_Bs0.child(1);
-
-    double px_bs = P.px();
-    double py_bs = P.py();
-    double pz_bs = P.pz();
-    double p_bs  = P.momentum().p().mag();
-
-    double xx_bs = P.momentum().x().x();
-    double xy_bs = P.momentum().x().y();
-    double xz_bs = P.momentum().x().z();
-
-    Hep3Vector P3D(px_bs, py_bs, pz_bs);
-
-    double perp_bs = P3D.perp();
-    double phi_bs  = P3D.phi();
-    double theta_bs = P3D.theta();
-
-    double production_vx = P.momentum().vertex().x();
-    double production_vy = P.momentum().vertex().y();
-    double production_vz = P.momentum().vertex().z();
-
-    double decay_vx = P.momentum().decayVertex().x();
-    double decay_vy = P.momentum().decayVertex().y();
-    double decay_vz = P.momentum().decayVertex().z();
-    int gen_bs = (int)IDhep(P) == 0 ? 0 : 1;
-    int chg_bs = (int)P.lund() > 0 ? 1 : -1;
-    
-
-    VectorL pB = pStar(P.p()); // ??? have to ensure that it's chosen properly
-    VectorL pB2 = pStar(P.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle());
-    double de_bs_old = pB.e() - Benergy();
-    double de_bs = pB.e() - BeamEnergy::E_beam_corr();
-    double de2_bs = pB2.e() - BeamEnergy::E_beam_corr();
-    double mbc_bs_old = beamEnergyConstraint(P);
-    double mbc_bs    = beamEnergyConstraint(P, BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle() * 1.e3);
-    
-    const int nValI = 2; 
-    const int nValD = 29;
-    int valPclI[nValI] = {chg_bs, gen_bs};
-    double valPclD[nValD] = {msKvf,
-                             msKmvf,
-                             msComb,
-                             chisqKvf,
-                             chisqKmvf,
-                             probChisqKvf,
-                             probChisqKmvf,
-                             cl,
-                             clKvf,
-                             clKmvf,
-                             production_vx,
-                             production_vy,
-                             production_vz,
-                             xx_bs,
-                             xy_bs,
-                             xz_bs,
-                             decay_vx,
-                             decay_vy,
-                             decay_vz,
-                             px_bs,
-                             py_bs,
-                             pz_bs,
-                             p_bs,
-                             perp_bs,
-                             phi_bs,
-                             theta_bs,
-                             mbc_bs,
-                             de_bs,
-                             de2_bs
-    };
-    std::string pclTitI[nValI] = {"chg", "gen"};
-    std::string pclTitD[nValD] = {"msV",
-                             "msM",
-                             "msC",
-                             "chiV",
-                             "chiM",
-                             "prbV",
-                             "prbM",
-                             "cl",
-                             "clV",
-                             "clM",
-                             "px",
-                             "py",
-                             "pz",
-                             "p",
-                             "pVx",
-                             "pVx",
-                             "pVy",
-                             "xx",
-                             "xy",
-                             "xz",
-                             "dVz",
-                             "dVy",
-                             "dVz",
-                             "pt",
-                             "ph",
-                             "th",
-                             "mbc",
-                             "de",
-                             "de2"
-    };
-
-
-    // =============== Printing option for debugging =================
-    // ===== Does not have a physics- or reconstruction sence ========
-    // May just skip, set to True to display and/or print in stdout ==
-    if (debugDump) {
-        printf("\n\n======== Bs0  ========= chg_bs:%i,  gen_bs:%i, ms_bs:%7.3f , de_bs: %7.3f , de_bs_old: %7.3f, mbc_bs: %7.3f , mbc_bs_old: %7.3f \n", 
-               chg_bs, gen_bs, msKvf, de_bs, de_bs_old, mbc_bs, mbc_bs_old);
-        printUserInfo(P);
-    }
-    // ================================================================
-    // ================================================================
-    // ================================================================
-
-    VectorL bs0L = getGenVectorL(IDhep(P));
-    std::string genSfx = "_bs_t";
-
-    dumpValues   (tt,  nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, "_bs", debugDump);
-    dumpGenValues(tt, gen_bs, bs0L, genSfx, debugDump);
-    dumpPi0      (tt, pi0_Bs0,     "_p0_b", debugDump);
-    // dumpPi0   (tt, pi0_Ds2317,  "_p0_d", debugDump);
-    dumpDs       (tt, Dss_Bs0,     "1", false, false, debugDump);
-    dumpDs2317   (tt, Dss2317_Bs0, "2", false, false, debugDump);
-
-    if (stDump) tt->dumpData();
-}
-// ***********************************************************
-void printVectPclWithChildren(std::vector<Particle>& pcl, const std::string& tit = "") {
-    if (pcl.size() > 0) {
-        printf("    ---- %s [%i] ----- \n", tit.c_str(), pcl.size());
-        for (int i = 0; i < pcl.size(); ++i) {
-            printPclDebug(pcl[i]);
-            for (int ich = 0; ich < pcl[i].nChildren(); ++ich)
-                printPclDebug(pcl[i].child(ich));
+    // ***********************************************************
+    void makeRecursiveVertexFit(vector<Particle>& p_list, bool debugDump = false, bool useKmvf = false) {
+        // fit DecayMother -> DecayChild1 + DecayChild2 + ... + trk1 + trk2 + ...
+        for (size_t i = 0; i < p_list.size(); ++i) {
+            makeRecursiveVertexFit(p_list[i], debugDump, useKmvf);
         }
     }
-    printf("\n");
-}
-// ***********************************************************
+    // ***********************************************************
+    void clearVectors() {
+        // clear all vectors
+        for (int i = 0; i < nTrk; ++i) trkV[i].clear();
+        gammaV.clear();
+        pi0.clear();
+        phi0.clear();
+        Ksr0.clear();
+        Ksr0bar.clear();
+        Dss_p.clear();
+        Dss_m.clear();
+        Dss_m_2317.clear();
+        Dss_p_2317.clear();
+        Bs0.clear();
+        Bs0bar.clear();
+        // BsStar0.clear();
+        // BsStar0bar.clear();
+        // Upsilon_5S.clear();
+    }
+    // ***********************************************************
+    double getHelicity(VectorL& mother, VectorL& dght, VectorL& grndDght) {
+        Hep3Vector V1_boost = -dght.boostVector();
+        VectorL mother_boosted = mother;
+        VectorL grndDght_boosted = grndDght;
+        mother_boosted.boost(V1_boost);
+        grndDght_boosted.boost(V1_boost);
+        double helic = -mother_boosted.vect().unit().dot(grndDght_boosted.vect().unit());
+        return helic;
+    }
+    // ***********************************************************
 
+    double getHelicity(Particle& p, int indDough = 0) {
+        if (p.nChildren() == 0) return -1;
 
+        VectorL mother   = p.p();
+        VectorL dght     = p.child(indDough).p();
+        VectorL grndDght = p.child(indDough).child(0).p();
+        double helic = getHelicity(mother, dght, grndDght);
+        return helic;
+    }
+    // **********************************************************
+    void withKaonId(std::vector<Particle>& p_list, const double prob, int accq0, int tofq0, int cdcq0, int ids0, int idb0) {
+        atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
+        for (size_t i = 0; i < p_list.size(); ++i) {
+            Particle& P = p_list[i];
+            double probParticle = kid.prob(&(P.mdstCharged()));
 
-/*
- * The main function. Events processing takes place here
-*/
-void Reco::event(BelleEvent* evptr, int* status) {
-    *status = 0;
-    bool debugTrkPID   = false,
-         debugVtx      = false,
-         debugPi0      = false,
-         debugPhiKsr   = false,
-         debugDss      = false,
-         debugDss_2317 = false,
-         debugBs0      = false,
-         debugDumpDss  = false,
-         debugDump2317 = false,
-         debugDumpBs0  = false;
+            if (P.mdstCharged() && probParticle >= prob) {
 
-    // IP information
-    const HepPoint3D& ip_position = IpProfile::position();
-    const HepSymMatrix& ip_error  = IpProfile::position_err();
-    // Gen_hepevt_Manager& hepevt = Gen_hepevt_Manager::get_manager();
+                if (!&P.userInfo()) createUserInfo(P);
+                UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
+                info.probPid(probParticle);
+                P.userInfo(info);
+                }
+            else {
+                p_list.erase(p_list.begin() + i);
+                --i;
+                }
+            }
+        }
 
-    // Event Information
-    int expNo = 0, runNo = 0, evtNo = 0;
-    getEventInfo(expNo, runNo, evtNo, McFlag); // utility.cc
-    // printf("\n---- exp:%2i,  run:%2i, evt:%i, ip_position:[%f, %f, %f] ----\n",
-    // expNo,runNo,evtNo, ip_position.x(), ip_position.y(), ip_position.z() );
-    // printf("\n\n***************** exp:%2i,  run:%2i, evt:%i *********************\n", expNo, runNo, evtNo);
-    std::cout << "\tExpNo: " << expNo << "\tRunNo: " << runNo << "\tEventNo: " << "\tMcFlag: " << McFlag << std::endl;
-  
-    // Event Shape
-    double r2 = -1.;
+    void withPionId(std::vector<Particle>& p_list,
+                    const double prob, int accq0, int tofq0, int cdcq0,
+                    int ids0, int idb0) {
+        /* ************* THE FUNCTION'S ANNOTATION **************
+         * Combine informations from ACC, TOF and CDC (dE/dx)
+         * in order to separate e+-, mu+-, K+-, pi+-, p+-
+         * atc_pid returns a likelihood ratio which is called
+         * probParticle that compares two particles i and j:
+         * Prob(i : j) = L(i) / (L(i) + L(j))
+         * For example, Prob(K : pi) tends to be 1 if the
+         * charged paritcle is K-like,
+         * and tends to be 0 if it is pi-like.
+         * Apparently, Prob(K : pi) = 1 - Prob(pi : K).
+         * Prob(K : pi) is NOT a probability to be a kaon.
+         * accq0, tofq0, cdcq0: flags for each detector
+         * accq0 = 3, tofq0 = 1, cdcq0 = 5 are the
+         * default and recommended values;
+         * ids0, idb0 -- signal and background species.
+         * 0 for e,
+         * 1 for mu,
+         * 2 for pi,
+         * 3 for K and
+         * 4 for p.
+         * By default, ids0 = 3 and idb0 = 2 (K against pi).
+         * */
 
-    Evtcls_hadron_info_Manager& clsMgr = Evtcls_hadron_info_Manager::get_manager();
-    if (clsMgr.count()) r2 = clsMgr[0].R2();
+        atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
 
-    // //////////////////  make charged particles - tracks //////////////////
-    // makes Kaon and Pion from MdstCharged w/o cut. 1 : w/ good_charged, 0 : w/ol
-    // ////////////////// ORDER: k_p, k_m, pi_p, pi_m ///////////////////////
-    makeKPi(trkV[2], // k_p
-            trkV[3], // k_m
-            trkV[0], // pi_p
-            trkV[1], // pi_m
-            1);
+        for (size_t i = 0; i < p_list.size(); ++i) {
+            Particle& P = p_list[i];
+            double probParticle = kid.prob(&(P.mdstCharged()));
+            if (P.mdstCharged() && probParticle < prob) { // a big difference compated to withKaonId
 
-    if (debugTrkPID) {
-        printf("\n");
-        printf("---- exp:%2i,  run:%2i, evt:%i ----\n", expNo, runNo, evtNo);
-        for (int itr = 0; itr < nTrk; ++itr)
-            printTrkPID(trkV[itr], trkTit[itr], "before");
+                if (!&P.userInfo()) createUserInfo(P);
+                UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
+                info.probPid(probParticle);
+                P.userInfo(info);
+                }
+            else {
+                p_list.erase(p_list.begin() + i);
+                --i;
+                }
+            }
+        }
+    // #=============== ================ ================#
+
+    // **********************************************************
+    // Modify this function
+    // Make sure that this function returns a correct value
+    int getEvtGenType() {
+        // 0:"Data", 1:"evtgen-charged", 2:"evtgen-mixed", 3:"evtgen-charm", 4:"evtgen-uds", 5:"evtgen-bsbs", 6:"evtgen-nonbsbs"
+        Gen_hepevt_Manager& genMgr = Gen_hepevt_Manager::get_manager();
+        int status = 0;
+
+        for (std::vector<Gen_hepevt>::iterator i = genMgr.begin(); i != genMgr.end(); ++i) {
+            int idhep = i->idhep();
+            switch (std::abs(idhep)) {
+                case 533:
+                    status = 1; // Bs0* (vector)
+                    break;
+                case 531:
+                    status = 2; // Bs0  (scalar)
+                    break;
+                case 431:
+                    status = 3; // Ds+-
+                    break;
+                case 10431:
+                    status = 4; // Ds1*(2317)
+                    break;
+                case 4:
+                    status = 5; // ccbar
+                    break;
+                case 3:
+                case 2:
+                case 1:
+                    status = 6; // uds
+                    break;
+            }
+        }
+        return status;
+    }
+    // ***********************************************************
+    void addEventValues2Columns(BelleTuple* tt, bool debugDump = false) {
+        // Event Information
+        int expNo, runNo, evtNo;
+        getEventInfo(expNo, runNo, evtNo, McFlag); // utility.cc
+        const HepPoint3D& ip_position = IpProfile::position(1);
+        const HepSymMatrix& ip_error = IpProfile::position_err(1);
+
+        int idGenType = getEvtGenType();
+
+        // Event Shape
+        double  r2 = -1.;
+        Evtcls_hadron_info_Manager& clsMgr = Evtcls_hadron_info_Manager::get_manager();
+        if (clsMgr.count()) r2 = clsMgr[0].R2();
+
+        tt->column("expn",  expNo); // Exp #
+        tt->column("runn",  runNo); // Run #
+        tt->column("evtn",  evtNo);
+        tt->column("ipx",   ip_position.x());
+        tt->column("ipy",   ip_position.y());
+        tt->column("ipz",   ip_position.z());
+        // ************* Signal shape ********
+        tt->column("r2", r2);
+        // *************  MC  ****************
+        tt->column("evtgen", idGenType);
+    }
+    // ***********************************************************
+    VectorL getGenVectorL(int idhPcl) {
+        VectorL pclL;
+        int ID_Pcl = -1;
+        Gen_hepevt_Manager& genMgr = Gen_hepevt_Manager::get_manager();
+        for (std::vector<Gen_hepevt>::iterator itr = genMgr.begin(); itr != genMgr.end(); ++itr) {
+            int idh = itr->idhep();
+            if (idh == idhPcl) { // Ds+/-
+                ID_Pcl = (*itr).get_ID();
+                pclL.setPx(genMgr[ID_Pcl - 1].PX());
+                pclL.setPy(genMgr[ID_Pcl - 1].PY());
+                pclL.setPz(genMgr[ID_Pcl - 1].PZ());
+                pclL.setE (genMgr[ID_Pcl - 1].E());
+            }
+        }
+        return pclL;
+    }
+    // ***********************************************************
+    void addPi0Values2Columns(BelleTuple* tt, Particle& p0, const std::string& sfx, bool debugDump) {
+
+        if (!&p0.userInfo()) createUserInfo(p0);
+        UserInfo& p0_info = dynamic_cast<UserInfo&>(p0.userInfo());
+
+        Particle& g1 = p0.child(0);
+        Particle& g2 = p0.child(1);
+
+        double msPi0_gg = (g1.p() + g2.p()).m();
+        double psrPi0   = pStar(p0.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
+        double pPi0     = p0.momentum().p().mag();
+
+        bool gen_pi0 = getIdHep(p0) == 0 ? false : true;
+        bool gen_g1  = getIdHep(g1) == 0 ? false : true;
+        bool gen_g2  = getIdHep(g2) == 0 ? false : true;
+
+        const int nValI = 3;
+        const int nValD = 13;
+
+        std::string pclTitI[nValI] = {"gen",   "gg1",  "gg2"};
+        int valPclI[nValI]         = {gen_pi0, gen_g1, gen_g2};
+        std::string pclTitD[nValD] = {"eg1", "eg2", "psr", "p", "mgg", "ms", "msm", "chi", "chm", "chn", "cmn", "cl", "clm"};
+        double valPclD[nValD]      = {g1.ptot(), g2.ptot(), psrPi0, pPi0, msPi0_gg, p0_info.msKvf(), p0_info.msKmvf(),
+                                      p0_info.chisqKvf(), p0_info.chisqKmvf(), p0_info.chisqKvfNdf(),
+                                      p0_info.chisqKmvfNdf(), p0_info.clKvf(), p0_info.clKmvf()};
+
+        for (int iVal = 0; iVal < nValI; ++iVal) tt->column(pclTitI[iVal] + sfx, valPclI[iVal]);
+        for (int iVal = 0; iVal < nValD; ++iVal) tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
     }
 
-    // If each plist element is not within atc_pID.prob >= prob,
-    // its element is removed from plist.
-    // ----------------- pos kaons ---- defalut values - kaons - pions
-    withKaonId(trkV[2], minProbPID_Kp,  3,    1,     5,  3,      2);      // K+ vs bg pi
-    // ----------------- neg kaons ---- defalut values - kaons - pions
-    withKaonId(trkV[3], minProbPID_Kn,  3,    1,     5,  3,      2);      // K- vs bg pi
-
-    // Comparison with protons is not needed to be implemented in the
-    // kind of processes that are taken place in this
-    // analysis (Bs --> Ds+ Ds0*(2317)- pi0)
-    // withKaonId(trkV[2], minProbPID_Kp, 3, 1, 5, 3, 4);   // K+ vs bg p
-    // withKaonId(trkV[3], minProbPID_Kn, 3, 1, 5, 3, 4);   // K- vs bg p
-
-    // If each plist element is not within atc_pID.prob < prob,
-    // its element is removed from plist.
-    // ----------------- pos pions ---- defalut values - kaons - pions
-    withPionId(trkV[0], maxProbPion,    3,    1,     5,  3,      2);        // pi+ vs bg K
-    // ----------------- neg pions ---- defalut values - kaons - pions
-    withPionId(trkV[1], maxProbPion,    3,    1,     5,  3,      2);        // pi- vs bg K
-
-    // The same story as above: protonts are not considered
-    // withPionId(trkV[0], maxProbPion, 3, 1, 5, 4, 2);     // pi+ vs bg p
-    // withPionId(trkV[1], maxProbPion, 3, 1, 5, 4, 2);     // pi- vs bg p
-
-
-    // If each plist element is not associated with rphi & z-svd hits
-    // whose number is equal to or larger than nRSvdHit and nZSvdHit,
-    // its element is removed from plist.
-    for (int itr = 0; itr < nTrk; ++itr) {
-        withSVD2(trkV[itr], 1, 1); // nRSvdHit, nZSvdHit
-        withdRdZcut(trkV[itr], ip_position, dRcut, dZcut);
+    // ***********************************************************
+    void addValues2Columns(BelleTuple* tt, int nValI, int nValD, int* valPclI, double* valPclD, std::string* pclTitI, std::string* pclTitD,
+                           const std::string& sfx, bool debugDump) {
+        for (int iVal = 0; iVal < nValI; ++iVal)
+            tt->column(pclTitI[iVal] + sfx, valPclI[iVal]);
+        for (int iVal = 0; iVal < nValD; ++iVal)
+            tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
     }
+    // ***********************************************************
+    void addGenValues2Columns(BelleTuple* tt, bool gen_pcl, VectorL pclL, const std::string& sfx, bool debugDump) {
+        const std::size_t nValD = 9;
+        const std::string pclTitD[nValD] = {"ms", "px", "py", "pz", "e", "th", "ct", "ph", "rh"};
+        double valPclD[nValD];
 
-    if (debugTrkPID) {
-        for (int itr = 0; itr < nTrk; ++itr)
-            printTrkPID(trkV[itr], trkTit[itr], "after");
-    }
+        if (gen_pcl) {
+            valPclD[0] = pclL.m();
+            valPclD[1] = pclL.px();
+            valPclD[2] = pclL.py();
+            valPclD[3] = pclL.pz();
+            valPclD[4] = pclL.e();
+            valPclD[5] = pclL.theta();
+            valPclD[6] = pclL.cosTheta();
+            valPclD[7] = pclL.phi();
+            valPclD[8] = pclL.rho();
+        } else {
+            std::fill_n(valPclD, nValD, -0.99);
+        }
 
-    // ================= WORKING WITH Gamma CANDIDATES ================= //
-    makeGamma(gammaV);
-    withPCut(gammaV, eGammaMin);
-
-    if(useVTX) {
-        for (std::vector<Particle>::iterator itr = gammaV.begin(); itr != gammaV.end(); ++itr) {
-            setGammaError(*itr, ip_position, ip_error); // changed from setGammasError
+        for (std::size_t iVal = 0; iVal < nValD; ++iVal) {
+            tt->column(pclTitD[iVal] + sfx, valPclD[iVal]);
         }
     }
+    // ***********************************************************
+    void dumpDsChild(BelleTuple* tt, Particle& P, const std::string& sfxDs = "",
+                     bool evtInfoDump = false,
+                     bool stDump = true, bool debugDump = false) {
 
-    // Match gamma candidates with their genhep info
-    if (McFlag) {
-        setGenHepInfoG(gammaV);
-    }
+        if (evtInfoDump) addEventValues2Columns(tt, debugDump);
 
-    createUserInfo(gammaV);
+        int lund = int(P.lund());
 
+        if (!&P.userInfo()) createUserInfo(P);
+        UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
 
-    // =================   WORKING WITH Pi0 CANDIDATES ================= //
-    makePi0(pi0);
-    // Checking gammas' energies for all the pi0 daughters
-    withPi0GammPCut(pi0, minPi0GammP);
-    // !!!! PAY ATTENTION. Start point
+        double chisqKvf      = info.chisqKvf();
+        double chisqKmvf     = info.chisqKmvf();
+        double chisqKvfNdf   = info.chisqKvfNdf();
+        double chisqKmvfNdf  = info.chisqKmvfNdf();
+        double msKvf         = info.msKvf();
+        double msKmvf        = info.msKmvf();
+        double clKvf         = info.clKvf();
+        double clKmvf        = info.clKmvf();
+        double helic         = info.helicity();
 
-    // Creating UserInfo objects in memory storage for the selected pi0's
-    createUserInfo(pi0);
-
-    // Setting error matrices for both pi0 daughters gamma
-    // it's necessary for vertex fitting
-    for (std::vector<Particle>::iterator itr = pi0.begin(); itr != pi0.end(); ++itr) {
-        setGammasError(*itr, ip_position, ip_error);
-    }
-
-    // Making a simple Kvf fit
-    makeRecursiveVertexFit(pi0, false, false);
-
-    // Selecting pi0 candidates considering their reconstructed masses (mass of 2 gammas)
-    withPi0MassGamGamCut(pi0, wMassPi0GG);
-
-    // Making a mass-constraint fit for a pi0 candidate, which passed through all cuts (including gammas)
-    makeRecursiveVertexFit(pi0, false, true);
-
-
-
-    /* setPi0Error(pi0); -- it was instead of the entire chuck of code from start poit
-     * only one this line above. Make sure that it's proper for your case of analysis
-     * !!!! PAY ATTENTION. End point
-     */
-
-    if (debugPi0) {
-        printf(" pi0[%i]  \n", pi0.size());
-        printPi0(pi0);
-    }
-
-    // Match candidates with genhep info 
-    if (McFlag) {
-        for (int itr = 0; itr < nTrk; ++itr) setGenHepInfoF(trkV[itr]);
-        setGenHepInfoP(pi0);
-    }    
-    
-    combination(phi0,      Ptype("PHI"),  trkV[2],   trkV[3], dM_V0);   // k_p, k_m
-    combination(Ksr0,      Ptype("K*0"),  trkV[2],   trkV[1], dM_Ksr0); // k_p, pi_m
-    combination(Ksr0bar,   Ptype("K*B"),  trkV[3],   trkV[0], dM_Ksr0); // k_m, pi_p
-    setGenHepInfoT(phi0);
-    setGenHepInfoT(Ksr0);
-    setGenHepInfoT(Ksr0bar);
-    
-    /* if (useVTX) {
-     *     makeRecursiveVertexFit(phi0, debugVtx);
-     *     makeRecursiveVertexFit(Ksr0, debugVtx);
-     *     makeRecursiveVertexFit(Ksr0bar, debugVtx);
-     * }
-    */
-
-    
-    if (debugPhiKsr) {
-        printf("         phi0[%i]  \n", phi0.size());
-        printf("         Ksr0[%i]  \n", Ksr0.size());
-        printf("   Ksr0bar[%i]  \n", Ksr0bar.size());
-    }
-
-    combination(Dss_p, Ptype("DS+"),    phi0,     trkV[0], dM_Dss); // phi0, pi_p
-    combination(Dss_m, Ptype("DS-"),    phi0,     trkV[1], dM_Dss); // phi0, pi_m
-    combination(Dss_p, Ptype("DS+"),    Ksr0bar,  trkV[2], dM_Dss); // K*0bar (K-pi+), k_p
-    combination(Dss_m, Ptype("DS-"),    Ksr0,     trkV[3], dM_Dss); // K*0 (K+pi-), k_m
-    setGenHepInfoT(Dss_p);
-    setGenHepInfoT(Dss_m);
-
-    // checkKaonPionPID(Dss_m);
-    // checkKaonPionPID(Dss_p);
-    
-    /* if (useVTX) {
-     *     makeRecursiveVertexFit(Dss_p, debugVtx);
-     *     makeRecursiveVertexFit(Dss_m, debugVtx);
-     * }
-    */
-    
-    if (debugDss) {
-        if (Dss_p.size() + Dss_m.size() > 0) {
-            printf("\n **** debugDss ****** exp:%2i,  run:%2i, evt:%i,  *******\n", expNo, runNo, evtNo);
-            printVectPclWithChildren(Dss_p, "Ds+");
-            printVectPclWithChildren(Dss_m, "Ds-");
+        int ind_ch1 = 0;
+        int lundChild = int(P.lund());
+        std::string ChildPcl;
+        if (abs(lundChild) == 333) {
+            ChildPcl ="phipi";
+            ind_ch1  = 1;
         }
-    }
-
-
-    combination(Dss_m_2317, Ptype(-10431), Dss_m, pi0, dM_2317);
-    combination(Dss_p_2317, Ptype( 10431), Dss_p, pi0, dM_2317);
-    setGenHepInfoT(Dss_m_2317);
-    setGenHepInfoT(Dss_p_2317);
-    
-    /* if (useVTX) {
-     *     makeRecursiveVertexFit(Dss_p_2317, debugVtx);
-     *     makeRecursiveVertexFit(Dss_m_2317, debugVtx);
-     * }
-    */
-    
-    if (debugDss_2317) {
-        if (Dss_p_2317.size() + Dss_m_2317.size() > 0) {
-            printf("\n **** debugDss_2317 ****** exp:%2i,  run:%2i, evt:%i,  *******\n", expNo, runNo, evtNo);
-            printVectPclWithChildren(Dss_p_2317, "DsJ(2317)+");
-            printVectPclWithChildren(Dss_m_2317, "DsJ(2317)-");
+        if (abs(lundChild) == 313) {
+            ChildPcl = "KsrK";
+            ind_ch1  = 2;
         }
+
+        double psr_ds_child           = pStar(P.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
+        double px_ds_child            = P.px();
+        double py_ds_child            = P.py();
+        double pz_ds_child            = P.pz();
+        double decay_vx_ds_child      = P.momentum().decayVertex().x();
+        double decay_vy_ds_child      = P.momentum().decayVertex().y();
+        double decay_vz_ds_child      = P.momentum().decayVertex().z();
+
+        Hep3Vector P3D                (px_ds_child, py_ds_child, pz_ds_child);
+        double perp_ds_child          = P3D.perp();
+        double phi_ds_child           = P3D.phi();
+        double theta_ds_child         = P3D.theta();
+
+
+        std::string dgrSuff = "_ch" + sfxDs;
+        int signPcl = int(P.lund() > 0 ? 1 : -1);
+        bool gen_pcl = getIdHep(P) == 0 ? false : true;
+
+        const int nValI = 3;
+        const int nValD = 18;
+        int valPclI[nValI] = {signPcl, gen_pcl, ind_ch1};
+        double valPclD[nValD] = {msKvf, msKmvf, chisqKvf, chisqKmvf, chisqKvfNdf, chisqKmvfNdf,
+                                 clKvf, clKmvf, decay_vx_ds_child, decay_vy_ds_child, decay_vz_ds_child,
+                                perp_ds_child, phi_ds_child, theta_ds_child, psr_ds_child, px_ds_child, py_ds_child, pz_ds_child};
+
+        std::string pclTitI[nValI] = {"chg", "gen", "ind"};
+        std::string pclTitD[nValD] = {"ms", "msm", "chi", "chim", "chn", "chmn",
+                                      "cl", "clm", "dvx", "dvy", "dvz",
+                                      "pt", "ph", "th", "psr", "px", "py", "pz"};
+
+        addValues2Columns(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
+
+        if (stDump) tt->dumpData();
+    }
+    // ***********************************************************
+    std::pair<int, double> getDsChildID(Particle& DsChild,
+                                        const int accq0 = 3,
+                                        const int tofq0 = 1,
+                                        const int cdcq0 = 5) {
+
+        double ids0 = 3,
+               idb0 = 2;
+        int lund_dschild = DsChild.lund();
+        switch (std::abs(lund_dschild)) {
+            case 321:         // K
+                break;
+            case 211:         // pi
+                ids0 = 2,
+                idb0 = 3;
+                break;
+            }
+        atc_pid kid(accq0, tofq0, cdcq0, ids0, idb0);
+        return std::make_pair(DsChild.lund(), kid.prob(&(DsChild.mdstCharged())));
+        }
+    // ***********************************************************
+    std::vector<std::pair<int, double> > getDsChildrenIdentification(Particle& DsMeson) {
+                std::vector<std::pair<int, double> > values;
+                std::vector<Particle> ds_children = {
+                        DsMeson.child(0).child(0),
+                        DsMeson.child(0).child(1),
+                        DsMeson.child(1)
+                    };
+                for (std::size_t i = 0; i < ds_children.size(); ++i)
+                    values.push_back(getDsChildID(ds_children[i]));
+
+            return values;
+        }
+    // ***********************************************************
+    void dumpDs(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDump = false, bool stDump = true, bool debugDump = false) {
+
+        if (evtInfoDump) addEventValues2Columns(tt, debugDump);
+        int lundDs = int(P.lund());
+
+        // Creating a userInfo object for the Ds meson candidate
+        if (!&P.userInfo()) createUserInfo(P);
+        UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
+
+        std::vector<std::pair<int, double> > ds_child_ids = getDsChildrenIdentification(P);
+
+
+
+        double chisqKvf      = info.chisqKvf();
+        double chisqKmvf     = info.chisqKmvf();
+        double chisqKvfNdf   = info.chisqKvfNdf();
+        double chisqKmvfNdf  = info.chisqKmvfNdf();
+        double msComb        = info.msComb();
+        double msKvf         = info.msKvf();
+        double msKmvf        = info.msKmvf();
+        double clKvf         = info.clKvf();
+        double clKmvf        = info.clKmvf();
+
+
+        double psr_ds           = pStar(P.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
+        double px_ds            = P.px();
+        double py_ds            = P.py();
+        double pz_ds            = P.pz();
+        Hep3Vector P3D          (px_ds, py_ds, pz_ds);
+        double perp_ds          = P3D.perp();
+        double phi_ds           = P3D.phi();
+        double theta_ds         = P3D.theta();
+        int    signPcl          = lundDs > 0 ? 1 : -1;
+        bool   gen_pcl          = getIdHep(P) == 0 ? false : true;
+        double decay_vx_ds      = P.momentum().decayVertex().x();
+        double decay_vy_ds      = P.momentum().decayVertex().y();
+        double decay_vz_ds      = P.momentum().decayVertex().z();
+        double helicChild1      = getHelicity(P);
+        double pid00            = ds_child_ids[0].second,
+               pid01            = ds_child_ids[1].second,
+               pid10            = ds_child_ids[2].second;
+        int    c00              = ds_child_ids[0].first,
+               c01              = ds_child_ids[1].first,
+               c10              = ds_child_ids[2].first;
+
+
+        // Working with Ds+(-) children (K+(-), K-(+) and pi+(-))
+        Particle& Child0        = P.child(0);             // phi0 (--> K+ K-) or K* (--> K+ pi-), or K*bar (--> K- pi+)
+
+        std::string dgrSuff = "_ds" + sfxDs, genDgrSuff = "_ds_t" + sfxDs;
+
+        const int nValI = 5;
+        const int nValD = 24;
+        int valPclI[nValI]    = {signPcl, gen_pcl, c00, c01, c10};
+        double valPclD[nValD] = {msKvf, msKmvf, chisqKvf, chisqKmvf, chisqKvfNdf, chisqKmvfNdf,
+                                 clKvf, clKmvf, decay_vx_ds, decay_vy_ds, decay_vz_ds,
+                                 psr_ds, px_ds, py_ds, pz_ds, perp_ds,
+                                 phi_ds, theta_ds, pid00, pid01, pid10};
+        std::string pclTitI[nValI] = {"chg", "gen", "c00", "c01", "c10"};
+        std::string pclTitD[nValD] = {
+                                      "ms", "msm", "chi", "chim", "chn", "chmn",
+                                      "cl", "clm", "dvx", "dvy", "dvz",
+                                     "psr", "px", "py", "pz", "pt",
+                                     "ph", "th", "p00", "p01", "p10"};
+
+        VectorL dssL = getGenVectorL(getIdHep(P));
+
+
+        tt->column("hel_ch" + sfxDs, helicChild1);
+        addValues2Columns(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
+        addGenValues2Columns(tt, gen_pcl, dssL, genDgrSuff, debugDump);
+        dumpDsChild(tt, Child0, sfxDs, false, false, debugDump);
+        if (stDump) tt->dumpData();
+    }
+    // ***********************************************************
+    void dumpDs2317(BelleTuple* tt, Particle& P, std::string sfxDs = "", bool evtInfoDump = false, bool stDump = true, bool debugDump = false) {
+
+        if (evtInfoDump) addEventValues2Columns(tt, debugDump);
+
+        if (!&P.userInfo()) createUserInfo(P);
+        UserInfo& info = dynamic_cast<UserInfo&>(P.userInfo());
+
+
+        double chisqKvf      = info.chisqKvf();
+        double chisqKmvf     = info.chisqKmvf();
+        double chisqKvfNdf   = info.chisqKvfNdf();
+        double chisqKmvfNdf  = info.chisqKmvfNdf();
+        double msKvf         = info.msKvf();
+        double msKmvf        = info.msKmvf();
+        double clKvf         = info.clKvf();
+        double clKmvf        = info.clKmvf();
+        double helic_2317    = -1.;
+
+
+        Particle& Child           = P.child(0);
+        Particle& pi0_2317        = P.child(1);
+        UserInfo& infoChild           = dynamic_cast<UserInfo&>(Child.userInfo());
+        UserInfo& infoPi0_2317        = dynamic_cast<UserInfo&>(pi0_2317.userInfo());
+
+        double msKvfChild         = infoChild.msKvf();
+        double psr_d17            = pStar(P.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle()).vect().mag();
+        double px_d17             = P.px();
+        double py_d17             = P.py();
+        double pz_d17             = P.pz();
+        double p_d17              = P.momentum().p().mag();
+        double decay_vx_d17       = P.momentum().decayVertex().x();
+        double decay_vy_d17       = P.momentum().decayVertex().y();
+        double decay_vz_d17       = P.momentum().decayVertex().z();
+
+
+        Hep3Vector P3D            (px_d17, py_d17, pz_d17);
+        double perp_d17           = P3D.perp();
+        double phi_d17            = P3D.phi();
+        double theta_d17          = P3D.theta();
+        int chg_d17               = int(P.lund() >  0 ? 1 : -1);
+        int gen_d17               = int(getIdHep(P) == 0 ? 0 : 1);
+
+        const int nValI = 2;
+        const int nValD = 20;
+        int valPclI[nValI] = {chg_d17, gen_d17};
+        double valPclD[nValD] = {msKvf, msKmvf, chisqKvf, chisqKmvf, chisqKvfNdf, chisqKmvfNdf,
+                                 clKvf, clKmvf, decay_vx_d17, decay_vy_d17, decay_vz_d17, psr_d17,
+                                 px_d17, py_d17, pz_d17, p_d17, perp_d17, phi_d17, theta_d17, helic_2317};
+        std::string pclTitI[nValI] = {"chg", "gen"};
+        std::string pclTitD[nValD] = {"ms","msm","chi", "chim", "chn", "chmn",
+                                 "cl", "clm", "dvx", "dvy", "dvz", "psr",
+                                 "px", "py", "pz", "p", "pt", "ph", "th","hel"};
+
+        std::string dgrSuff = "_d17", genDgrSuff = "_d17_t";
+
+        VectorL ds17L = getGenVectorL(getIdHep(P));
+
+        addValues2Columns(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, dgrSuff, debugDump);
+        addGenValues2Columns(tt, gen_d17, ds17L, genDgrSuff, debugDump);
+        addPi0Values2Columns(tt, pi0_2317, "_p0_d", debugDump);
+        dumpDs(tt, Child, sfxDs, false, false, debugDump);
+
+        if (stDump) tt->dumpData();
+    }
+    // ***********************************************************
+    void dumpBs0(BelleTuple* tt, Particle& P, bool evtInfoDump = false,
+                     bool stDump = true, bool debugDump = true) {
+
+        if (evtInfoDump) addEventValues2Columns(tt, debugDump);
+
+        if (!&P.userInfo()) createUserInfo(P);
+        UserInfo &info = dynamic_cast<UserInfo &>(P.userInfo());
+
+        double chisqKvf = info.chisqKvf();
+        double chisqKmvf = info.chisqKmvf();
+        double chisqKvfNdf = info.chisqKvfNdf();
+        double chisqKmvfNdf = info.chisqKmvfNdf();
+        double msKvf = info.msKvf();
+        double msKmvf = info.msKmvf();
+        double clKvf = info.clKvf();
+        double clKmvf = info.clKmvf();
+
+        Particle &Dss_Bs0 = P.child(0);
+        Particle &Dss2317_Bs0 = P.child(1);
+        Particle &pi0_Bs0 = P.child(2);
+
+        double px_bs = P.px();
+        double py_bs = P.py();
+        double pz_bs = P.pz();
+        double p_bs = P.momentum().p().mag();
+
+        Hep3Vector P3D(px_bs, py_bs, pz_bs);
+
+        double perp_bs = P3D.perp();
+        double phi_bs = P3D.phi();
+        double theta_bs = P3D.theta();
+
+        double decay_vx = P.momentum().decayVertex().x();
+        double decay_vy = P.momentum().decayVertex().y();
+        double decay_vz = P.momentum().decayVertex().z();
+        int gen_bs = int(getIdHep(P) == 0 ? 0 : 1);
+        int chg_bs = int(P.lund() > 0 ? 1 : -1);
+
+
+        VectorL pB = pStar(P.p());
+        VectorL pB2 = pStar(P.p(), BeamEnergy::E_HER(), BeamEnergy::E_LER(), BeamEnergy::Cross_angle());
+        double de_bs_old = pB.e() - Benergy();
+        double de_bs = pB.e() - BeamEnergy::E_beam_corr();
+        double de2_bs = pB2.e() - BeamEnergy::E_beam_corr();
+        double mbc_bs_old = beamEnergyConstraint(P);
+        double mbc_bs = beamEnergyConstraint(P, BeamEnergy::E_HER(), BeamEnergy::E_LER(),
+                                             BeamEnergy::Cross_angle() * 1.e3);
+
+        const int nValI = 2;
+        const int nValD = 21;
+        int valPclI[nValI] = {chg_bs, gen_bs};
+        double valPclD[nValD] = {msKvf, msKmvf, chisqKvf, chisqKmvf, chisqKvfNdf, chisqKmvfNdf,
+                                 clKvf, clKmvf, decay_vx, decay_vy, decay_vz,
+                                 px_bs, py_bs, pz_bs, p_bs, perp_bs,
+                                 phi_bs, theta_bs, mbc_bs, de_bs, de2_bs};
+        std::string pclTitI[nValI] = {"chg", "gen"};
+        std::string pclTitD[nValD] = {"ms", "msm", "chi", "chim", "chn", "chmn",
+                                      "cl", "clm", "dvx", "dvy", "dvz",
+                                      "px", "py", "pz", "p", "pt",
+                                      "ph", "th", "mbc", "de", "de2"};
+
+        VectorL bs0L = getGenVectorL(getIdHep(P));
+        std::string genSfx = "_bs_t";
+
+        addValues2Columns(tt, nValI, nValD, valPclI, valPclD, pclTitI, pclTitD, "_bs", debugDump);
+        addGenValues2Columns(tt, gen_bs, bs0L, genSfx, debugDump);
+        addPi0Values2Columns(tt, pi0_Bs0, "_p0_b", debugDump);
+        dumpDs(tt, Dss_Bs0, "1", false, false, debugDump);
+        dumpDs2317(tt, Dss2317_Bs0, "2", false, false, debugDump);
+
+        if (stDump) tt->dumpData();
     }
 
-    combination(Bs0, Ptype(531), Dss_m, Dss_p_2317, pi0, dM_Bs0);
-    combination(Bs0, Ptype(531), Dss_p, Dss_m_2317, pi0, dM_Bs0);
-    // combination(Bs0bar, Ptype(-531), Dss_m, Dss_p_2317, pi0, dM_Bs0);
-    // combination(Bs0bar, Ptype(-531), Dss_p, Dss_m_2317, pi0, dM_Bs0);
-    setGenHepInfoT(Bs0);
-    setGenHepInfoT(Bs0bar);
-    
-    /* if(useVTX) {
-     *     makeRecursiveVertexFit(Bs0, debugVtx);
-     *     makeRecursiveVertexFit(Bs0bar, debugVtx);
-     * }
-    */
-
-    /* combination(BsStar0, Ptype(533), Bs0, gammaV, dM_Bs0);
-     * combination(BsStar0bar, Ptype(-533), Bs0bar, gammaV, dM_Bs0);
-     * setGenHepInfoT(BsStar0);
-     * setGenHepInfoT(BsStar0bar);
-     * combination(Upsilon_5S, Ptype(9000553),  BsStar0, BsStar0bar, dM_Bs0);
-     */
-    
-    // ----------------------------  Dumping  ---------------------------
-    // Ds
     /*
-    std::string sfxDs = "";
-    if (stDumpDss) {
-        for (int iEvt = 0; iEvt < Dss_p.size(); ++iEvt)
-            dumpDs(TP_Dss, Dss_p[iEvt], sfxDs, true, stDumpDss, debugDumpDss);
-        for (int iEvt = 0; iEvt < Dss_m.size(); ++iEvt)
-            dumpDs(TP_Dss, Dss_m[iEvt], sfxDs, true, stDumpDss, debugDumpDss);
-    }    
-    // Ds(2317)
-    if (stDump2317) {
-        for (int iEvt = 0; iEvt < Dss_p_2317.size(); ++iEvt)
-            dumpDs2317(TP_Dss_2317, Dss_p_2317[iEvt], sfxDs, true, stDump2317, debugDump2317);
-        for (int iEvt = 0; iEvt < Dss_m_2317.size(); ++iEvt)
-            dumpDs2317(TP_Dss_2317, Dss_m_2317[iEvt], sfxDs, true, stDump2317, debugDump2317);
-    }
+     * The main function. Events processing takes place here
     */
+    void Reco::event(BelleEvent* evptr, int* status) {
+        *status = 0;
+        bool debugTrkPID   = false,
+             debugVtx      = false,
+             debugPi0      = false,
+             debugPhiKsr   = false,
+             debugDss      = false,
+             debugDss_2317 = false,
+             debugBs0      = false,
+             debugDumpDss  = false,
+             debugDump2317 = false,
+             debugDumpBs0  = false;
 
-    // Bs0
-    if (stDumpBs0) {
-        for (int iEvt = 0; iEvt < Bs0.size(); ++iEvt)
-            dumpBs0(TP_Bs0, Bs0[iEvt], true, stDumpBs0, debugDumpBs0);
-        for (int iEvt = 0; iEvt < Bs0bar.size(); ++iEvt)
-            dumpBs0(TP_Bs0, Bs0bar[iEvt], true, stDumpBs0, debugDumpBs0);
+        // IP information
+        const HepPoint3D& ip_position = IpProfile::position(1);
+        const HepSymMatrix& ip_error  = IpProfile::position_err(1);
+
+        // Event Information
+        int expNo = 0, runNo = 0, evtNo = 0;
+        getEventInfo(expNo, runNo, evtNo, McFlag); // utility.cc
+        std::cout << "\tExpNo: " << expNo << "\tRunNo: " << runNo << "\tEventNo: " << evtNo << "\tMcFlag: " << McFlag << std::endl;
+
+        if (evtNo == 470) {
+            std::cout << "--1" << std::endl;
+        }
+
+        // Event Shape
+        double r2 = -1.;
+
+        Evtcls_hadron_info_Manager& clsMgr = Evtcls_hadron_info_Manager::get_manager();
+        if (clsMgr.count()) r2 = clsMgr[0].R2();
+
+        // //////////////////  make charged particles - tracks //////////////////
+        // makes Kaon and Pion from MdstCharged w/o cut. 1 : w/ good_charged, 0 : w/ol
+        // ////////////////// ORDER: k_p, k_m, pi_p, pi_m ///////////////////////
+        makeKPi(trkV[2], // k_p
+                trkV[3], // k_m
+                trkV[0], // pi_p
+                trkV[1], // pi_m
+                1);
+
+
+        // If each plist element is not within atc_pID.prob >= prob,
+        // its element is removed from plist.
+        // ----------------- pos kaons ---- default values - kaons - pions
+        withKaonId(trkV[2], minProbPID_Kp,  3,    1,     5,  3,      2);      // K+ vs bg pi
+
+        // ----------------- neg kaons ---- default values - kaons - pions
+        withKaonId(trkV[3], minProbPID_Kn,  3,    1,     5,  3,      2);      // K- vs bg pi
+
+
+        // If each plist element is not within atc_pID.prob < prob,
+        // its element is removed from plist.
+        // ----------------- pos pions ---- default values - kaons - pions
+        withPionId(trkV[0], maxProbPion,    3,    1,     5,  2,      3);        // pi+ vs bg K
+        // ----------------- neg pions ---- default values - kaons - pions
+        withPionId(trkV[1], maxProbPion,    3,    1,     5,  2,      3);        // pi- vs bg K
+
+
+        // If each plist element is not associated with rphi & z-svd hits
+        // whose number is equal to or larger than nRSvdHit and nZSvdHit,
+        // its element is removed from plist.
+        for (int itr = 0; itr < nTrk; ++itr) {
+            withSVD2(trkV[itr], 1, 1); // nRSvdHit, nZSvdHit
+            withdRdZcut(trkV[itr], ip_position, dRcut, dZcut);
+        }
+
+
+        // ================= WORKING WITH Gamma CANDIDATES ================= //
+        makeGamma(gammaV);
+        withPCut(gammaV, eGammaMin);
+
+        if(useVTX) {
+            for (std::vector<Particle>::iterator itr = gammaV.begin(); itr != gammaV.end(); ++itr) {
+                setGammaError(*itr, ip_position, ip_error); // changed from setGammasError
+            }
+        }
+
+        // Match gamma candidates with their gen-hep info
+        if (McFlag) {
+            setGenHepInfoG(gammaV);
+        }
+
+        if (evtNo == 470) {
+            std::cout << "--2" << std::endl;
+        }
+        createUserInfo(gammaV);
+
+
+        // =================   WORKING WITH Pi0 CANDIDATES ================= //
+        makePi0(pi0);
+        // Checking gammas' energies for all the pi0 daughters
+        withPi0GammPCut(pi0, minPi0GammP);
+        // !!!! PAY ATTENTION. Start point
+
+        // Creating UserInfo objects in memory storage for the selected pi0's
+        createUserInfo(pi0);
+        if (evtNo == 470) {
+            std::cout << "--3" << std::endl;
+        }
+
+        // Setting error matrices for both pi0 daughters gamma
+        // it's necessary for vertex fitting
+        for (std::vector<Particle>::iterator itr = pi0.begin(); itr != pi0.end(); ++itr) {
+            setGammasError(*itr, ip_position, ip_error);
+        }
+
+        // Making a simple Kvf fit
+        makeRecursiveVertexFit(pi0, false, false);
+
+        // Selecting pi0 candidates considering their reconstructed masses (mass of 2 gammas)
+        withPi0MassGamGamCut(pi0, wMassPi0GG);
+
+        // Making a mass-constraint fit for a pi0 candidate, which passed through all cuts (including gammas)
+        makeRecursiveVertexFit(pi0, false, true);
+
+
+        // Match candidates with gen-hep info
+        if (McFlag) {
+            for (int itr = 0; itr < nTrk; ++itr) setGenHepInfoF(trkV[itr]);
+            setGenHepInfoP(pi0);
+        }
+        if (evtNo == 470) {
+            std::cout << "--4" << std::endl;
+        }
+        combination(phi0,      Ptype("PHI"),  trkV[2],   trkV[3], dM_V0);   // k_p, k_m
+        combination(Ksr0,      Ptype("K*0"),  trkV[2],   trkV[1], dM_Ksr0); // k_p, pi_m
+        combination(Ksr0bar,   Ptype("K*B"),  trkV[3],   trkV[0], dM_Ksr0); // k_m, pi_p
+        setGenHepInfoT(phi0);
+        setGenHepInfoT(Ksr0);
+        setGenHepInfoT(Ksr0bar);
+
+        combination(Dss_p, Ptype("DS+"),    phi0,     trkV[0], dM_Dss); // phi0, pi_p
+        combination(Dss_m, Ptype("DS-"),    phi0,     trkV[1], dM_Dss); // phi0, pi_m
+        combination(Dss_p, Ptype("DS+"),    Ksr0bar,  trkV[2], dM_Dss); // K*0bar (K-pi+), k_p
+        combination(Dss_m, Ptype("DS-"),    Ksr0,     trkV[3], dM_Dss); // K*0 (K+pi-), k_m
+        setGenHepInfoT(Dss_p);
+        setGenHepInfoT(Dss_m);
+
+        combination(Dss_m_2317, Ptype(-10431), Dss_m, pi0, dM_2317);
+        combination(Dss_p_2317, Ptype( 10431), Dss_p, pi0, dM_2317);
+        setGenHepInfoT(Dss_m_2317);
+        setGenHepInfoT(Dss_p_2317);
+
+        combination(Bs0, Ptype(531), Dss_m, Dss_p_2317, pi0, dM_Bs0);
+        combination(Bs0, Ptype(531), Dss_p, Dss_m_2317, pi0, dM_Bs0);
+        setGenHepInfoT(Bs0);
+        combination(Bs0bar, Ptype(-531), Dss_m, Dss_p_2317, pi0, dM_Bs0);
+        combination(Bs0bar, Ptype(-531), Dss_p, Dss_m_2317, pi0, dM_Bs0);
+        setGenHepInfoT(Bs0bar);
+
+        /* combination(BsStar0, Ptype(533), Bs0, gammaV, dM_Bs0);
+         * combination(BsStar0bar, Ptype(-533), Bs0bar, gammaV, dM_Bs0);
+         * setGenHepInfoT(BsStar0);
+         * setGenHepInfoT(BsStar0bar);
+         * combination(Upsilon_5S, Ptype(9000553),  BsStar0, BsStar0bar, dM_Bs0);
+         */
+
+        // ----------------------------  Dumping  ---------------------------
+        // Ds
+        /*
+        std::string sfxDs = "";
+        if (stDumpDss) {
+            for (int iEvt = 0; iEvt < Dss_p.size(); ++iEvt)
+                dumpDs(TP_Dss, Dss_p[iEvt], sfxDs, true, stDumpDss, debugDumpDss);
+            for (int iEvt = 0; iEvt < Dss_m.size(); ++iEvt)
+                dumpDs(TP_Dss, Dss_m[iEvt], sfxDs, true, stDumpDss, debugDumpDss);
+        }
+        // Ds(2317)
+        if (stDump2317) {
+            for (int iEvt = 0; iEvt < Dss_p_2317.size(); ++iEvt)
+                dumpDs2317(TP_Dss_2317, Dss_p_2317[iEvt], sfxDs, true, stDump2317, debugDump2317);
+            for (int iEvt = 0; iEvt < Dss_m_2317.size(); ++iEvt)
+                dumpDs2317(TP_Dss_2317, Dss_m_2317[iEvt], sfxDs, true, stDump2317, debugDump2317);
+        }
+        */
+        if (evtNo == 470) {
+            std::cout << "--5" << std::endl;
+        }
+        // Bs0
+        if (stDumpBs0) {
+            for (int iEvt = 0; iEvt < Bs0.size(); ++iEvt) {
+                if (evtNo == 470) {
+                    std::cout << "--6" << std::endl;
+                }
+                makeRecursiveVertexFit(Bs0[iEvt]);
+                if (evtNo == 470) {
+                    std::cout << "--7" << std::endl;
+                }
+                dumpBs0(TP_Bs0, Bs0[iEvt], true, stDumpBs0, debugDumpBs0);
+                }
+
+            for (int iEvt = 0; iEvt < Bs0bar.size(); ++iEvt) {
+                makeRecursiveVertexFit(Bs0bar[iEvt]);
+                dumpBs0(TP_Bs0, Bs0bar[iEvt], true, stDumpBs0, debugDumpBs0);
+                }
+
+    //        for (int iEvt = 0; iEvt < Bs0bar.size(); ++iEvt)
+    //            dumpBs0(TP_Bs0, Bs0bar[iEvt], true, stDumpBs0, debugDumpBs0);
+                }
+        std::cout << "---------  clearVectors (final) ----------" << std::endl;
+        clearVectors();
+        if (evtNo == 470) {
+            std::cout << "--8" << std::endl;
+        }
+        std::cout << "------------------  Reco end ---------------------" << std::endl;
+        *status = 1;
+
     }
-    printf("---------  clearVectors (final) --------- \n");
-    clearVectors();
-    printf("------------------  Reco end -------------------- \n");
-    *status = 1;
 
-}
-
-#if defined(BELLE_NAMESPACE)
 } // namespace Belle
-#endif
 
