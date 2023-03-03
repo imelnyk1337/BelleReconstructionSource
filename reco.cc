@@ -411,16 +411,15 @@ void createUserInfo(Particle& particle) {
     particle.userInfo(*(new UserInfo(particle)));
     UserInfo& info = dynamic_cast<UserInfo&>(particle.userInfo());
     int lund = (int)particle.lund();
-    double cTau = Ptype(lund).cTau();
     bool useTube = false;
+    bool useKmvf = false;
     double wMass = dM_Dgr;
 
     // !!! used for this reconstruction
-    if ((abs(lund) > 500) && (abs(lund) < 600)) {                         // B0, Bc, Bs
+    if ((abs(lund) > 500) && (abs(lund) < 600)) {                     // B0, Bc, Bs
         useTube = true;
-        wMass = wB;
+        wMass = dM_Bs0;
     }
-    // !!! used for this reconstruction (only Phi0)
     else if ((lund == 310) || (abs(lund) == 3122) || (lund == 333)) { // K0s, Lam0, Phi0
         wMass = dM_V0;
     }
@@ -428,34 +427,27 @@ void createUserInfo(Particle& particle) {
     else if (abs(lund)  == 313) {                                          // K*0
         wMass = dM_Ksr0;
     }
-    else if ((abs(lund) == 113) || (abs(lund) == 213)) {                // RHO0,+.-
-        wMass = dM_Rho;
-    }
-    // !!! used for this reconstruction
-    else if ((abs(lund) == 413) || (abs(lund) == 423)) {                // D*+, D*0feve
-        useTube = true; 
-        wMass = wDst;
-    }
     else if (abs(lund)  == 431) {                                          // DS+
         wMass = dM_Dss;
+        useKmvf = true;
     }
-    else if (abs(lund)  == 433) {                                          // D*S+
-        useTube = true;
-        wMass = dM_Dsst;
-    }
+
     else if (abs(lund)  == 10431) {                                        // D**S+(D_sJ(2317))
         useTube = true;
         wMass = dM_2317;
     }
-    else if (abs(lund)  == 443) {                                          // J/psi
-        useTube = true; 
+    else if (abs(lund) == 111) {                                           // pi0
+        useTube = false;
+        wMass = wMassPi0GG;
+        useKmvf = true;
     }
+
     
     info.msComb(particle.p().m());
     info.maxChi2(-1.);
     info.wMass(wMass);
     info.useTube(useTube);
-    info.useKmvf(cTau > 1.e-5);
+    info.useKmvf(useKmvf);
     info.isAdoptCut(true);
     info.chisqKvf(-1.);
     info.chisqKmvf(-1.);
@@ -569,12 +561,12 @@ void makeRecursiveVertexFit(Particle& Mother, bool debugDump = false, bool useKm
     }
                 
     // Checking for long-living particles as a criteria of mass-constraint fit
-    double cTauMother = Ptype(lundMother).cTau();
-    if (cTauMother > 1.e-5) useKmvf =  true;
+//    double cTauMother = Ptype(lundMother).cTau();
+//    if (cTauMother > 1.e-5) useKmvf =  true;
     // making it unenabled for Ds2317. PDG id: 10431 of abs. units
-    if (abs(lundMother) == 10431) useKmvf = false;
+//    if (abs(lundMother) == 10431) useKmvf = false;
 
-    infoMother.useKmvf(useKmvf);
+//    infoMother.useKmvf(useKmvf);
         
     if (infoMother.useKmvf()) {
         // use additional mass-vertex fitter to correct position (?) and LV
@@ -886,6 +878,15 @@ VectorL getGenVectorL(int idhPcl) {
 // ***********************************************************
 void dumpPi0(BelleTuple* tt, Particle& p0, const std::string& sfx, bool debugDump) {
 
+    if (!&p0.userInfo()) createUserInfo(p0);
+    UserInfo& p0_info = dynamic_cast<UserInfo&>(p0.userInfo());
+    double chisqKvf     = p0_info.chisqKvf(),
+           chisqKmvf    = p0_info.chisqKmvf(),
+           chisqKvfNdf  = p0_info.chisqKvfNdf(),
+           chisqKmvfNdf = p0_info.chisqKmvfNdf(),
+           clKvf        = p0_info.clKvf(),
+           clKmvf       = p0_info.clKmvf();
+
     Particle& g1 = p0.child(0);
     Particle& g2 = p0.child(1);
 
@@ -898,12 +899,13 @@ void dumpPi0(BelleTuple* tt, Particle& p0, const std::string& sfx, bool debugDum
     bool gen_g2  = IDhep(g2) == 0 ? false : true;
 
     const int nValI = 3;
-    const int nValD = 4;
+    const int nValD = 10;
 
     std::string pclTitI[nValI] = {"gen", "gg1", "gg2"};
     int valPclI[nValI]    = {gen_pi0, gen_g1, gen_g2};
-    std::string pclTitD[nValD] = {"eg1", "eg2", "psr", "mgg"};
-    double valPclD[nValD] = {g1.ptot(), g2.ptot(), psrPi0, msPi0_gg};
+    std::string pclTitD[nValD] = {"eg1", "eg2", "psr", "mgg", "chi", "chm", "chn", "cmn", "cl", "clm"};
+    double valPclD[nValD] = {g1.ptot(), g2.ptot(), psrPi0, msPi0_gg, chisqKvf, chisqKmvf,
+                             chisqKvfNdf, chisqKmvfNdf, clKvf, clKmvf};
 
     if (debugDump) {
         printf("  ==== dumpValues ==== pi0 (%s): ", sfx.c_str());
